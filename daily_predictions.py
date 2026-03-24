@@ -4,6 +4,7 @@ from features.predictions.modeling import train_model, evaluate_model
 from kickbase_api.league import get_league_id
 from kickbase_api.user import login
 from features.notifier import send_mail
+import google.generativeai as genai
 from features.predictions.data_handler import (
     create_player_data_table,
     check_if_data_reload_needed,
@@ -58,7 +59,7 @@ competition_ids = [1]                   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 =
 league_name = "Spitz"  # Name of your league, must be exact match, can be done via env or hardcoded
 start_budget = 50_000_000               # Starting budget of your league, used to calculate current budgets of other managers
 league_start_date = "2025-12-22"        # Start date of your league, used to filter activities, format: YYYY-MM-DD
-email = os.getenv("martens.lucamalco@gmx.de")         # Email to send recommendations to, can be the same as EMAIL_USER or different
+email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can be the same as EMAIL_USER or different
 
 # ---------------------------------------------------
 
@@ -106,5 +107,50 @@ squad_recommendations_df = join_current_squad(token, league_id, live_predictions
 print("\n=== Squad Recommendations ===")
 display(squad_recommendations_df)
 
-# Send email with recommendations
+# --- KI-LOGIK START ---
+print("\nKI-Analyse wird gestartet...")
+
+# KI konfigurieren
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel('gemini-1.5-flash') # Schnell und gut für Text
+
+# Daten für die KI aufbereiten (Tabellen in Text umwandeln)
+budget_text = manager_budgets_df.to_string()
+market_text = market_recommendations_df.to_string()
+squad_text = squad_recommendations_df.to_string()
+
+prompt = f"""
+Du bist ein Profi-Kickbase-Berater. Analysiere meine Daten und gib mir eine klare To-Do-Liste.
+Mein Name in der Liste ist 'Luca Malco'.
+
+1. BUDGET-CHECK: Wer hat wie viel Geld? Wer ist die größte Gefahr auf dem Transfermarkt?
+2. KAUFEN: Welche Spieler vom Markt (Market Recommendations) soll ich UNBEDINGT kaufen? (Berücksichtige Marktwert-Steigerung UND mein Budget).
+3. VERKAUFEN: Welche Spieler aus meinem Kader (Squad Recommendations) soll ich sofort verkaufen, weil sie fallen oder keinen Sinn machen?
+4. GEHEIMTIPP: Basierend auf deinem Wissen (News/Ligainsider), gibt es Warnungen für die empfohlenen Spieler (Verletzungen etc.)?
+
+Hier sind die Daten:
+BUDGETS:
+{budget_text}
+
+MARKT (VORSCHLÄGE):
+{market_text}
+
+MEIN KADER:
+{squad_text}
+"""
+
+try:
+    response = model.generate_content(prompt)
+    ai_advice = response.text
+    print("\n=== KI EMPFEHLUNG ===\n")
+    print(ai_advice)
+except Exception as e:
+    ai_advice = "KI-Analyse fehlgeschlagen: " + str(e)
+    print(ai_advice)
+
+# --- KI-LOGIK ENDE ---
+
+# Send email (Hier kannst du entscheiden, ob du die KI-Antwort mitschicken willst)
+# Hinweis: Du müsstest die send_mail Funktion in features/notifier.py 
+# eventuell anpassen, damit sie den Text 'ai_advice' auch verarbeitet.
 send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email)
