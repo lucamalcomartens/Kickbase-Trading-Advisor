@@ -5,7 +5,7 @@ import smtplib
 import os
 
 # Füge 'ai_advice' oben in die Klammer ein (mit =None als Sicherheit)
-def send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice=None):
+def send_mail(budget_df, market_df, squad_df, email, ai_advice=None):
     
     # Hier wird normalerweise der E-Mail-Inhalt (Body) erstellt.
     # Wir fügen die KI-Analyse ganz oben in die Mail ein:
