@@ -110,31 +110,34 @@ display(squad_recommendations_df)
 # --- KI-LOGIK START ---
 print("\nKI-Analyse wird gestartet...")
 
-# KI konfigurieren
+# KI konfigurieren - Mit Google Search für aktuelle News/Verletzungen
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-2.5-flash') # Schnell und gut für Text
+model = genai.GenerativeModel(
+    model_name='gemini-2.5-flash',
+    tools=[{'google_search': {}}] 
+)
 
-# Daten für die KI aufbereiten (Tabellen in Text umwandeln)
 # Daten für die KI aufbereiten
 budget_text = manager_budgets_df.to_string()
 market_text = market_recommendations_df.to_string()
 squad_text = squad_recommendations_df.to_string()
 
-# DER RADIKALE PROFI-PROMPT (Nur Befehle & News)
+# DER RADIKALE PROFI-PROMPT
 prompt = f"""
-Du bist ein Kickbase-Profi-Analyst. Luca will nicht nachdenken, er will gewinnen. 
-Analysiere die Daten und gib knallharte Anweisungen.
+Du bist ein Kickbase-Profi-Analyst für Luca Malco. Luca will nicht nachdenken, er will gewinnen. 
+Analysiere die Daten und gib knallharte Anweisungen. Handle wie ein erfahrener Manager.
 
-STRUKTUR DER ANTWORT:
+STRUKTUR DER ANTWORT (Halte dich exakt daran!):
 
-1. 🎯 DIREKTE BEFEHLE (Kurz & Knapp)
-- SOFORT KAUFEN: [Name] (Max-Gebot: X€)
-- SOFORT VERKAUFEN: [Name] (Grund: Sinkt/Form/Verletzt)
-- HALTEN: [Name]
+1. 🎯 DEINE BEFEHLE (Kurz & Knapp - Priorität!)
+- SOFORT KAUFEN: [Name] (Max-Gebot: X€ - basierend auf dem Cash der Gegner)
+- SOFORT VERKAUFEN: [Name] (Grund: Marktwert-Verlust, Form oder Verletzung)
+- HALTEN: [Name] (Nur wenn S11 sicher und MV stabil)
 
-2. 🧠 WARUM DIESE ENTSCHEIDUNG? (Details für später)
-- Berücksichtige für jeden Spieler: Aktuelle Form, Marktwert-Trend und den nächsten Spieltag (Gegner-Stärke).
-- Suche nach News (Verletzungen, S11-Prognosen von Ligainsider) und warne Luca, falls ein "Kauf" laut News doch auf der Bank sitzt.
+2. 🧠 HINTERGRUND-CHECK (Details & News)
+- Prüfe aktuelle News (Verletzungen, Sperren, S11-Prognosen von Ligainsider).
+- Berücksichtige den nächsten Spieltag: Wer hat ein leichtes/schweres Spiel?
+- Warne Luca explizit, falls ein Marktwert-Gewinner laut News am Wochenende nicht spielt!
 
 DATEN:
 BUDGETS: {budget_text}
@@ -143,36 +146,16 @@ KADER: {squad_text}
 """
 
 try:
-    # Falls dein API-Key die Suche unterstützt, aktiviere tools=[{'google_search': {}}]
+    # Generierung der Antwort
     response = model.generate_content(prompt)
     ai_advice = response.text
     print("\n=== KI-ANWEISUNGEN GENERIERT ===")
-except Exception as e:
-    ai_advice = f"KI-Analyse fehlgeschlagen: {e}"
-Hier sind die Daten:
-BUDGETS:
-{budget_text}
-
-MARKT (VORSCHLÄGE):
-{market_text}
-
-MEIN KADER:
-{squad_text}
-"""
-
-try:
-    response = model.generate_content(prompt)
-    ai_advice = response.text
-    print("\n=== KI EMPFEHLUNG ===\n")
     print(ai_advice)
 except Exception as e:
-    ai_advice = "KI-Analyse fehlgeschlagen: " + str(e)
+    ai_advice = f"KI-Analyse fehlgeschlagen: {str(e)}"
     print(ai_advice)
 
 # --- KI-LOGIK ENDE ---
 
-# Send email (Hier kannst du entscheiden, ob du die KI-Antwort mitschicken willst)
-# Hinweis: Du müsstest die send_mail Funktion in features/notifier.py 
-# eventuell anpassen, damit sie den Text 'ai_advice' auch verarbeitet.
-# Wir hängen ai_advice als neuen Parameter hinten dran
+# E-Mail mit KI-Analyse versenden
 send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice)
