@@ -153,4 +153,5 @@ except Exception as e:
 # Send email (Hier kannst du entscheiden, ob du die KI-Antwort mitschicken willst)
 # Hinweis: Du müsstest die send_mail Funktion in features/notifier.py 
 # eventuell anpassen, damit sie den Text 'ai_advice' auch verarbeitet.
-send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email)
+# Wir hängen ai_advice als neuen Parameter hinten dran
+send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice)
