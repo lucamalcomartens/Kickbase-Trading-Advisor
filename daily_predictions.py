@@ -126,6 +126,8 @@ prompt = f"""
 Du bist ein Kickbase-Profi-Analyst für Luca Malco. Luca will nicht nachdenken, er will gewinnen. 
 Analysiere die Daten und gib knallharte Anweisungen. Handle wie ein erfahrener Manager.
 
+Beachte außerdem dass ein Kader nur maximal 17 Spieler haben darf und maximal 3 vom selben Team
+
 STRUKTUR DER ANTWORT (Halte dich exakt daran!):
 
 1. 🎯 DEINE BEFEHLE (Kurz & Knapp - Priorität!)
@@ -137,6 +139,8 @@ STRUKTUR DER ANTWORT (Halte dich exakt daran!):
 - Prüfe aktuelle News (Verletzungen, Sperren, S11-Prognosen von Ligainsider).
 - Berücksichtige den nächsten Spieltag: Wer hat ein leichtes/schweres Spiel?
 - Warne Luca explizit, falls ein Marktwert-Gewinner laut News am Wochenende nicht spielt!
+
+
 
 DATEN:
 BUDGETS: {budget_text}
