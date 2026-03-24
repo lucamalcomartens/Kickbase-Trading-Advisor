@@ -115,19 +115,40 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-2.5-flash') # Schnell und gut für Text
 
 # Daten für die KI aufbereiten (Tabellen in Text umwandeln)
+# Daten für die KI aufbereiten
 budget_text = manager_budgets_df.to_string()
 market_text = market_recommendations_df.to_string()
 squad_text = squad_recommendations_df.to_string()
 
+# DER RADIKALE PROFI-PROMPT (Nur Befehle & News)
 prompt = f"""
-Du bist ein Profi-Kickbase-Berater. Analysiere meine Daten und gib mir eine klare To-Do-Liste.
-Mein Name in der Liste ist 'Luca Malco'.
+Du bist ein Kickbase-Profi-Analyst. Luca will nicht nachdenken, er will gewinnen. 
+Analysiere die Daten und gib knallharte Anweisungen.
 
-1. BUDGET-CHECK: Wer hat wie viel Geld? Wer ist die größte Gefahr auf dem Transfermarkt?
-2. KAUFEN: Welche Spieler vom Markt (Market Recommendations) soll ich UNBEDINGT kaufen? (Berücksichtige Marktwert-Steigerung UND mein Budget).
-3. VERKAUFEN: Welche Spieler aus meinem Kader (Squad Recommendations) soll ich sofort verkaufen, weil sie fallen oder keinen Sinn machen?
-4. GEHEIMTIPP: Basierend auf deinem Wissen (News/Ligainsider), gibt es Warnungen für die empfohlenen Spieler (Verletzungen etc.)?
+STRUKTUR DER ANTWORT:
 
+1. 🎯 DIREKTE BEFEHLE (Kurz & Knapp)
+- SOFORT KAUFEN: [Name] (Max-Gebot: X€)
+- SOFORT VERKAUFEN: [Name] (Grund: Sinkt/Form/Verletzt)
+- HALTEN: [Name]
+
+2. 🧠 WARUM DIESE ENTSCHEIDUNG? (Details für später)
+- Berücksichtige für jeden Spieler: Aktuelle Form, Marktwert-Trend und den nächsten Spieltag (Gegner-Stärke).
+- Suche nach News (Verletzungen, S11-Prognosen von Ligainsider) und warne Luca, falls ein "Kauf" laut News doch auf der Bank sitzt.
+
+DATEN:
+BUDGETS: {budget_text}
+MARKT: {market_text}
+KADER: {squad_text}
+"""
+
+try:
+    # Falls dein API-Key die Suche unterstützt, aktiviere tools=[{'google_search': {}}]
+    response = model.generate_content(prompt)
+    ai_advice = response.text
+    print("\n=== KI-ANWEISUNGEN GENERIERT ===")
+except Exception as e:
+    ai_advice = f"KI-Analyse fehlgeschlagen: {e}"
 Hier sind die Daten:
 BUDGETS:
 {budget_text}
