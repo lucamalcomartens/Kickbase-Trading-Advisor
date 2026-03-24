@@ -112,7 +112,7 @@ print("\nKI-Analyse wird gestartet...")
 
 # KI konfigurieren
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash') # Schnell und gut für Text
+model = genai.GenerativeModel('gemini-2.5-pro') # Schnell und gut für Text
 
 # Daten für die KI aufbereiten (Tabellen in Text umwandeln)
 budget_text = manager_budgets_df.to_string()
