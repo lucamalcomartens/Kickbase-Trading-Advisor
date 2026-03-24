@@ -4,20 +4,8 @@ from zoneinfo import ZoneInfo
 import smtplib
 import os
 
-# Füge 'ai_advice' oben in die Klammer ein (mit =None als Sicherheit)
 def send_mail(budget_df, market_df, squad_df, email, ai_advice=None):
-    
-    # Hier wird normalerweise der E-Mail-Inhalt (Body) erstellt.
-    # Wir fügen die KI-Analyse ganz oben in die Mail ein:
-    
-    mail_body = "<h1>Deine tägliche Kickbase-Analyse</h1>"
-    
-    if ai_advice:
-        # Die KI-Antwort wird schön formatiert oben drüber gesetzt
-        mail_body += f"<h2>KI-Empfehlung:</h2><p style='white-space: pre-wrap;'>{ai_advice}</p><hr>"
-    
-    # ... restlicher Code für die Tabellen ...
-    """Sends an email with the provided DataFrames as HTML tables."""
+    """Sends an email with the provided DataFrames as HTML tables and AI advice."""
 
     if not email:
         print("\nNo email provided, skipping email sending.")
@@ -26,18 +14,18 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None):
     EMAIL_ADDRESS = os.getenv("EMAIL_USER")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
 
-    # If it's 22:00 or later, show tomorrow's date; else today
+    # Zeitberechnung für den Betreff
     now = datetime.now(ZoneInfo("Europe/Berlin"))
     date_to_show = now + timedelta(days=1) if now.hour >= 22 else now
     today = date_to_show.strftime("%d-%m-%Y")
 
-    # Metadata for the email
+    # Metadata
     msg = EmailMessage()
-    msg["Subject"] = f"Kickbase: {today}"
+    msg["Subject"] = f"Kickbase Analyse: {today}"
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = email
 
-    # Styling function for DataFrames
+    # Styling Funktion für die Tabellen
     def style_df(df):
         return df.to_html(index=False, border=0, classes="dataframe", escape=False).replace(
             "<table",
@@ -53,50 +41,56 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None):
             '<tr style="background-color:#fefefe;">'
         )
 
-    # Set email content
-    msg.set_content("Sorry, results only via html visible.", subtype="plain")
+    # Vorbereitung der KI-Sektion (Nur wenn ai_advice vorhanden ist)
+    ai_section = ""
+    if ai_advice:
+        ai_section = f"""
+        <div style="background-color: #e8f4f8; border-left: 5px solid #2980b9; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
+            <h3 style="color: #2980b9; margin-top: 0;">🤖 Dein KI-Berater empfiehlt:</h3>
+            <p style="white-space: pre-wrap; font-size: 15px; color: #2c3e50; line-height: 1.6; font-style: italic;">
+                {ai_advice}
+            </p>
+        </div>
+        """
+
+    # E-Mail Inhalt zusammenbauen
+    msg.set_content("Ergebnisse sind nur in der HTML-Ansicht sichtbar.", subtype="plain")
     msg.add_alternative(f"""\
     <html>
     <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px;">
         <div style="max-width: 1000px; margin: auto; background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow-x: auto;">
-        
-        <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
-        
-        <p style="font-size: 14px; color: #333;">Greetings!</p>
+            
+            <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report für {today}</h2>
+            
+            {ai_section}
 
-        <h3 style="color: #2c3e50; margin-top: 30px;">Manager Budgets</h3>
-        <p style="font-size: 14px; color: #333;">Here are the current budgets of all managers in your league:</p>
-        {style_df(budget_df)}
+            <h3 style="color: #2c3e50; margin-top: 30px;">Manager Budgets</h3>
+            <p style="font-size: 14px; color: #333;">Geschätzte Budgets deiner Konkurrenten:</p>
+            {style_df(budget_df)}
 
-        <h3 style="color: #2c3e50; margin-top: 30px;">Current Market Predictions</h3>
-        <p style="font-size: 14px; color: #333;">The following table shows all available players with a substantial positive predicted market value for the next day:</p>
+            <h3 style="color: #2c3e50; margin-top: 30px;">Transfermarkt Empfehlungen</h3>
+            <p style="font-size: 14px; color: #333;">Diese Spieler auf dem Markt steigen voraussichtlich im Wert:</p>
+            {style_df(market_df)}
 
-        {style_df(market_df)}
+            <h3 style="color: #2c3e50; margin-top: 30px;">Dein Kader</h3>
+            <p style="font-size: 14px; color: #333;">Status und Prognose für deine aktuellen Spieler:</p>
+            {style_df(squad_df)}
 
-        <h3 style="color: #2c3e50; margin-top: 30px;">Your Squad Predictions</h3>
-        <p style="font-size: 14px; color: #333;">Here are the predicted market values for all players currently in your squad:</p>
-
-        {style_df(squad_df)}
-
-        <p style="margin-top: 20px; font-size: 14px;">Best regards, <br><b>Your KickAdvisor Bot</b></p>
-        
-        <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-        <p style="font-size: 11px; color: gray; text-align: center;">
-            This email was generated by the 
-            <a href="https://github.com/LennardFe/Kickbase-Trading-Advisor" 
-            style="color: #888; text-decoration: none; font-weight: bold;">
-            Kickbase Trading Advisor
-            </a>
-        </p>
+            <p style="margin-top: 30px; font-size: 14px;">Viel Erfolg beim Traden! <br><b>Dein KickAdvisor Bot</b></p>
+            
+            <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+            <p style="font-size: 11px; color: gray; text-align: center;">
+                Generiert mit dem <a href="https://github.com/LennardFe/Kickbase-Trading-Advisor" style="color: #888; text-decoration: none; font-weight: bold;">Kickbase Trading Advisor</a>
+            </p>
         </div>
     </body>
     </html>
     """, subtype="html")
 
-    # Send email via Gmail SMTP
+    # Versand
     with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
         smtp.starttls()
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         smtp.send_message(msg)
         
-    print("\nEmail sent successfully!")
+    print("\nEmail erfolgreich mit KI-Analyse versendet!")
