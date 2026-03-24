@@ -107,15 +107,9 @@ squad_recommendations_df = join_current_squad(token, league_id, live_predictions
 print("\n=== Squad Recommendations ===")
 display(squad_recommendations_df)
 
-# --- KI-LOGIK START ---
-print("\nKI-Analyse wird gestartet...")
-
-# KI konfigurieren - Mit Google Search für aktuelle News/Verletzungen
+# KI konfigurieren - Stabil und ohne Schnickschnack
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel(
-    model_name='gemini-2.5-flash',
-    tools=[{'google_search': {}}] 
-)
+model = genai.GenerativeModel('gemini-2.5-flash') 
 
 # Daten für die KI aufbereiten
 budget_text = manager_budgets_df.to_string()
@@ -125,19 +119,16 @@ squad_text = squad_recommendations_df.to_string()
 # DER RADIKALE PROFI-PROMPT
 prompt = f"""
 Du bist ein Kickbase-Profi-Analyst für Luca Malco. Luca will nicht nachdenken, er will gewinnen. 
-Analysiere die Daten und gib knallharte Anweisungen. Handle wie ein erfahrener Manager.
-
-STRUKTUR DER ANTWORT (Halte dich exakt daran!):
+Analysiere die Daten und gib knallharte Anweisungen.
 
 1. 🎯 DEINE BEFEHLE (Kurz & Knapp - Priorität!)
-- SOFORT KAUFEN: [Name] (Max-Gebot: X€ - basierend auf dem Cash der Gegner)
-- SOFORT VERKAUFEN: [Name] (Grund: Marktwert-Verlust, Form oder Verletzung)
-- HALTEN: [Name] (Nur wenn S11 sicher und MV stabil)
+- SOFORT KAUFEN: [Name] (Max-Gebot: X€)
+- SOFORT VERKAUFEN: [Name] (Grund: Sinkt/Form/Verletzt)
+- HALTEN: [Name]
 
-2. 🧠 HINTERGRUND-CHECK (Details & News)
-- Prüfe aktuelle News (Verletzungen, Sperren, S11-Prognosen von Ligainsider).
-- Berücksichtige den nächsten Spieltag: Wer hat ein leichtes/schweres Spiel?
-- Warne Luca explizit, falls ein Marktwert-Gewinner laut News am Wochenende nicht spielt!
+2. 🧠 HINTERGRUND (Details & News)
+- Warum diese Entscheidung? (Form, Marktwert-Trend, nächster Gegner)
+- Gibt es News zu Verletzungen oder S11-Chancen?
 
 DATEN:
 BUDGETS: {budget_text}
@@ -146,16 +137,8 @@ KADER: {squad_text}
 """
 
 try:
-    # Generierung der Antwort
     response = model.generate_content(prompt)
     ai_advice = response.text
     print("\n=== KI-ANWEISUNGEN GENERIERT ===")
-    print(ai_advice)
 except Exception as e:
     ai_advice = f"KI-Analyse fehlgeschlagen: {str(e)}"
-    print(ai_advice)
-
-# --- KI-LOGIK ENDE ---
-
-# E-Mail mit KI-Analyse versenden
-send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice)
