@@ -4,7 +4,19 @@ from zoneinfo import ZoneInfo
 import smtplib
 import os
 
-def send_mail(budget_df, market_df, squad_df, email):
+# Füge 'ai_advice' oben in die Klammer ein (mit =None als Sicherheit)
+def send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice=None):
+    
+    # Hier wird normalerweise der E-Mail-Inhalt (Body) erstellt.
+    # Wir fügen die KI-Analyse ganz oben in die Mail ein:
+    
+    mail_body = "<h1>Deine tägliche Kickbase-Analyse</h1>"
+    
+    if ai_advice:
+        # Die KI-Antwort wird schön formatiert oben drüber gesetzt
+        mail_body += f"<h2>KI-Empfehlung:</h2><p style='white-space: pre-wrap;'>{ai_advice}</p><hr>"
+    
+    # ... restlicher Code für die Tabellen ...
     """Sends an email with the provided DataFrames as HTML tables."""
 
     if not email:
