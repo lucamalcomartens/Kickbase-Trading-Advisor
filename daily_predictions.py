@@ -5,7 +5,7 @@ from kickbase_api.league import get_league_id
 from kickbase_api.user import login
 from features.notifier import send_mail
 import datetime
-import google.generativeai as genai
+import google.genai as genai
 from features.predictions.data_handler import (
     create_player_data_table,
     check_if_data_reload_needed,
