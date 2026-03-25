@@ -372,4 +372,4 @@ except Exception as e:
 
 # E-Mail mit KI-Analyse versenden
 
-send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email, ai_advice)
+send_mail(manager_budgets_df, market_all_df, squad_recommendations_df, email, ai_advice)
