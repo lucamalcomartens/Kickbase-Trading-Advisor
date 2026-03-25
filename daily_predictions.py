@@ -122,7 +122,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel(
     model_name='gemini-2.5-pro',
     tools=[
-        {"google_search_retrieval": {}}
+        {"google_search": {}}
     ]
 )
 
