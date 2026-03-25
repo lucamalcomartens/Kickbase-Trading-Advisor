@@ -20,6 +20,8 @@ import os, pandas as pd
 # Load environment variables from .env file
 load_dotenv() 
 
+print(f"GenAI Version: {genai.__version__}")
+
 # ----------------- Notes & TODOs -----------------
 
 # TODO Fix the UTC timezone problems in the github actions scheduling
