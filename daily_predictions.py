@@ -112,6 +112,28 @@ squad_recommendations_df = join_current_squad(token, league_id, live_predictions
 print("\n=== Squad Recommendations ===")
 display(squad_recommendations_df)
 
+
+# In deinem Hauptskript nach dem Laden der Daten:
+
+from kickbase_api.market import get_market # Falls noch nicht importiert
+
+# Alle Spieler vom Transfermarkt laden (ohne Filterung durch dein Modell)
+# Hinweis: Die genaue Funktion hängt von deiner kickbase_api Implementierung ab
+all_market_raw = get_market(token, league_id) 
+
+# Erstelle ein einfaches DataFrame daraus
+all_market_players_df = pd.DataFrame([
+    {
+        "firstName": p.first_name,
+        "lastName": p.last_name,
+        "team": p.team_id,
+        "marketValue": p.market_value,
+        "price": p.price, # Der Preis, für den er gelistet ist
+        "position": p.position,
+        "expiry": p.expiry # Wann er vom Markt verschwindet
+    } for p in all_market_raw
+])
+
 # --- KI-LOGIK START ---
 from google import genai
 from google.genai import types
@@ -125,6 +147,7 @@ try:
     # 2. Daten für die KI aufbereiten
     budget_text = manager_budgets_df.to_string()
     market_text = market_recommendations_df.to_string()
+    full_market_list = all_market_players_df.to_string() # ALLE Spieler
     squad_text = squad_recommendations_df.to_string()
 
     # 3. Dein originaler Prompt
@@ -151,7 +174,7 @@ HEUTIGES DATUM: {today}
 
 DATEN:
 BUDGETS: {budget_text}
-MARKT: {market_text}
+KOMPLETTER TRANSFERMARKT (Alle verfügbaren Spieler): {full_market_list}
 KADER: {squad_text}
 </current_data_context>
 
