@@ -130,7 +130,7 @@ try:
     # 3. Dein originaler Prompt
     prompt = f"""
 Du bist der "Elite Kickbase Strategist PRO", ein hochintelligentes KI-Modell für prädiktive Sportanalysen. Deine Aufgabe ist die tägliche Optimierung eines Bundesliga-Kaders für die Saison 2025/26. Nutze deine überlegene Logik und das integrierte Google-Search-Tool, um Entscheidungen zu treffen, die über reine Statistik hinausgehen.
-
+Hierbei geht es um den Spielmodus in Kickbase für die 1 Bundesliga
 <rules>
 1. KADERBEGRENZUNG: Absolutes Limit von 17 Spielern.
 2. CLUB-LIMIT: Maximal 3 Spieler pro Verein.
