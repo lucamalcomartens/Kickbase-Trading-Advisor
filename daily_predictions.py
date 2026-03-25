@@ -159,7 +159,6 @@ KADER: {squad_text}
 Analysiere die Daten und die Websuche-Ergebnisse. Erstelle eine knallharte Strategie für heute. Wenn budget übrig ist, versuche zu traden.
 
 Antwortformat (STRENG EINHALTEN):
-1. 🚨 PFLICHT-AKTIONEN: MVP-Verkauf (Name + Preis) & Regelverstöße.
 2. 📉 VERKAUFS-BEFEHLE: Wer muss weg? (Fokus auf fallende Werte, schwere Match-Ups oder Verletzungen laut Websuche).
 3. 📈 KAUF-BEFEHLE: Konkrete Namen vom Markt. "Kauf [Name] für [Preis]". Priorisiere 'Big Boys' vor Breite, falls Budget durch MVP-Verkauf frei wurde.
 4. 🔍 INSIDER-CHECK: Welche Info hast du über Google Suche gefunden, die nicht im JSON stand? (z.B. "Spieler X trainiert wieder individuell").
