@@ -4,6 +4,7 @@ from features.predictions.modeling import train_model, evaluate_model
 from kickbase_api.league import get_league_id
 from kickbase_api.user import login
 from features.notifier import send_mail
+import datetime
 import google.generativeai as genai
 from features.predictions.data_handler import (
     create_player_data_table,
@@ -40,6 +41,8 @@ features = [
     "mv_change_3d", "mv_vol_3d",
     "mv_trend_7d", "market_divergence"
 ]
+
+today = datetime.date.today().strftime("%d. %B %Y")
 
 # what column to learn and predict on
 target = "mv_target_clipped"
@@ -114,6 +117,11 @@ print("\nKI-Analyse wird gestartet...")
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel(
     model_name='gemini-2.5-pro'
+    "tools": [
+  {
+    "google_search": {}
+  }
+]
 )
 
 # Daten für die KI aufbereiten
@@ -123,29 +131,44 @@ squad_text = squad_recommendations_df.to_string()
 
 # DER RADIKALE PROFI-PROMPT
 prompt = f"""
-Du bist ein Kickbase-Profi-Analyst für Luca Malco. Luca will nicht nachdenken, er will gewinnen. 
-Analysiere die Daten und gib knallharte Anweisungen. Handle wie ein erfahrener Manager.
+Du bist der "Elite Kickbase Strategist PRO", ein hochintelligentes KI-Modell für prädiktive Sportanalysen. Deine Aufgabe ist die tägliche Optimierung eines Bundesliga-Kaders für die Saison 2025/26. Nutze deine überlegene Logik und das integrierte Google-Search-Tool, um Entscheidungen zu treffen, die über reine Statistik hinausgehen.
 
-Beachte außerdem dass ein Kader nur maximal 17 Spieler haben darf und maximal 3 vom selben Team
+<rules>
+1. KADERBEGRENZUNG: Absolutes Limit von 17 Spielern.
+2. CLUB-LIMIT: Maximal 3 Spieler pro Verein.
+3. NO UNDERPAY: Gebote immer >= Marktwert.
+4. MVP-LIQUIDATION: Verkaufe zwingend den punktbesten Spieler des letzten Spieltags (MVP).
+5. BUDGET: Freitagabend muss der Kontostand >= 0 Euro sein.
+</rules>
 
-STRUKTUR DER ANTWORT (Halte dich exakt daran!):
+<grounding_instruction>
+Nutze die Google Suche aktiv, um folgende Echtzeit-Informationen zu prüfen, bevor du eine Empfehlung abgibst:
+- Aktuelle Verletzungen oder Trainingsabbrüche der letzten 24 Stunden für Spieler in meinem Kader oder auf dem Markt.
+- Voraussichtliche Rotationen bei Top-Teams (Bayern, Dortmund, Leipzig) aufgrund von Champions-League-Belastung.
+- Marktwert-Trends: Bestätige, ob der Trend eines Spielers (UP/DOWN) durch reale News (z.B. Stammplatzverlust) untermauert wird.
+</grounding_instruction>
 
-1. 🎯 DEINE BEFEHLE (Kurz & Knapp - Priorität!)
-- SOFORT KAUFEN: [Name] (Max-Gebot: X€ - basierend auf dem Cash der Gegner)
-- SOFORT VERKAUFEN: [Name] (Grund: Marktwert-Verlust, Form oder Verletzung)
-- HALTEN: [Name] (Nur wenn S11 sicher und MV stabil)
-
-2. 🧠 HINTERGRUND-CHECK (Details & News)
-- Prüfe aktuelle News (Verletzungen, Sperren, S11-Prognosen von Ligainsider).
-- Berücksichtige den nächsten Spieltag: Wer hat ein leichtes/schweres Spiel?
-- Warne Luca explizit, falls ein Marktwert-Gewinner laut News am Wochenende nicht spielt!
-
-
+<current_data_context>
+HEUTIGES DATUM: {today}
 
 DATEN:
 BUDGETS: {budget_text}
 MARKT: {market_text}
 KADER: {squad_text}
+</current_data_context>
+
+<task>
+Analysiere die Daten und die Websuche-Ergebnisse. Erstelle eine knallharte Strategie für heute.
+
+Antwortformat (STRENG EINHALTEN):
+1. 🚨 PFLICHT-AKTIONEN: MVP-Verkauf (Name + Preis) & Regelverstöße.
+2. 📉 VERKAUFS-BEFEHLE: Wer muss weg? (Fokus auf fallende Werte, schwere Match-Ups oder Verletzungen laut Websuche).
+3. 📈 KAUF-BEFEHLE: Konkrete Namen vom Markt. "Kauf [Name] für [Preis]". Priorisiere 'Big Boys' vor Breite, falls Budget durch MVP-Verkauf frei wurde.
+4. 🔍 INSIDER-CHECK: Welche Info hast du über Google Suche gefunden, die nicht im JSON stand? (z.B. "Spieler X trainiert wieder individuell").
+5. 🛡️ AUFSTELLUNGS-PROGNOSE: Kurz-Tipp für das kommende Wochenende basierend auf Heim/Auswärts-Stärke.
+</task>
+
+
 """
 
 try:
