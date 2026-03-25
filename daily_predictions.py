@@ -246,7 +246,7 @@ try:
 
     budget_text = manager_budgets_df.to_string()
 
-    market_text = market_recommendations_df.to_string()
+    market_text = market_all_df.to_string()
 
     squad_text = squad_recommendations_df.to_string()
 
@@ -300,7 +300,7 @@ DATEN:
 
 BUDGETS: {budget_text}
 
-MARKT: {market_text}
+MARKT (ALLE verfügbaren Spieler inkl. Marktwert-Trends):
 
 KADER: {squad_text}
 
@@ -310,7 +310,9 @@ KADER: {squad_text}
 
 <task>
 
-Analysiere die Daten und die Websuche-Ergebnisse. Erstelle eine knallharte Strategie für heute. Wenn budget übrig ist, versuche zu traden.
+Analysiere den gesamten Transfermarkt. 
+- Identifiziere Spieler, die trotz fallendem Trend (Under-Value) aufgrund von News (Websuche) ein Kauf sein könnten.
+- Erstelle eine knallharte Strategie
 
 
 
