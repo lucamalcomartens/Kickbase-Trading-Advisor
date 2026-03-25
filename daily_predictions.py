@@ -115,8 +115,6 @@ display(squad_recommendations_df)
 # --- KI-LOGIK START ---
 print("\nKI-Analyse wird gestartet...")
 
-import google.generativeai as genai
-import os
 
 # KI konfigurieren
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
