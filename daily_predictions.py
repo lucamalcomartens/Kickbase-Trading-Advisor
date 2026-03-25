@@ -113,15 +113,17 @@ display(squad_recommendations_df)
 # --- KI-LOGIK START ---
 print("\nKI-Analyse wird gestartet...")
 
-# KI konfigurieren - Mit Google Search für aktuelle News/Verletzungen
+import google.generativeai as genai
+import os
+
+# KI konfigurieren
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 model = genai.GenerativeModel(
-    model_name='gemini-2.5-pro'
-    "tools": [
-  {
-    "google_search": {}
-  }
-]
+    model_name='gemini-2.5-pro',
+    tools=[
+        {"google_search_retrieval": {}}
+    ]
 )
 
 # Daten für die KI aufbereiten
