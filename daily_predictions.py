@@ -113,26 +113,22 @@ print("\n=== Squad Recommendations ===")
 display(squad_recommendations_df)
 
 # --- KI-LOGIK START ---
+from google import genai
+from google.genai import types
+
 print("\nKI-Analyse wird gestartet...")
 
+try:
+    # 1. Client initialisieren (Das neue SDK benötigt kein .configure)
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-# KI konfigurieren
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    # 2. Daten für die KI aufbereiten
+    budget_text = manager_budgets_df.to_string()
+    market_text = market_recommendations_df.to_string()
+    squad_text = squad_recommendations_df.to_string()
 
-model = genai.GenerativeModel(
-    model_name='gemini-2.5-pro',
-    tools=[
-        {"google_search": {}}
-    ]
-)
-
-# Daten für die KI aufbereiten
-budget_text = manager_budgets_df.to_string()
-market_text = market_recommendations_df.to_string()
-squad_text = squad_recommendations_df.to_string()
-
-# DER RADIKALE PROFI-PROMPT
-prompt = f"""
+    # 3. Dein originaler Prompt
+    prompt = f"""
 Du bist der "Elite Kickbase Strategist PRO", ein hochintelligentes KI-Modell für prädiktive Sportanalysen. Deine Aufgabe ist die tägliche Optimierung eines Bundesliga-Kaders für die Saison 2025/26. Nutze deine überlegene Logik und das integrierte Google-Search-Tool, um Entscheidungen zu treffen, die über reine Statistik hinausgehen.
 
 <rules>
@@ -169,16 +165,21 @@ Antwortformat (STRENG EINHALTEN):
 4. 🔍 INSIDER-CHECK: Welche Info hast du über Google Suche gefunden, die nicht im JSON stand? (z.B. "Spieler X trainiert wieder individuell").
 5. 🛡️ AUFSTELLUNGS-PROGNOSE: Kurz-Tipp für das kommende Wochenende basierend auf Heim/Auswärts-Stärke.
 </task>
-
-
 """
 
-try:
-    # Generierung der Antwort
-    response = model.generate_content(prompt)
+    # 4. Generierung mit Google Search Retrieval
+    response = client.models.generate_content(
+        model='gemini-2.5-pro',
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(google_search=types.GoogleSearchRetrieval())]
+        ),
+        contents=prompt
+    )
+
     ai_advice = response.text
     print("\n=== KI-ANWEISUNGEN GENERIERT ===")
     print(ai_advice)
+
 except Exception as e:
     ai_advice = f"KI-Analyse fehlgeschlagen: {str(e)}"
     print(ai_advice)
