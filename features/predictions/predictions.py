@@ -162,11 +162,15 @@ def live_data_predictions(today_df, model, features):
     today_df_features = today_df[features]
     today_df_results = today_df.copy()
 
-    # Predict mv_target
-    today_df_results["predicted_mv_target"] = np.round(model.predict(today_df_features), 2)
+    # The model predicts the next-day market value change, not the absolute market value.
+    today_df_results["predicted_mv_change"] = np.round(model.predict(today_df_features), 2)
+    today_df_results["predicted_mv_target"] = np.round(
+        today_df_results["mv"] + today_df_results["predicted_mv_change"],
+        2,
+    )
 
-    # Sort by predicted_mv_target descending
-    today_df_results = today_df_results.sort_values("predicted_mv_target", ascending=False)
+    # Sort by predicted market value change descending.
+    today_df_results = today_df_results.sort_values("predicted_mv_change", ascending=False)
 
     # Filter date to today or yesterday if before 22:15, because mv is updated around 22:15
     now = datetime.now(ZoneInfo("Europe/Berlin"))
@@ -178,7 +182,7 @@ def live_data_predictions(today_df, model, features):
     today_df_results = today_df_results.dropna(subset=["mv"])
 
     # Keep only relevant columns
-    today_df_results = today_df_results[["player_id", "first_name", "last_name", "position", "team_name", "date", "p", "mp", "ppm", "days_to_next", "mv_change_1d", "mv_trend_1d", "mv", "predicted_mv_target"]]
+    today_df_results = today_df_results[["player_id", "first_name", "last_name", "position", "team_name", "date", "p", "mp", "ppm", "days_to_next", "mv_change_1d", "mv_trend_1d", "mv", "predicted_mv_change", "predicted_mv_target"]]
 
     return today_df_results
 
@@ -207,7 +211,7 @@ def join_current_squad(token, league_id, today_df_results):
         squad_df = squad_df.rename(columns={"mv_x": "mv"})
 
     # Add model deltas to make decisions and prompt context easier to interpret.
-    squad_df["delta_prediction"] = np.round(squad_df["predicted_mv_target"] - squad_df["mv"], 2)
+    squad_df["delta_prediction"] = np.round(squad_df["predicted_mv_change"], 2)
     squad_df["delta_percent"] = np.where(
         squad_df["mv"].fillna(0) != 0,
         np.round((squad_df["delta_prediction"] / squad_df["mv"]) * 100, 2),
@@ -215,7 +219,7 @@ def join_current_squad(token, league_id, today_df_results):
     )
 
     # Keep only relevant columns
-    squad_df = squad_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob"]]
+    squad_df = squad_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob"]]
 
     return enrich_squad_candidates(squad_df)
 
@@ -252,10 +256,10 @@ def join_current_market(token, league_id, today_df_results, min_predicted_mv_tar
 
     # Apply the recommendation filter only when a minimum target is configured.
     if min_predicted_mv_target is not None:
-        bid_df = bid_df[bid_df["predicted_mv_target"] > min_predicted_mv_target]
+        bid_df = bid_df[bid_df["predicted_mv_change"] > min_predicted_mv_target]
 
-    # Sort by predicted_mv_target descending
-    bid_df = bid_df.sort_values("predicted_mv_target", ascending=False)
+    # Sort by predicted market value change descending.
+    bid_df = bid_df.sort_values("predicted_mv_change", ascending=False)
 
     # Rename prob to s_11_prob for better understanding
     if "prob" not in bid_df.columns:
@@ -266,7 +270,7 @@ def join_current_market(token, league_id, today_df_results, min_predicted_mv_tar
     bid_df = bid_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
 
     # Add model deltas to make bidding logic easier to reason about.
-    bid_df["delta_prediction"] = np.round(bid_df["predicted_mv_target"] - bid_df["mv"], 2)
+    bid_df["delta_prediction"] = np.round(bid_df["predicted_mv_change"], 2)
     bid_df["delta_percent"] = np.where(
         bid_df["mv"].fillna(0) != 0,
         np.round((bid_df["delta_prediction"] / bid_df["mv"]) * 100, 2),
@@ -274,6 +278,6 @@ def join_current_market(token, league_id, today_df_results, min_predicted_mv_tar
     )
 
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "mv_trend_1d", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "mv_trend_1d", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return enrich_market_candidates(bid_df)
