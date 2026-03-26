@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from html import escape
 import smtplib
 import os
+import re
 
 def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_sections=None):
     """Sends an email with the provided DataFrames as HTML tables and AI advice."""
@@ -101,16 +102,6 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
         </div>
         """
 
-    def top_action_block(title, subtitle, df):
-        return f"""
-        <div style="margin-top:16px;padding:18px;background:#ffffff;border:1px solid #dfe7f0;border-radius:18px;box-shadow:0 8px 24px rgba(20, 50, 74, 0.05);">
-            <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#627d98;">Top Entscheidung</div>
-            <h4 style="margin:6px 0 6px 0;font-size:18px;line-height:1.2;color:#102a43;">{title}</h4>
-            <p style="margin:0 0 14px 0;font-size:13px;line-height:1.5;color:#52606d;">{subtitle}</p>
-            {style_df(df)}
-        </div>
-        """
-
     def stat_card(label, value, accent_color, background_color):
         return f"""
         <div style="display:inline-block;width:31%;min-width:180px;margin:0 1% 12px 1%;vertical-align:top;">
@@ -121,6 +112,93 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
         </div>
         """
 
+    def render_inline_formatting(text):
+        escaped_text = escape(text)
+        escaped_text = re.sub(
+            r"\*\*(.+?)\*\*",
+            lambda match: f'<strong style="color:#ffffff;">{match.group(1)}</strong>',
+            escaped_text,
+        )
+        escaped_text = re.sub(
+            r"`(.+?)`",
+            lambda match: (
+                '<span style="padding:2px 6px;border-radius:6px;background:rgba(255,255,255,0.08);'
+                'font-family:Consolas,monospace;font-size:0.95em;">'
+                f'{match.group(1)}</span>'
+            ),
+            escaped_text,
+        )
+        return escaped_text
+
+    def render_ai_advice(advice_text):
+        if not advice_text:
+            return ""
+
+        lines = [line.rstrip() for line in advice_text.splitlines()]
+        blocks = []
+        list_items = []
+
+        def flush_list():
+            nonlocal list_items
+            if list_items:
+                blocks.append(
+                    "<ul style=\"margin:10px 0 18px 0;padding-left:20px;color:#e6edf3;\">"
+                    + "".join(
+                        f"<li style=\"margin:0 0 10px 0;line-height:1.65;\">{item}</li>" for item in list_items
+                    )
+                    + "</ul>"
+                )
+                list_items = []
+
+        for raw_line in lines:
+            line = raw_line.strip()
+
+            if not line:
+                flush_list()
+                continue
+
+            if line.startswith("### "):
+                flush_list()
+                blocks.append(
+                    f"<h4 style=\"margin:18px 0 10px 0;font-size:18px;line-height:1.3;color:#ffffff;\">{render_inline_formatting(line[4:])}</h4>"
+                )
+                continue
+
+            if line.startswith("## "):
+                flush_list()
+                blocks.append(
+                    f"<h3 style=\"margin:18px 0 10px 0;font-size:22px;line-height:1.25;color:#ffffff;\">{render_inline_formatting(line[3:])}</h3>"
+                )
+                continue
+
+            if line.startswith("# "):
+                flush_list()
+                blocks.append(
+                    f"<h2 style=\"margin:18px 0 10px 0;font-size:26px;line-height:1.2;color:#ffffff;\">{render_inline_formatting(line[2:])}</h2>"
+                )
+                continue
+
+            if line.startswith("* ") or line.startswith("- "):
+                list_items.append(render_inline_formatting(line[2:]))
+                continue
+
+            numbered_match = re.match(r"^(\d+)\.\s+(.*)$", line)
+            if numbered_match:
+                flush_list()
+                number, content = numbered_match.groups()
+                blocks.append(
+                    f"<div style=\"margin:14px 0 8px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.06);color:#f4f8fb;line-height:1.65;\"><span style=\"display:inline-block;min-width:28px;font-weight:700;color:#9fd3ff;\">{number}.</span>{render_inline_formatting(content)}</div>"
+                )
+                continue
+
+            flush_list()
+            blocks.append(
+                f"<p style=\"margin:0 0 14px 0;line-height:1.75;color:#e6edf3;\">{render_inline_formatting(line)}</p>"
+            )
+
+        flush_list()
+        return "".join(blocks)
+
     # Vorbereitung der KI-Sektion (Nur wenn ai_advice vorhanden ist)
     ai_section = ""
     if ai_advice:
@@ -128,37 +206,21 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
         <div style="margin-top:28px;padding:24px 26px;border-radius:20px;background:#14324a;color:#f4f8fb;box-shadow:0 14px 36px rgba(20, 50, 74, 0.18);">
             <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#9fbad0;">KI Analyse</div>
             <h3 style="margin:10px 0 12px 0;font-size:24px;line-height:1.2;color:#ffffff;">Dein KI-Berater empfiehlt</h3>
-            <p style="margin:0;white-space:pre-wrap;font-size:15px;line-height:1.7;color:#e6edf3;">
-                {escape(ai_advice)}
-            </p>
+            <div style="margin:0;font-size:15px;line-height:1.7;color:#e6edf3;">
+                {render_ai_advice(ai_advice)}
+            </div>
         </div>
         """
 
-    buy_now_count = 0
-    sell_count = 0
-    if top_action_sections:
-        buy_now_count = len(top_action_sections.get("Jetzt kaufen", {}).get("data", []))
-        sell_count = len(top_action_sections.get("Eher verkaufen", {}).get("data", []))
+    expiring_today_count = 0
+    if "expiring_today" in market_df.columns:
+        expiring_today_count = int(market_df["expiring_today"].fillna(False).sum())
 
     summary_cards = "".join([
         stat_card("Marktspieler", len(market_df), "#9f1c1c", "#fff4eb"),
         stat_card("Kaderspieler", len(squad_df), "#1d4f91", "#edf4ff"),
-        stat_card("Sofortaktionen", buy_now_count + sell_count, "#1f6f43", "#eef7ee"),
+        stat_card("Laufen Heute Aus", expiring_today_count, "#1f6f43", "#eef7ee"),
     ])
-
-    top_actions_section = ""
-    if top_action_sections:
-        blocks = []
-        for title, section in top_action_sections.items():
-            blocks.append(top_action_block(title, section.get("subtitle", ""), section.get("data")))
-        top_actions_section = f"""
-        <div style="margin-top:28px;padding:24px;background:linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);border:1px solid #d6e2f0;border-radius:22px;">
-            <div style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#486581;">Heute Abend zuerst lesen</div>
-            <h3 style="margin:8px 0 6px 0;font-size:24px;line-height:1.2;color:#102a43;">Top Aktionen</h3>
-            <p style="margin:0 0 8px 0;font-size:14px;line-height:1.5;color:#52606d;">Die wichtigsten Entscheidungen stehen vor den Detailtabellen, damit du auf dem Handy direkt weisst, was jetzt zu tun ist.</p>
-            {''.join(blocks)}
-        </div>
-        """
 
     market_section = section_block(
         "Transfermarkt Uebersicht",
@@ -189,7 +251,6 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
                 </div>
 
                 <div style="margin-top:8px;overflow-x:auto;">
-                    {top_actions_section}
             {ai_section}
                     {market_section}
                     {squad_section}
