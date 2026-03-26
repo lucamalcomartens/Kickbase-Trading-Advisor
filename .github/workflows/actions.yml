@@ -30,5 +30,6 @@ jobs:
           KICK_USER: ${{ secrets.KICK_USER }}
           KICK_PASS: ${{ secrets.KICK_PASS }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: |
           python daily_predictions.py

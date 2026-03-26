@@ -43,6 +43,7 @@
       <ul>
         <li><code>KICK_USER</code>: Your Kickbase Username (usually your email)</li>
         <li><code>KICK_PASS</code>: Your Kickbase Password (handled securely)</li>
+        <li><code>FOOTBALL_DATA_API_KEY</code> (optional): Enables next opponent, home/away, and a simple fixture difficulty without any extra AI call</li>
         <li><code>EMAIL_USER</code>: Your Gmail Address (for sending and receiving emails)</li>
         <li><code>EMAIL_PASS</code>: Password for your Gmail account (usually an app password)
           <ul>
@@ -59,7 +60,7 @@
 </div>
 
 <div align="justify">
-  <strong>Other Use Case Options:</strong> The tool can be used without the email notifier. Just leave out the secrets, and the results will still be displayed in the GitHub Action execution log. As described in the fourth step "Test Your Setup," you can also always execute the workflow manually and are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed along with the packages listed in <code>requirements.txt</code>. Create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If you have any further questions or encounter issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
+  <strong>Other Use Case Options:</strong> The tool can be used without the email notifier. Just leave out the secrets, and the results will still be displayed in the GitHub Action execution log. As described in the fourth step "Test Your Setup," you can also always execute the workflow manually and are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed along with the packages listed in <code>requirements.txt</code>. Create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If <code>FOOTBALL_DATA_API_KEY</code> is set, the prompt and email also receive opponent and simple fixture context without consuming additional AI resources. If you have any further questions or encounter issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
 </div>
 
 <h2 align="center">Future Work & Ideas</h2>

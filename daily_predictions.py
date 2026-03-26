@@ -5,7 +5,7 @@ from features.predictions.preprocessing import preprocess_player_data, split_dat
 from features.predictions.modeling import train_model, evaluate_model
 
 from kickbase_api.league import get_league_id
-from kickbase_api.others import get_matchdays
+from kickbase_api.others import get_matchdays, get_fixture_context, enrich_with_fixture_context
 
 from kickbase_api.user import login, get_budget, get_username
 
@@ -452,6 +452,7 @@ print(f"\nModel evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2
 
 # Make live data predictions (enthält Vorhersagen für ALLE Spieler)
 live_predictions_df = live_data_predictions(today_df, model, features)
+fixture_context = get_fixture_context(competition_ids[0])
 
 # Pull the full current market without filtering to only positive predictions.
 market_all_df = join_current_market(
@@ -460,15 +461,17 @@ market_all_df = join_current_market(
     live_predictions_df,
     min_predicted_mv_target=None,
 )
+market_all_df = enrich_with_fixture_context(market_all_df, fixture_context)
 
-market_email_df = market_all_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "expiring_today"]].copy()
+market_email_df = market_all_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "expiring_today", "next_opponent", "home_or_away", "fixture_difficulty"]].copy()
 
 print(f"\nAnzahl Spieler auf dem Markt: {len(market_all_df)}")
 
 # Join mit dem eigenen Kader
 squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
+squad_recommendations_df = enrich_with_fixture_context(squad_recommendations_df, fixture_context)
 
-squad_email_df = squad_recommendations_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "sell_priority_score", "squad_role", "s_11_prob"]].copy()
+squad_email_df = squad_recommendations_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "sell_priority_score", "squad_role", "s_11_prob", "next_opponent", "home_or_away", "fixture_difficulty"]].copy()
 
 top_action_sections = prepare_top_actions(market_all_df, squad_recommendations_df)
 
@@ -537,27 +540,27 @@ try:
 
     squad_text = format_prompt_table(
         squad_recommendations_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=18,
     )
     expiring_now_text = format_prompt_table(
         market_expiring_now_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=18,
     )
     later_market_text = format_prompt_table(
         market_later_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=18,
     )
     trade_stash_text = format_prompt_table(
         market_trade_stash_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=12,
     )
     hold_candidates_text = format_prompt_table(
         market_hold_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=12,
     )
     squad_risk_text = format_prompt_table(
@@ -640,6 +643,8 @@ TRADING_WINDOW_MODE: {matchday_context['trading_window_mode']}
 
 FRIDAY_SAFETY_MODE: {matchday_context['friday_safety_mode']}
 
+SPIELPLAN-KONTEXT: {'aktiv' if fixture_context else 'nicht verfuegbar'}
+
 KADERSTRUKTUR: {core_starter_count} core_starter, {rotation_hold_count} rotation_hold, {sell_candidate_count} sell_candidate
 
 MEHRFACHBELEGUNG PRO VEREIN IM KADER:
@@ -668,6 +673,7 @@ HINWEIS ZU DEN SCORES:
 - football_signal_score ist ein interner Struktur-Score aus Startelfwahrscheinlichkeit, Punkten, Minuten, Punkte-pro-Minute und Naehe zum naechsten Spiel.
 - predicted_mv_change ist die erwartete Marktwertveraenderung bis morgen. predicted_mv_target ist der daraus abgeleitete absolute Marktwert fuer morgen.
 - recommended_bid_min und recommended_bid_max sind bereits berechnete Fallback-Gebote aus Score, Ablaufzeit und erwarteter Marktwertchance.
+- next_opponent, home_or_away und fixture_difficulty kommen, falls verfuegbar, aus einem externen Spielplan-Feed ohne zusaetzlichen KI-Aufruf.
 
 </current_data_context>
 
