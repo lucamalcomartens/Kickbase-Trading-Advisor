@@ -33,6 +33,7 @@ from IPython.display import display
 from dotenv import load_dotenv
 
 import os, pandas as pd
+import time
 
 
 
@@ -329,6 +330,15 @@ from google.genai import types
 
 print("\nKI-Analyse wird gestartet...")
 
+MAX_AI_RETRIES = 3
+
+RETRYABLE_AI_ERROR_MARKERS = [
+    "503",
+    "UNAVAILABLE",
+    "high demand",
+    "try again later",
+]
+
 
 
 try:
@@ -516,19 +526,39 @@ Antwortformat (STRENG EINHALTEN):
 
     # 4. Generierung mit Google Search Retrieval
 
-    response = client.models.generate_content(
+    response = None
+    last_error = None
 
-        model='gemini-2.5-pro',
+    for attempt in range(1, MAX_AI_RETRIES + 1):
+        try:
+            response = client.models.generate_content(
 
-        config=types.GenerateContentConfig(
+                model='gemini-2.5-pro',
 
-            tools=[types.Tool(google_search=types.GoogleSearchRetrieval())]
+                config=types.GenerateContentConfig(
 
-        ),
+                    tools=[types.Tool(google_search=types.GoogleSearchRetrieval())]
 
-        contents=prompt
+                ),
 
-    )
+                contents=prompt
+
+            )
+            break
+        except Exception as error:
+            last_error = error
+            error_text = str(error)
+            is_retryable = any(marker.lower() in error_text.lower() for marker in RETRYABLE_AI_ERROR_MARKERS)
+
+            if attempt == MAX_AI_RETRIES or not is_retryable:
+                raise
+
+            wait_seconds = attempt * 5
+            print(f"KI-Analyse Versuch {attempt} fehlgeschlagen ({error_text}). Neuer Versuch in {wait_seconds} Sekunden...")
+            time.sleep(wait_seconds)
+
+    if response is None and last_error is not None:
+        raise last_error
 
 
 
