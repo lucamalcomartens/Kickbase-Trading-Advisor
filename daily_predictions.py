@@ -302,14 +302,14 @@ market_all_df = join_current_market(
     min_predicted_mv_target=None,
 )
 
-market_email_df = market_all_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "expiring_today"]].copy()
+market_email_df = market_all_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "expiring_today"]].copy()
 
 print(f"\nAnzahl Spieler auf dem Markt: {len(market_all_df)}")
 
 # Join mit dem eigenen Kader
 squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
 
-squad_email_df = squad_recommendations_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "sell_priority_score", "squad_role", "s_11_prob"]].copy()
+squad_email_df = squad_recommendations_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "sell_priority_score", "squad_role", "s_11_prob"]].copy()
 
 top_action_sections = prepare_top_actions(market_all_df, squad_recommendations_df)
 
@@ -361,27 +361,27 @@ try:
 
     squad_text = format_prompt_table(
         squad_recommendations_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role"],
         limit=18,
     )
     expiring_now_text = format_prompt_table(
         market_expiring_now_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
         limit=18,
     )
     later_market_text = format_prompt_table(
         market_later_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
         limit=18,
     )
     trade_stash_text = format_prompt_table(
         market_trade_stash_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp"],
         limit=12,
     )
     squad_risk_text = format_prompt_table(
         squad_risk_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_action"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_action"],
         limit=12,
     )
     available_budget_text = format_currency(own_available_budget) if own_available_budget is not None else "n/a"
@@ -462,6 +462,7 @@ KADER-RISIKEN AUS MODELLSICHT:
 HINWEIS ZU DEN SCORES:
 - priority_score bewertet Dringlichkeit, Marktwertpotenzial, Trend, Startelfwahrscheinlichkeit und interne Fussballsignale.
 - football_signal_score ist ein interner Struktur-Score aus Startelfwahrscheinlichkeit, Punkten, Minuten, Punkte-pro-Minute und Naehe zum naechsten Spiel.
+- predicted_mv_change ist die erwartete Marktwertveraenderung bis morgen. predicted_mv_target ist der daraus abgeleitete absolute Marktwert fuer morgen.
 - recommended_bid_min und recommended_bid_max sind bereits berechnete Fallback-Gebote aus Score, Ablaufzeit und erwarteter Marktwertchance.
 
 </current_data_context>
