@@ -6,7 +6,7 @@ from features.predictions.modeling import train_model, evaluate_model
 
 from kickbase_api.league import get_league_id
 
-from kickbase_api.user import login
+from kickbase_api.user import login, get_budget, get_username
 
 from features.notifier import send_mail
 
@@ -115,6 +115,93 @@ pd.set_option("display.max_rows", None)
 pd.set_option("display.width", 1000)
 
 
+def format_currency(value):
+    """Format a numeric value for compact prompt output."""
+
+    if pd.isna(value):
+        return "n/a"
+    return f"{float(value):,.0f}".replace(",", ".")
+
+
+def format_prompt_table(df, columns, limit=None):
+    """Return a compact table string with only the columns relevant for the prompt."""
+
+    available_columns = [column for column in columns if column in df.columns]
+    prompt_df = df[available_columns].copy()
+
+    if limit is not None:
+        prompt_df = prompt_df.head(limit)
+
+    if prompt_df.empty:
+        return "Keine Daten verfuegbar"
+
+    return prompt_df.to_string(index=False)
+
+
+def build_player_name(df):
+    """Create a compact player name column from first and last name."""
+
+    return (df["first_name"].fillna("") + " " + df["last_name"].fillna("")).str.strip()
+
+
+def prepare_top_actions(market_df, squad_df):
+    """Build compact top-action tables for the email header and mobile-first reading."""
+
+    buy_now_df = market_df[market_df["buy_action"] == "buy_now"].copy().head(5)
+    watchlist_df = market_df[
+        (market_df["buy_action"] == "watchlist") & (~market_df["expiring_today"])
+    ].copy().head(5)
+    sell_df = squad_df[squad_df["squad_action"] == "sell"].copy().head(5)
+
+    if not buy_now_df.empty:
+        buy_now_df["Spieler"] = build_player_name(buy_now_df)
+        buy_now_df = buy_now_df[["Spieler", "team_name", "asset_role", "priority_score", "bid_range"]].rename(
+            columns={
+                "team_name": "Team",
+                "asset_role": "Rolle",
+                "priority_score": "Score",
+                "bid_range": "Gebot",
+            }
+        )
+
+    if not watchlist_df.empty:
+        watchlist_df["Spieler"] = build_player_name(watchlist_df)
+        watchlist_df = watchlist_df[["Spieler", "team_name", "asset_role", "priority_score", "recommended_bid_max"]].rename(
+            columns={
+                "team_name": "Team",
+                "asset_role": "Zieltyp",
+                "priority_score": "Score",
+                "recommended_bid_max": "Max Gebot",
+            }
+        )
+
+    if not sell_df.empty:
+        sell_df["Spieler"] = build_player_name(sell_df)
+        sell_df = sell_df[["Spieler", "team_name", "squad_role", "sell_priority_score", "delta_prediction"]].rename(
+            columns={
+                "team_name": "Team",
+                "squad_role": "Typ",
+                "sell_priority_score": "Sell Score",
+                "delta_prediction": "Delta",
+            }
+        )
+
+    return {
+        "Jetzt kaufen": {
+            "subtitle": "Die wichtigsten Deals vor dem naechsten Marktwertupdate.",
+            "data": buy_now_df,
+        },
+        "Spaeter beobachten": {
+            "subtitle": "Starke Optionen, die nicht heute Nacht verloren gehen.",
+            "data": watchlist_df,
+        },
+        "Eher verkaufen": {
+            "subtitle": "Spieler, die Kapital blockieren oder an Risiko gewinnen.",
+            "data": sell_df,
+        },
+    }
+
+
 
 # ----------------- USER SETTINGS -----------------
 
@@ -164,6 +251,10 @@ print("\n=== Manager Budgets ===")
 
 display(manager_budgets_df)
 
+own_budget = get_budget(token, league_id)
+
+own_username = get_username(token)
+
 
 
 # Data handling
@@ -203,19 +294,25 @@ print(f"\nModel evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2
 # Make live data predictions (enthält Vorhersagen für ALLE Spieler)
 live_predictions_df = live_data_predictions(today_df, model, features)
 
-# --- NEU: Den gesamten Markt ohne Filter abgreifen ---
-# Wir nutzen join_current_market, müssen aber sicherstellen, dass nichts weggefiltert wird.
-# Falls deine Funktion intern filtert, müsstest du dort ein Argument wie 'filter=False' ergänzen
-# oder hier manuell mergen.
-market_all_df = join_current_market(token, league_id, live_predictions_df) 
+# Pull the full current market without filtering to only positive predictions.
+market_all_df = join_current_market(
+    token,
+    league_id,
+    live_predictions_df,
+    min_predicted_mv_target=None,
+)
 
-# Falls join_current_market nur Empfehlungen zurückgibt, erstelle hier eine 'Full' Version:
-# Diese Zeile stellt sicher, dass wir die Vorhersagen für die Spieler auf dem Markt haben,
-# egal ob der Trend positiv oder negativ ist.
+market_email_df = market_all_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "expiring_today"]].copy()
+
 print(f"\nAnzahl Spieler auf dem Markt: {len(market_all_df)}")
 
 # Join mit dem eigenen Kader
 squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
+
+squad_email_df = squad_recommendations_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "sell_priority_score", "squad_role", "s_11_prob"]].copy()
+
+top_action_sections = prepare_top_actions(market_all_df, squad_recommendations_df)
+
 print("\n=== Squad Recommendations ===")
 
 display(squad_recommendations_df)
@@ -242,23 +339,61 @@ try:
 
 
 
-    # 2. Daten für die KI aufbereiten
+    # 2. Daten fuer die KI aufbereiten
 
-    budget_text = manager_budgets_df.to_string()
+    own_budget_row = manager_budgets_df[manager_budgets_df["User"] == own_username]
+    own_available_budget = own_budget_row["Available Budget"].iloc[0] if not own_budget_row.empty else None
+    squad_team_counts = squad_recommendations_df["team_name"].value_counts()
+    squad_team_counts_text = squad_team_counts[squad_team_counts > 1].to_string() if not squad_team_counts.empty else "Keine auffaelligen Doppelungen"
 
-    market_text = market_all_df.to_string()
+    market_expiring_now_df = market_all_df[market_all_df["expiring_today"]].sort_values(
+        ["priority_score", "delta_prediction", "hours_to_exp"],
+        ascending=[False, False, True],
+    )
+    market_later_df = market_all_df[~market_all_df["expiring_today"]].sort_values(
+        ["priority_score", "delta_prediction", "hours_to_exp"],
+        ascending=[False, False, True],
+    )
+    market_trade_stash_df = market_all_df[
+        (market_all_df["delta_prediction"] > 0) & (market_all_df["mv_change_yesterday"] <= 0)
+    ].sort_values(["delta_prediction", "hours_to_exp"], ascending=[False, True])
+    squad_risk_df = squad_recommendations_df.sort_values(["delta_prediction", "mv_change_yesterday"], ascending=[True, True])
 
-    squad_text = squad_recommendations_df.to_string()
+    squad_text = format_prompt_table(
+        squad_recommendations_df,
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role"],
+        limit=18,
+    )
+    expiring_now_text = format_prompt_table(
+        market_expiring_now_df,
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        limit=18,
+    )
+    later_market_text = format_prompt_table(
+        market_later_df,
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp"],
+        limit=18,
+    )
+    trade_stash_text = format_prompt_table(
+        market_trade_stash_df,
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp"],
+        limit=12,
+    )
+    squad_risk_text = format_prompt_table(
+        squad_risk_df,
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_action"],
+        limit=12,
+    )
+    available_budget_text = format_currency(own_available_budget) if own_available_budget is not None else "n/a"
+    own_budget_text = format_currency(own_budget)
 
 
 
-    # 3. Dein originaler Prompt
+    # 3. Prompt fuer eine expiry-aware und langfristige Trading-Strategie
 
     prompt = f"""
 
-Du bist der "Elite Kickbase Strategist PRO", ein hochintelligentes KI-Modell für prädiktive Sportanalysen. Deine Aufgabe ist die tägliche Optimierung eines Bundesliga-Kaders für die Saison 2025/26. Nutze deine überlegene Logik und das integrierte Google-Search-Tool, um Entscheidungen zu treffen, die über reine Statistik hinausgehen.
-
-Hierbei geht es um den Spielmodus in Kickbase für die 1 Bundesliga
+Du bist mein Kickbase Portfoliomanager fuer die 1. Bundesliga. Deine Aufgabe ist es, kurzfristige Marktwertgewinne bis zum naechsten Marktwertupdate mitzunehmen, ohne dabei die langfristige Trading-Strategie und die Kaderentwicklung aus den Augen zu verlieren.
 
 <rules>
 
@@ -268,9 +403,11 @@ Hierbei geht es um den Spielmodus in Kickbase für die 1 Bundesliga
 
 3. NO UNDERPAY: Gebote immer >= Marktwert.
 
-4. BUDGET: Freitagabend muss der Kontostand >= 0 Euro sein. Es sei denn es ist Länderspielpause
+4. BUDGET: Freitagabend muss der Kontostand >= 0 Euro sein, ausser in der Laenderspielpause.
 
+5. ZEITFAKTOR: Spieler mit Ablauf vor dem naechsten Marktwertupdate haben die hoechste operative Prioritaet, weil spaeter auslaufende Spieler bis dahin noch weiter im Marktwert schwanken koennen.
 
+6. LANGFRISTIGES TRADING: Beruecksichtige nicht nur morgen, sondern auch Spieler, die ueber mehrere Tage ein guter Trading-Asset oder spaeter ein starker Kaderbaustein sein koennen.
 
 </rules>
 
@@ -278,13 +415,15 @@ Hierbei geht es um den Spielmodus in Kickbase für die 1 Bundesliga
 
 <grounding_instruction>
 
-Nutze die Google Suche aktiv, um folgende Echtzeit-Informationen zu prüfen, bevor du eine Empfehlung abgibst:
+Nutze die Google Suche gezielt nur fuer die wichtigsten Entscheidungen.
 
-- Aktuelle Verletzungen oder Trainingsabbrüche der letzten 24 Stunden für Spieler in meinem Kader oder auf dem Markt.
+- Pruefe die 5 wichtigsten Sofort-Kaufkandidaten, die vor dem naechsten Marktwertupdate auslaufen.
 
-- Voraussichtliche Rotationen bei Top-Teams (Bayern, Dortmund, Leipzig) aufgrund von Champions-League-Belastung.
+- Pruefe die 5 kritischsten Verkaufs- oder Halt-Entscheidungen in meinem Kader.
 
-- Marktwert-Trends: Bestätige, ob der Trend eines Spielers (UP/DOWN) durch reale News (z.B. Stammplatzverlust) untermauert wird.
+- Suche nur nach belastbaren Echtzeit-Infos wie Verletzungen, Trainingsstatus, Sperren, Rotationen oder Stammplatzverlust.
+
+- Wenn du keine belastbare neue Information findest, sage das explizit und spekuliere nicht.
 
 </grounding_instruction>
 
@@ -294,15 +433,36 @@ Nutze die Google Suche aktiv, um folgende Echtzeit-Informationen zu prüfen, bev
 
 HEUTIGES DATUM: {today}
 
+MEIN USERNAME: {own_username}
 
+MEIN AKTUELLES BUDGET: {own_budget_text} Euro
 
-DATEN:
+MEIN GESCHAETZTES VERFUEGBARES BUDGET OHNE REGELVERSTOSS: {available_budget_text} Euro
 
-BUDGETS: {budget_text}
+AKTUELLE KADERGROESSE: {len(squad_recommendations_df)} von 17
 
-MARKT (ALLE verfügbaren Spieler inkl. Marktwert-Trends):
+MEHRFACHBELEGUNG PRO VEREIN IM KADER:
+{squad_team_counts_text}
 
-KADER: {squad_text}
+MEIN KADER:
+{squad_text}
+
+MARKTSEGMENT A - SPIELER, DIE VOR DEM NAECHSTEN MARKTWERTUPDATE ABLAUFEN:
+{expiring_now_text}
+
+MARKTSEGMENT B - SPIELER, DIE SPAETER ABLAUFEN:
+{later_market_text}
+
+MARKTSEGMENT C - MOEGLICHE TRADING-REBOUNDS (gestern schwach, Modell heute positiv):
+{trade_stash_text}
+
+KADER-RISIKEN AUS MODELLSICHT:
+{squad_risk_text}
+
+HINWEIS ZU DEN SCORES:
+- priority_score bewertet Dringlichkeit, Marktwertpotenzial, Trend, Startelfwahrscheinlichkeit und interne Fussballsignale.
+- football_signal_score ist ein interner Struktur-Score aus Startelfwahrscheinlichkeit, Punkten, Minuten, Punkte-pro-Minute und Naehe zum naechsten Spiel.
+- recommended_bid_min und recommended_bid_max sind bereits berechnete Fallback-Gebote aus Score, Ablaufzeit und erwarteter Marktwertchance.
 
 </current_data_context>
 
@@ -310,21 +470,42 @@ KADER: {squad_text}
 
 <task>
 
-Analysiere den gesamten Transfermarkt. 
-- Identifiziere Spieler, die trotz fallendem Trend (Under-Value) aufgrund von News (Websuche) ein Kauf sein könnten.
-- Erstelle eine knallharte Strategie
+Erstelle eine konkrete Abendstrategie fuer mein Kickbase-Team.
+
+- Priorisiere zuerst Spieler aus Marktsegment A, wenn sie bis zum naechsten Marktwertupdate die beste Kombination aus Zeitfaktor, Trading-Potenzial und sportlicher Relevanz haben.
+
+- Vernachlaessige Marktsegment B nicht. Wenn spaeter auslaufende Spieler strategisch deutlich besser sind als die Sofort-Kandidaten, sollst du das klar sagen.
+
+- Denke wie ein Trader und wie ein Manager: kurzfristige Gewinne mitnehmen, aber nicht blind alles auf den naechsten Tag optimieren, wenn ein spaeterer Transfer strategisch staerker ist.
+
+- Nutze die vorhandenen priority_score-, asset_role- und recommended_bid-Werte aktiv als Grundlage. Du darfst sie begruendet leicht anpassen, sollst sie aber nicht ignorieren.
+
+- Gib fuer jeden Kaufkandidaten ein maximales Gebot in Euro an. Das Gebot soll sich an Wichtigkeit, Budget, Trading-Chance, Startelf-Wahrscheinlichkeit und Ablaufzeit orientieren.
+
+- Unterscheide klar zwischen:
+  A) Sofort kaufen vor dem naechsten Marktwertupdate
+  B) Beobachten und spaeter angreifen
+  C) Nicht kaufen
+
+- Beruecksichtige auch Verkaeufe aus meinem Kader, wenn dadurch bessere Trades oder wichtigere Einkaeufe moeglich werden.
+
+- Wenn ein Spieler vor allem als Trading-Asset interessant ist, sage das explizit.
 
 
 
 Antwortformat (STRENG EINHALTEN):
 
-2. 📉 VERKAUFS-BEFEHLE: Wer muss weg? (Fokus auf fallende Werte, schwere Match-Ups oder Verletzungen laut Websuche).
+1. TEAMSTATUS: Kurze Einordnung meines Kaders, meines Budgets und meines dringendsten Handlungsbedarfs heute Abend.
 
-3. 📈 KAUF-BEFEHLE: Konkrete Namen vom Markt. "Kauf [Name] für [Preis]". Priorisiere 'Big Boys' vor Breite, falls Budget durch MVP-Verkauf frei wurde.
+2. VERKAUFS-BEFEHLE: Wer muss weg oder ist aktiv entbehrlich? Fokus auf fallende Werte, Risiko und Kapitalfreisetzung.
 
-4. 🔍 INSIDER-CHECK: Welche Info hast du über Google Suche gefunden, die nicht im JSON stand? (z.B. "Spieler X trainiert wieder individuell").
+3. SOFORT-KAEUFE BIS ZUM NAECHSTEN UPDATE: Nenne nur die wichtigsten Spieler aus Marktsegment A. Format je Spieler: "Kauf [Name] | Prioritaet [A/B/C] | Max Gebot [Euro] | Rolle [Starter/Trader/Hold] | Warum jetzt".
 
-5. 🛡️ AUFSTELLUNGS-PROGNOSE: Kurz-Tipp für das kommende Wochenende basierend auf Heim/Auswärts-Stärke.
+4. SPAETERE CHANCEN: Welche spaeter auslaufenden Spieler darf ich trotzdem nicht verpassen? Format je Spieler: "Beobachte [Name] | Zielstrategie | Spaeteres Max Gebot | Warum trotz spaeterem Ablauf relevant".
+
+5. NEWS-CHECK: Welche belastbaren Infos aus der Websuche veraendern die Entscheidung wirklich?
+
+6. TRADING-PLAN: Was ist deine Strategie fuer die naechsten 2 bis 4 Tage, damit ich nicht nur heute, sondern auch langfristig besser trade?
 
 </task>
 
@@ -372,4 +553,4 @@ except Exception as e:
 
 # E-Mail mit KI-Analyse versenden
 
-send_mail(manager_budgets_df, market_all_df, squad_recommendations_df, email, ai_advice)
+send_mail(manager_budgets_df, market_email_df, squad_email_df, email, ai_advice, top_action_sections)
