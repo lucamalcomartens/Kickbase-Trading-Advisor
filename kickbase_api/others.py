@@ -52,7 +52,9 @@ def get_achievement_reward(token, league_id, achievement_id):
     url = f"{BASE_URL}/leagues/{league_id}/user/achievements/{achievement_id}"
     data = get_json_with_token(url, token)
 
-    amount = data["ac"]
-    reward = data["er"]
+    # Some achievements do not expose a monetary reward in the API response.
+    # Treat missing values as zero so they are ignored instead of spamming warnings.
+    amount = data.get("ac", 0)
+    reward = data.get("er", 0)
 
     return amount, reward
