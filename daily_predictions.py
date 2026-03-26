@@ -35,6 +35,7 @@ from dotenv import load_dotenv
 
 import os, pandas as pd
 import time
+import json
 from zoneinfo import ZoneInfo
 
 
@@ -116,6 +117,10 @@ pd.set_option("display.max_columns", None)
 pd.set_option("display.max_rows", None)
 
 pd.set_option("display.width", 1000)
+
+ANALYSIS_HISTORY_PATH = "analysis_history.json"
+MAX_ANALYSIS_HISTORY_ENTRIES = 20
+PROMPT_HISTORY_ENTRIES = 3
 
 
 def format_currency(value):
@@ -202,6 +207,99 @@ def prepare_top_actions(market_df, squad_df):
             "subtitle": "Spieler, die Kapital blockieren oder an Risiko gewinnen.",
             "data": sell_df,
         },
+    }
+
+
+def load_analysis_history(file_path):
+    """Load persisted compact analysis history for prompt continuity."""
+
+    if not os.path.exists(file_path):
+        return []
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as history_file:
+            history_data = json.load(history_file)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"Warnung: Analyse-History konnte nicht geladen werden: {error}")
+        return []
+
+    return history_data if isinstance(history_data, list) else []
+
+
+def save_analysis_history(file_path, history_entries):
+    """Persist compact analysis history for future prompt context."""
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as history_file:
+            json.dump(history_entries[-MAX_ANALYSIS_HISTORY_ENTRIES:], history_file, ensure_ascii=False, indent=2)
+    except OSError as error:
+        print(f"Warnung: Analyse-History konnte nicht gespeichert werden: {error}")
+
+
+def summarise_player_rows(df, role_column, limit=3):
+    """Create compact one-line player summaries for analysis history."""
+
+    if df.empty:
+        return []
+
+    player_names = build_player_name(df)
+    summaries = []
+    for index, (_, row) in enumerate(df.head(limit).iterrows()):
+        player_name = player_names.iloc[index]
+        role_value = row.get(role_column, "n/a")
+        delta_value = format_currency(row.get("delta_prediction", 0))
+        team_name = row.get("team_name", "unbekannt")
+        summaries.append(f"{player_name} ({team_name}) | {role_value} | Delta {delta_value}")
+
+    return summaries
+
+
+def format_history_for_prompt(history_entries, max_entries=PROMPT_HISTORY_ENTRIES):
+    """Return the last compact analysis summaries as prompt text."""
+
+    if not history_entries:
+        return "Keine vorherigen Analysen gespeichert."
+
+    history_lines = []
+    for entry in history_entries[-max_entries:]:
+        history_lines.append(
+            "\n".join([
+                f"- Analyse vom {entry.get('report_date', 'unbekannt')} | Window: {entry.get('trading_window_mode', 'unknown')} | Friday: {entry.get('friday_safety_mode', 'unknown')} | Budget: {entry.get('own_budget', 'n/a')}",
+                f"  Top Buys: {', '.join(entry.get('top_buys', [])) or 'keine'}",
+                f"  Top Holds: {', '.join(entry.get('top_holds', [])) or 'keine'}",
+                f"  Top Sells: {', '.join(entry.get('top_sells', [])) or 'keine'}",
+                f"  Letzte KI-Kernaussage: {entry.get('ai_excerpt', 'keine')}",
+            ])
+        )
+
+    return "\n\n".join(history_lines)
+
+
+def build_history_entry(report_date, own_budget_value, matchday_info, market_df, squad_df, ai_text, ai_status):
+    """Build a compact persisted summary for future analyses."""
+
+    buy_candidates = market_df[market_df["buy_action"] == "buy_now"]
+    hold_candidates = market_df[
+        (market_df["delta_prediction"] > 0)
+        & (market_df["asset_role"].isin(["medium_term_hold", "core_starter"]))
+    ]
+    sell_candidates = squad_df[squad_df["squad_action"] == "sell"]
+    ai_excerpt = " ".join(str(ai_text).split())[:320] if ai_text else "keine"
+
+    return {
+        "report_date": report_date,
+        "created_at": datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat(),
+        "trading_window_mode": matchday_info.get("trading_window_mode", "unknown"),
+        "friday_safety_mode": matchday_info.get("friday_safety_mode", "unknown"),
+        "next_matchday": matchday_info.get("next_matchday", "unbekannt"),
+        "days_until_next_matchday": matchday_info.get("days_until_next_matchday", "unbekannt"),
+        "own_budget": format_currency(own_budget_value),
+        "squad_size": int(len(squad_df)),
+        "top_buys": summarise_player_rows(buy_candidates, "asset_role"),
+        "top_holds": summarise_player_rows(hold_candidates, "asset_role"),
+        "top_sells": summarise_player_rows(sell_candidates, "squad_role"),
+        "ai_status": ai_status,
+        "ai_excerpt": ai_excerpt or "keine",
     }
 
 
@@ -314,6 +412,7 @@ own_budget = get_budget(token, league_id)
 own_username = get_username(token)
 
 matchday_context = get_next_matchday_context(token, competition_ids[0])
+analysis_history = load_analysis_history(ANALYSIS_HISTORY_PATH)
 
 
 
@@ -468,6 +567,7 @@ try:
     )
     available_budget_text = format_currency(own_available_budget) if own_available_budget is not None else "n/a"
     own_budget_text = format_currency(own_budget)
+    previous_analysis_text = format_history_for_prompt(analysis_history)
 
 
 
@@ -514,6 +614,9 @@ Nutze die Google Suche gezielt nur fuer die wichtigsten Entscheidungen.
 
 
 <current_data_context>
+
+VORHERIGE ANALYSE-KONTEXT-HISTORY:
+{previous_analysis_text}
 
 HEUTIGES DATUM: {today}
 
@@ -663,6 +766,18 @@ Antwortformat (STRENG EINHALTEN):
 
     ai_advice = response.text
 
+    history_entry = build_history_entry(
+        today,
+        own_budget,
+        matchday_context,
+        market_all_df,
+        squad_recommendations_df,
+        ai_advice,
+        "success",
+    )
+    analysis_history.append(history_entry)
+    save_analysis_history(ANALYSIS_HISTORY_PATH, analysis_history)
+
     print("\n=== KI-ANWEISUNGEN GENERIERT ===")
 
     print(ai_advice)
@@ -672,6 +787,18 @@ Antwortformat (STRENG EINHALTEN):
 except Exception as e:
 
     ai_advice = f"KI-Analyse fehlgeschlagen: {str(e)}"
+
+    history_entry = build_history_entry(
+        today,
+        own_budget,
+        matchday_context,
+        market_all_df,
+        squad_recommendations_df,
+        ai_advice,
+        "failed",
+    )
+    analysis_history.append(history_entry)
+    save_analysis_history(ANALYSIS_HISTORY_PATH, analysis_history)
 
     print(ai_advice)
 
