@@ -32,4 +32,21 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: |
-          python daily_predictions.py
+          mkdir -p run_outputs
+          set -o pipefail
+          python daily_predictions.py 2>&1 | tee run_outputs/console.log
+
+      - name: Append run summary
+        if: always()
+        run: |
+          if [ -f run_outputs/last_run_summary.md ]; then
+            cat run_outputs/last_run_summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kickadvisor-last-run
+          path: run_outputs/
+          if-no-files-found: warn

@@ -28,6 +28,7 @@ from features.predictions.data_handler import (
 )
 
 from features.budgets import calc_manager_budgets
+from features.run_report import write_run_report
 
 from IPython.display import display
 
@@ -121,6 +122,7 @@ pd.set_option("display.width", 1000)
 ANALYSIS_HISTORY_PATH = "analysis_history.json"
 MAX_ANALYSIS_HISTORY_ENTRIES = 20
 PROMPT_HISTORY_ENTRIES = 3
+RUN_OUTPUT_DIR = "run_outputs"
 
 
 def format_currency(value):
@@ -445,6 +447,12 @@ print("\nData preprocessed.")
 model = train_model(X_train, y_train)
 
 signs_percent, rmse, mae, r2 = evaluate_model(model, X_test, y_test)
+model_metrics = {
+    "signs_percent": round(float(signs_percent), 2),
+    "rmse": round(float(rmse), 2),
+    "mae": round(float(mae), 2),
+    "r2": round(float(r2), 4),
+}
 
 print(f"\nModel evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2f}\nMAE: {mae:.2f}\nR2: {r2:.2f}")
 
@@ -492,6 +500,7 @@ from google.genai import types
 print("\nKI-Analyse wird gestartet...")
 
 MAX_AI_RETRIES = 3
+ai_status = "not_started"
 
 RETRYABLE_AI_ERROR_MARKERS = [
     "503",
@@ -771,6 +780,7 @@ Antwortformat (STRENG EINHALTEN):
 
 
     ai_advice = response.text
+    ai_status = "success"
 
     history_entry = build_history_entry(
         today,
@@ -779,7 +789,7 @@ Antwortformat (STRENG EINHALTEN):
         market_all_df,
         squad_recommendations_df,
         ai_advice,
-        "success",
+        ai_status,
     )
     analysis_history.append(history_entry)
     save_analysis_history(ANALYSIS_HISTORY_PATH, analysis_history)
@@ -793,6 +803,7 @@ Antwortformat (STRENG EINHALTEN):
 except Exception as e:
 
     ai_advice = f"KI-Analyse fehlgeschlagen: {str(e)}"
+    ai_status = "failed"
 
     history_entry = build_history_entry(
         today,
@@ -801,7 +812,7 @@ except Exception as e:
         market_all_df,
         squad_recommendations_df,
         ai_advice,
-        "failed",
+        ai_status,
     )
     analysis_history.append(history_entry)
     save_analysis_history(ANALYSIS_HISTORY_PATH, analysis_history)
@@ -816,4 +827,24 @@ except Exception as e:
 
 # E-Mail mit KI-Analyse versenden
 
-send_mail(manager_budgets_df, market_email_df, squad_email_df, email, ai_advice, top_action_sections)
+mail_status = "skipped" if not email else "success"
+try:
+    send_mail(manager_budgets_df, market_email_df, squad_email_df, email, ai_advice, top_action_sections)
+except Exception as error:
+    mail_status = f"failed: {error}"
+    print(f"Warnung: E-Mail-Versand fehlgeschlagen: {error}")
+
+write_run_report(
+    output_dir=RUN_OUTPUT_DIR,
+    report_date=today,
+    own_username=own_username,
+    own_budget=own_budget,
+    matchday_context=matchday_context,
+    model_metrics=model_metrics,
+    market_df=market_all_df,
+    squad_df=squad_recommendations_df,
+    ai_status=ai_status,
+    ai_advice=ai_advice,
+    mail_status=mail_status,
+    fixture_context_active=bool(fixture_context),
+)
