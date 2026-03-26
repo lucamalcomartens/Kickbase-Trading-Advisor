@@ -47,11 +47,11 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
 
     def cell_style(column_name, value):
         style = "padding:12px 14px;border-bottom:1px solid #e7ecf3;font-size:13px;color:#203040;vertical-align:top;"
-        right_aligned_columns = {"mv", "budget", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "priority_score", "recommended_bid_max", "sell_priority_score", "Score", "Sell Score", "Delta", "Max Gebot"}
+        right_aligned_columns = {"mv", "budget", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "s_11_prob", "hours_to_exp", "priority_score", "recommended_bid_max", "sell_priority_score", "Score", "Sell Score", "Delta", "Max Gebot"}
         if column_name in right_aligned_columns:
             style += "text-align:right;font-variant-numeric:tabular-nums;"
 
-        if column_name in {"mv_change_yesterday", "predicted_mv_target", "budget", "Delta"} and isinstance(value, (int, float)):
+        if column_name in {"mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "budget", "Delta"} and isinstance(value, (int, float)):
             if value > 0:
                 style += "color:#1f6f43;font-weight:700;"
             elif value < 0:
@@ -134,10 +134,16 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
         </div>
         """
 
+    buy_now_count = 0
+    sell_count = 0
+    if top_action_sections:
+        buy_now_count = len(top_action_sections.get("Jetzt kaufen", {}).get("data", []))
+        sell_count = len(top_action_sections.get("Eher verkaufen", {}).get("data", []))
+
     summary_cards = "".join([
-        stat_card("Manager", len(budget_df), "#1f6f43", "#eef7ee"),
         stat_card("Marktspieler", len(market_df), "#9f1c1c", "#fff4eb"),
         stat_card("Kaderspieler", len(squad_df), "#1d4f91", "#edf4ff"),
+        stat_card("Sofortaktionen", buy_now_count + sell_count, "#1f6f43", "#eef7ee"),
     ])
 
     top_actions_section = ""
@@ -154,19 +160,14 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
         </div>
         """
 
-    budget_section = section_block(
-        "Manager Budgets",
-        "Geschaetzte Budgets deiner Konkurrenten fuer die heutige Trading-Planung.",
-        style_df(budget_df),
-    )
     market_section = section_block(
         "Transfermarkt Uebersicht",
-        "Alle Spieler, die aktuell auf dem Markt sind, inklusive Prognose fuer morgen.",
+        "Alle Spieler, die aktuell auf dem Markt sind, inklusive erwarteter Veraenderung und prognostiziertem Marktwert fuer morgen.",
         style_df(market_df),
     )
     squad_section = section_block(
         "Dein Kader",
-        "Status und Prognose fuer deine aktuellen Spieler.",
+        "Status, erwartete Veraenderung und Prognose fuer deine aktuellen Spieler.",
         style_df(squad_df),
     )
 
@@ -190,7 +191,6 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
                 <div style="margin-top:8px;overflow-x:auto;">
                     {top_actions_section}
             {ai_section}
-                    {budget_section}
                     {market_section}
                     {squad_section}
                 </div>
