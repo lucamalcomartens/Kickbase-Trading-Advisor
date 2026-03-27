@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
@@ -63,6 +63,20 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
             {"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
             force_refresh=force_refresh,
         )
+        if not fixtures:
+            fixtures = _request_api_football(
+                api_key,
+                "/fixtures",
+                {
+                    "league": league_id,
+                    "season": season,
+                    "from": datetime.now(timezone.utc).date().isoformat(),
+                    "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
+                    "status": "NS-TBD-PST",
+                    "timezone": API_FOOTBALL_TIMEZONE,
+                },
+                force_refresh=force_refresh,
+            )
         injuries = _request_api_football(
             api_key,
             "/injuries",
@@ -79,7 +93,8 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
         return _empty_context("request_failed", season=season, error=str(error))
 
     rankings = _extract_rankings(standings)
-    team_context = _build_team_context(fixtures, rankings)
+    team_context = _seed_team_context_from_standings(standings, rankings)
+    team_context = _build_team_context(fixtures, rankings, team_context)
     injury_totals = _apply_injury_context(team_context, injuries)
     top_affected_teams = _build_top_affected_teams(team_context)
 
@@ -267,6 +282,13 @@ def _request_api_football(api_key, endpoint, params, force_refresh=False):
     )
     response.raise_for_status()
     payload = response.json()
+    payload_errors = payload.get("errors") or []
+    if isinstance(payload_errors, dict):
+        payload_errors = [f"{key}: {value}" for key, value in payload_errors.items() if value]
+    payload_errors = [str(item) for item in payload_errors if item]
+    if payload_errors:
+        raise ValueError(f"API-Football {endpoint} returned errors: {' | '.join(payload_errors)}")
+
     response_rows = payload.get("response", [])
     _write_cache(endpoint, params, response_rows)
     return response_rows
@@ -340,8 +362,33 @@ def _extract_rankings(standings_rows):
     return ranking_by_team
 
 
-def _build_team_context(fixtures_rows, rankings):
+def _seed_team_context_from_standings(standings_rows, rankings):
     team_context = {}
+    for standings_row in standings_rows:
+        for league_standing in standings_row.get("league", {}).get("standings", []):
+            for row in league_standing:
+                team_name = row.get("team", {}).get("name")
+                if not team_name:
+                    continue
+                team_key = normalize_team_name(team_name)
+                team_context[team_key] = {
+                    "team_name": team_name,
+                    "next_opponent": None,
+                    "home_or_away": None,
+                    "next_match_date": None,
+                    "fixture_difficulty": rank_to_fixture_difficulty(rankings.get(team_key)),
+                    "external_fixture_source": "api_football",
+                    "team_missing_count": 0,
+                    "team_questionable_count": 0,
+                    "team_availability_score": 100.0,
+                    "team_availability_level": "stable",
+                    "team_availability_note": "Keine gemeldeten Ausfaelle im API-Football Feed",
+                }
+    return team_context
+
+
+def _build_team_context(fixtures_rows, rankings, team_context=None):
+    team_context = dict(team_context or {})
     sorted_rows = sorted(fixtures_rows, key=lambda row: row.get("fixture", {}).get("date") or "")
 
     for row in sorted_rows:
