@@ -96,36 +96,36 @@ def _load_api_football_context_for_season(
             {"league": league_id, "season": season},
             force_refresh=force_refresh,
         )
+    fixture_window_start = datetime.now(timezone.utc).date().isoformat()
+    fixture_window_end = (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat()
     fixtures = _request_api_football_with_fallbacks(
         api_key,
         "/fixtures",
-        primary_params={"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
+        primary_params={
+            "league": league_id,
+            "season": season,
+            "from": fixture_window_start,
+            "to": fixture_window_end,
+            "status": "NS-TBD-PST",
+            "timezone": API_FOOTBALL_TIMEZONE,
+        },
         fallback_param_sets=[
             {
                 "league": league_id,
                 "season": season,
-                "from": datetime.now(timezone.utc).date().isoformat(),
-                "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
-                "status": "NS-TBD-PST",
+                "from": fixture_window_start,
+                "to": fixture_window_end,
                 "timezone": API_FOOTBALL_TIMEZONE,
-            }
-        ],
-        force_refresh=force_refresh,
-    )
-    if not fixtures:
-        fixtures = _request_api_football(
-            api_key,
-            "/fixtures",
+            },
             {
                 "league": league_id,
                 "season": season,
-                "from": datetime.now(timezone.utc).date().isoformat(),
-                "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
-                "status": "NS-TBD-PST",
-                "timezone": API_FOOTBALL_TIMEZONE,
+                "from": fixture_window_start,
+                "to": fixture_window_end,
             },
-            force_refresh=force_refresh,
-        )
+        ],
+        force_refresh=force_refresh,
+    )
     injuries = _request_api_football(
         api_key,
         "/injuries",
