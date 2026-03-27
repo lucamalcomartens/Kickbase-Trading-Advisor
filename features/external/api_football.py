@@ -96,10 +96,20 @@ def _load_api_football_context_for_season(
             {"league": league_id, "season": season},
             force_refresh=force_refresh,
         )
-    fixtures = _request_api_football(
+    fixtures = _request_api_football_with_fallbacks(
         api_key,
         "/fixtures",
-        {"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
+        primary_params={"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
+        fallback_param_sets=[
+            {
+                "league": league_id,
+                "season": season,
+                "from": datetime.now(timezone.utc).date().isoformat(),
+                "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
+                "status": "NS-TBD-PST",
+                "timezone": API_FOOTBALL_TIMEZONE,
+            }
+        ],
         force_refresh=force_refresh,
     )
     if not fixtures:
@@ -375,6 +385,21 @@ def _request_api_football(api_key, endpoint, params, force_refresh=False):
     response_rows = payload.get("response", [])
     _write_cache(endpoint, params, response_rows)
     return response_rows
+
+
+def _request_api_football_with_fallbacks(api_key, endpoint, primary_params, fallback_param_sets, force_refresh=False):
+    errors = []
+    request_param_sets = [primary_params, *(fallback_param_sets or [])]
+
+    for index, params in enumerate(request_param_sets):
+        try:
+            return _request_api_football(api_key, endpoint, params, force_refresh=force_refresh)
+        except Exception as error:
+            errors.append(str(error))
+            if index == len(request_param_sets) - 1:
+                raise ValueError(" | ".join(errors)) from error
+
+    return []
 
 
 def _read_cache(endpoint, params):
