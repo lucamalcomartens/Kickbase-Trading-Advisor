@@ -25,6 +25,7 @@ DEFAULT_CACHE_TTL_MINUTES = {
     "/standings": 180,
     "/fixtures": 30,
     "/injuries": 180,
+    "/teams": 720,
 }
 COMPETITION_LOOKUP = {
     1: {"country": "Germany", "preferred_names": ["Bundesliga"], "default_league_ids": [78]},
@@ -57,6 +58,14 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
             {"league": league_id, "season": season},
             force_refresh=force_refresh,
         )
+        teams = []
+        if not standings:
+            teams = _request_api_football(
+                api_key,
+                "/teams",
+                {"league": league_id, "season": season},
+                force_refresh=force_refresh,
+            )
         fixtures = _request_api_football(
             api_key,
             "/fixtures",
@@ -83,17 +92,30 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
             {
                 "league": league_id,
                 "season": season,
-                "date": datetime.now(timezone.utc).date().isoformat(),
                 "timezone": API_FOOTBALL_TIMEZONE,
             },
             force_refresh=force_refresh,
         )
+        if not injuries:
+            injuries = _request_api_football(
+                api_key,
+                "/injuries",
+                {
+                    "league": league_id,
+                    "season": season,
+                    "date": datetime.now(timezone.utc).date().isoformat(),
+                    "timezone": API_FOOTBALL_TIMEZONE,
+                },
+                force_refresh=force_refresh,
+            )
     except Exception as error:
         print(f"Hinweis: API-Football Kontext konnte nicht geladen werden: {error}")
         return _empty_context("request_failed", season=season, error=str(error))
 
     rankings = _extract_rankings(standings)
     team_context = _seed_team_context_from_standings(standings, rankings)
+    if not team_context and teams:
+        team_context = _seed_team_context_from_teams(teams)
     team_context = _build_team_context(fixtures, rankings, team_context)
     injury_totals = _apply_injury_context(team_context, injuries)
     top_affected_teams = _build_top_affected_teams(team_context)
@@ -106,6 +128,8 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
             "league_id": league_id,
             "league_name": league["league"].get("name"),
             "team_count": len(team_context),
+            "teams_loaded": len(teams),
+            "standings_loaded": len(standings),
             "fixtures_loaded": len(fixtures),
             "injury_entries_loaded": len(injuries),
             "injured_player_count": injury_totals["missing"],
@@ -387,6 +411,29 @@ def _seed_team_context_from_standings(standings_rows, rankings):
     return team_context
 
 
+def _seed_team_context_from_teams(team_rows):
+    team_context = {}
+    for row in team_rows:
+        team_name = row.get("team", {}).get("name")
+        if not team_name:
+            continue
+        team_key = normalize_team_name(team_name)
+        team_context[team_key] = {
+            "team_name": team_name,
+            "next_opponent": None,
+            "home_or_away": None,
+            "next_match_date": None,
+            "fixture_difficulty": None,
+            "external_fixture_source": "api_football",
+            "team_missing_count": 0,
+            "team_questionable_count": 0,
+            "team_availability_score": 100.0,
+            "team_availability_level": "stable",
+            "team_availability_note": "Keine gemeldeten Ausfaelle im API-Football Feed",
+        }
+    return team_context
+
+
 def _build_team_context(fixtures_rows, rankings, team_context=None):
     team_context = dict(team_context or {})
     sorted_rows = sorted(fixtures_rows, key=lambda row: row.get("fixture", {}).get("date") or "")
@@ -575,6 +622,8 @@ def _empty_context(reason, season=None, error=None):
         "league_id": None,
         "league_name": None,
         "team_count": 0,
+        "teams_loaded": 0,
+        "standings_loaded": 0,
         "fixtures_loaded": 0,
         "injury_entries_loaded": 0,
         "injured_player_count": 0,

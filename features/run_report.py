@@ -397,6 +397,8 @@ def _render_markdown(payload):
 - Liga: {api_football_summary.get('league_name')}
 - Season: {api_football_summary.get('season')}
 - Teams mit Kontext: {api_football_summary.get('team_count')}
+- Teams geladen: {api_football_summary.get('teams_loaded')}
+- Standings geladen: {api_football_summary.get('standings_loaded')}
 - Geladene Fixtures: {api_football_summary.get('fixtures_loaded')}
 - Injury Entries: {api_football_summary.get('injury_entries_loaded')}
 - Missing Player Flags: {api_football_summary.get('injured_player_count')}
