@@ -38,79 +38,106 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
     """Load optional API-Football team context for fixtures and availability."""
 
     api_key = (os.getenv("API_FOOTBALL_KEY") or "").strip()
-    season = _resolve_current_season(current_dt)
+    requested_season = _resolve_current_season(current_dt)
+    season_candidates = _build_season_candidates(requested_season, competition_id)
     descriptor = COMPETITION_LOOKUP.get(competition_id)
 
     if not api_key:
-        return _empty_context("missing_api_key", season=season)
+        return _empty_context("missing_api_key", season=requested_season, requested_season=requested_season)
     if descriptor is None:
-        return _empty_context("unsupported_competition", season=season)
+        return _empty_context("unsupported_competition", season=requested_season, requested_season=requested_season)
 
-    try:
-        league = _resolve_league(api_key, competition_id, descriptor, season)
-        if not league:
-            return _empty_context("league_not_found", season=season)
+    last_error = None
+    for season in season_candidates:
+        try:
+            return _load_api_football_context_for_season(
+                api_key,
+                competition_id,
+                descriptor,
+                season,
+                requested_season=requested_season,
+                force_refresh=force_refresh,
+            )
+        except Exception as error:
+            last_error = error
+            fallback_season = _extract_supported_season_from_error(error)
+            if fallback_season is not None and fallback_season not in season_candidates:
+                season_candidates.append(fallback_season)
 
-        league_id = int(league["league"]["id"])
-        standings = _request_api_football(
+    print(f"Hinweis: API-Football Kontext konnte nicht geladen werden: {last_error}")
+    failed_season = season_candidates[-1] if season_candidates else requested_season
+    return _empty_context("request_failed", season=failed_season, requested_season=requested_season, error=str(last_error))
+
+
+def _load_api_football_context_for_season(
+    api_key,
+    competition_id,
+    descriptor,
+    season,
+    requested_season,
+    force_refresh=False,
+):
+    league = _resolve_league(api_key, competition_id, descriptor, season)
+    if not league:
+        return _empty_context("league_not_found", season=season, requested_season=requested_season)
+
+    league_id = int(league["league"]["id"])
+    standings = _request_api_football(
+        api_key,
+        "/standings",
+        {"league": league_id, "season": season},
+        force_refresh=force_refresh,
+    )
+    teams = []
+    if not standings:
+        teams = _request_api_football(
             api_key,
-            "/standings",
+            "/teams",
             {"league": league_id, "season": season},
             force_refresh=force_refresh,
         )
-        teams = []
-        if not standings:
-            teams = _request_api_football(
-                api_key,
-                "/teams",
-                {"league": league_id, "season": season},
-                force_refresh=force_refresh,
-            )
+    fixtures = _request_api_football(
+        api_key,
+        "/fixtures",
+        {"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
+        force_refresh=force_refresh,
+    )
+    if not fixtures:
         fixtures = _request_api_football(
             api_key,
             "/fixtures",
-            {"league": league_id, "season": season, "next": 40, "timezone": API_FOOTBALL_TIMEZONE},
+            {
+                "league": league_id,
+                "season": season,
+                "from": datetime.now(timezone.utc).date().isoformat(),
+                "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
+                "status": "NS-TBD-PST",
+                "timezone": API_FOOTBALL_TIMEZONE,
+            },
             force_refresh=force_refresh,
         )
-        if not fixtures:
-            fixtures = _request_api_football(
-                api_key,
-                "/fixtures",
-                {
-                    "league": league_id,
-                    "season": season,
-                    "from": datetime.now(timezone.utc).date().isoformat(),
-                    "to": (datetime.now(timezone.utc).date() + timedelta(days=21)).isoformat(),
-                    "status": "NS-TBD-PST",
-                    "timezone": API_FOOTBALL_TIMEZONE,
-                },
-                force_refresh=force_refresh,
-            )
+    injuries = _request_api_football(
+        api_key,
+        "/injuries",
+        {
+            "league": league_id,
+            "season": season,
+            "timezone": API_FOOTBALL_TIMEZONE,
+        },
+        force_refresh=force_refresh,
+    )
+    if not injuries:
         injuries = _request_api_football(
             api_key,
             "/injuries",
             {
                 "league": league_id,
                 "season": season,
+                "date": datetime.now(timezone.utc).date().isoformat(),
                 "timezone": API_FOOTBALL_TIMEZONE,
             },
             force_refresh=force_refresh,
         )
-        if not injuries:
-            injuries = _request_api_football(
-                api_key,
-                "/injuries",
-                {
-                    "league": league_id,
-                    "season": season,
-                    "date": datetime.now(timezone.utc).date().isoformat(),
-                    "timezone": API_FOOTBALL_TIMEZONE,
-                },
-                force_refresh=force_refresh,
-            )
-    except Exception as error:
-        print(f"Hinweis: API-Football Kontext konnte nicht geladen werden: {error}")
-        return _empty_context("request_failed", season=season, error=str(error))
 
     rankings = _extract_rankings(standings)
     team_context = _seed_team_context_from_standings(standings, rankings)
@@ -125,6 +152,8 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
             "available": bool(team_context),
             "source": "api_football",
             "season": season,
+            "requested_season": requested_season,
+            "season_fallback_applied": int(season) != int(requested_season),
             "league_id": league_id,
             "league_name": league["league"].get("name"),
             "team_count": len(team_context),
@@ -208,6 +237,32 @@ def _is_empty(value):
 def _resolve_current_season(current_dt=None):
     reference_dt = current_dt or datetime.now(timezone.utc)
     return reference_dt.year if reference_dt.month >= 7 else reference_dt.year - 1
+
+
+def _build_season_candidates(requested_season, competition_id):
+    candidates = []
+    for env_key in [f"API_FOOTBALL_SEASON_{competition_id}", "API_FOOTBALL_SEASON"]:
+        env_value = (os.getenv(env_key) or "").strip()
+        if env_value.isdigit():
+            candidates.append(int(env_value))
+    candidates.append(int(requested_season))
+
+    seen = set()
+    ordered_candidates = []
+    for season in candidates:
+        if season in seen:
+            continue
+        seen.add(season)
+        ordered_candidates.append(season)
+    return ordered_candidates
+
+
+def _extract_supported_season_from_error(error):
+    message = str(error or "")
+    match = re.search(r"try from\s+(\d{4})\s+to\s+(\d{4})", message, flags=re.IGNORECASE)
+    if not match:
+        return None
+    return int(match.group(2))
 
 
 def _resolve_league(api_key, competition_id, descriptor, season):
@@ -613,12 +668,14 @@ def _normalize_kickoff(value):
     return datetime.fromisoformat(str(value).replace("Z", "+00:00")).isoformat()
 
 
-def _empty_context(reason, season=None, error=None):
+def _empty_context(reason, season=None, requested_season=None, error=None):
     summary = {
         "available": False,
         "source": "api_football",
         "reason": reason,
         "season": season,
+        "requested_season": requested_season,
+        "season_fallback_applied": bool(requested_season is not None and season is not None and int(requested_season) != int(season)),
         "league_id": None,
         "league_name": None,
         "team_count": 0,

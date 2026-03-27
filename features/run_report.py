@@ -396,6 +396,8 @@ def _render_markdown(payload):
 - Grund: {api_football_summary.get('reason')}
 - Liga: {api_football_summary.get('league_name')}
 - Season: {api_football_summary.get('season')}
+- Angefragte Season: {api_football_summary.get('requested_season')}
+- Season-Fallback aktiv: {api_football_summary.get('season_fallback_applied')}
 - Teams mit Kontext: {api_football_summary.get('team_count')}
 - Teams geladen: {api_football_summary.get('teams_loaded')}
 - Standings geladen: {api_football_summary.get('standings_loaded')}
@@ -407,6 +409,7 @@ def _render_markdown(payload):
 - Market Opportunity Adjustments: {availability_adjustment_summary.get('market_opportunity_count')}
 - Squad Sell Pressure Up: {availability_adjustment_summary.get('squad_sell_pressure_up')}
 - Squad Sell Pressure Down: {availability_adjustment_summary.get('squad_sell_pressure_down')}
+- Fehler: {api_football_summary.get('error')}
 
 {api_football_lines}
 
