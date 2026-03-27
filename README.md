@@ -39,7 +39,7 @@
   <ol>
     <li><strong>Fork the Repository:</strong> Click the "Fork" button to create a copy of this repository in your account.</li>
     <li>
-      <strong>Set Your Variables:</strong> In the file <code>daily_predictions.py</code>, set the following variables:
+      <strong>Set Your Variables:</strong> In the file <code>config/settings.py</code>, set the following variables:
       <ul>
 <li><code>competition_ids</code>: The league you are playing in (default: 1 = Bundesliga).</li>
 <li><code>league_name</code>: The exact name of your league (case-sensitive, include spaces, use UTF encoding for special symbols like emojis). If the name doesn't match any league in your account, the tool will default to your first league. If you belong to only one league, you can leave this empty.</li>
@@ -70,6 +70,19 @@
 
 <div align="justify">
   <strong>Other Use Case Options:</strong> The tool can be used without the email notifier. Just leave out the secrets, and the results will still be displayed in the GitHub Action execution log. As described in the fourth step "Test Your Setup," you can also always execute the workflow manually and are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed along with the packages listed in <code>requirements.txt</code>. Create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If <code>FOOTBALL_DATA_API_KEY</code> is set, the prompt and email also receive opponent and simple fixture context without consuming additional AI resources. If you have any further questions or encounter issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
+</div>
+
+<h2 align="center">Project Structure</h2>
+<div align="justify">
+  <ul>
+    <li><code>config/</code>: Central project settings and path management.</li>
+    <li><code>scripts/</code>: Executable workflow entrypoints. The actual daily run lives in <code>scripts/run_daily_predictions.py</code>.</li>
+    <li><code>features/</code>: Domain logic such as bidding strategy, reports, AI prompt preparation, offer tracking, and prediction helpers.</li>
+    <li><code>kickbase_api/</code>: Encapsulated Kickbase API access layer.</li>
+    <li><code>data/</code>: Generated runtime data such as the SQLite database, analysis history, and local run outputs.</li>
+    <li><code>reports/</code>: Versioned markdown reports that stay inside the repository.</li>
+    <li><code>daily_predictions.py</code>: Thin compatibility entrypoint that forwards to the real runner in <code>scripts/</code>.</li>
+  </ul>
 </div>
 
 <h2 align="center">Future Work & Ideas</h2>
