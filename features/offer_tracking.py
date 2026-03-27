@@ -108,7 +108,7 @@ def summarize_market_feed_debug(raw_market_feed, target_player_names=None, limit
                 "player_id": _extract_player_id(item),
                 "player_name": player_name,
                 "market_value": _extract_market_value(item),
-                "expires_at": _extract_datetime(item, OFFER_EXPIRY_KEYS + ["dt"]),
+                "expires_at": _extract_offer_expiry(item, datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")),
                 "sample": _sanitize_candidate(item),
             }
         )
@@ -126,7 +126,7 @@ def summarize_market_feed_debug(raw_market_feed, target_player_names=None, limit
                     "player_id": _extract_player_id(item),
                     "player_name": _extract_player_name(item),
                     "market_value": _extract_market_value(item),
-                    "expires_at": _extract_datetime(item, OFFER_EXPIRY_KEYS + ["dt"]),
+                    "expires_at": _extract_offer_expiry(item, datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")),
                     "sample": _sanitize_candidate(item),
                 }
             )
@@ -196,6 +196,9 @@ def _iter_structure_nodes(payload, path="root"):
 
 
 def _looks_like_offer_candidate(candidate, path=""):
+    if _looks_like_market_player(candidate):
+        return _looks_like_market_offer(candidate)
+
     player_id = _extract_player_id(candidate)
     offer_amount = _extract_offer_amount(candidate)
     has_offer_marker = (
@@ -213,6 +216,9 @@ def _looks_like_offer_candidate(candidate, path=""):
 
 
 def _normalize_offer_candidate(candidate, path, league_id, own_username, observed_at):
+    if _looks_like_market_player(candidate) and not _looks_like_market_offer(candidate):
+        return None
+
     player_id = _extract_player_id(candidate)
     offer_amount = _extract_offer_amount(candidate)
     if player_id is None or offer_amount is None:
@@ -240,7 +246,7 @@ def _normalize_offer_candidate(candidate, path, league_id, own_username, observe
         "expires_at": expires_at,
         "status": "active",
         "observed_at": observed_at,
-        "source": f"manager_transfer_feed:{path}",
+        "source": f"market_feed:{path}" if _looks_like_market_player(candidate) else f"manager_transfer_feed:{path}",
         "raw_json": json.dumps(candidate, ensure_ascii=False, sort_keys=True),
     }
 
@@ -367,7 +373,10 @@ def _looks_like_market_player(candidate):
 
 
 def _looks_like_market_offer(candidate):
-    return _looks_like_market_player(candidate) and _extract_numeric(candidate, ["uop"]) not in (None, 0)
+    own_offer = _extract_numeric(candidate, ["uop"])
+    offer_count = _extract_numeric(candidate, ["ofc"])
+    offer_id = _extract_scalar(candidate, ["uoid"])
+    return _looks_like_market_player(candidate) and own_offer not in (None, 0) and (offer_count not in (None, 0) or offer_id is not None)
 
 
 def _extract_numeric(candidate, keys):
