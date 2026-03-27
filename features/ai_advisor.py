@@ -46,6 +46,10 @@ def generate_ai_advice(
 
     strategy_context = strategy_context or {}
     management_summary = strategy_context.get("management_summary", {})
+    squad_management = strategy_context.get("squad_management", {})
+    roster_needs = strategy_context.get("roster_needs", {})
+    external_data = strategy_context.get("external_data", {})
+    api_football_summary = external_data.get("api_football", {})
     active_offer_actions_df = pd.DataFrame(strategy_context.get("active_offer_actions", []))
     recent_outbid_df = pd.DataFrame(strategy_context.get("recent_outbid", []))
     validation_notes = strategy_context.get("validation_notes", [])
@@ -56,6 +60,20 @@ def generate_ai_advice(
     avg_outbid_gap = float(management_summary.get("avg_outbid_gap", 0) or 0)
     avg_outbid_gap_pct = float(management_summary.get("avg_outbid_gap_pct", 0) or 0)
     recent_outbid_count_14d = int(management_summary.get("recent_outbid_count_14d", 0) or 0)
+    market_scarcity_level = squad_management.get("market_scarcity_level", "unknown")
+    strong_replacement_count = int(squad_management.get("strong_replacement_count", 0) or 0)
+    protected_player_count = int(squad_management.get("protected_player_count", 0) or 0)
+    primary_need_position = roster_needs.get("primary_need_position", "none")
+    primary_need_level = roster_needs.get("primary_need_level", "none")
+    urgent_need_count = int(roster_needs.get("urgent_need_count", 0) or 0)
+    position_need_rows = roster_needs.get("position_needs", [])
+    api_football_available = bool(api_football_summary.get("available"))
+    api_football_league_name = api_football_summary.get("league_name", "n/a")
+    api_football_team_count = int(api_football_summary.get("team_count", 0) or 0)
+    api_football_injured_player_count = int(api_football_summary.get("injured_player_count", 0) or 0)
+    api_football_questionable_player_count = int(api_football_summary.get("questionable_player_count", 0) or 0)
+    api_football_top_teams_df = pd.DataFrame(api_football_summary.get("top_affected_teams", []))
+    api_football_adjustment_summary = api_football_summary.get("availability_adjustment_summary", {})
 
     squad_team_counts = squad_recommendations_df["team_name"].value_counts()
     squad_team_counts_text = squad_team_counts[squad_team_counts > 1].to_string() if not squad_team_counts.empty else "Keine auffaelligen Doppelungen"
@@ -97,6 +115,8 @@ def generate_ai_advice(
             "football_signal_score",
             "sell_priority_score",
             "squad_role",
+            "retention_priority",
+            "squad_strategy_note",
             "next_opponent",
             "home_or_away",
             "fixture_difficulty",
@@ -126,6 +146,14 @@ def generate_ai_advice(
             "estimated_market_winning_bid",
             "bid_strategy_note",
             "personal_bid_feedback",
+            "position_label",
+            "roster_need_level",
+            "roster_need_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_note",
+            "team_availability_priority_adjustment",
             "has_active_offer",
             "active_offer_amount",
             "active_offer_decision",
@@ -160,6 +188,14 @@ def generate_ai_advice(
             "estimated_market_winning_bid",
             "bid_strategy_note",
             "personal_bid_feedback",
+            "position_label",
+            "roster_need_level",
+            "roster_need_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_note",
+            "team_availability_priority_adjustment",
             "has_active_offer",
             "active_offer_amount",
             "active_offer_decision",
@@ -191,6 +227,14 @@ def generate_ai_advice(
             "estimated_market_winning_bid",
             "bid_strategy_note",
             "personal_bid_feedback",
+            "position_label",
+            "roster_need_level",
+            "roster_need_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_note",
+            "team_availability_priority_adjustment",
             "has_active_offer",
             "active_offer_amount",
             "active_offer_decision",
@@ -224,6 +268,14 @@ def generate_ai_advice(
             "estimated_market_winning_bid",
             "bid_strategy_note",
             "personal_bid_feedback",
+            "position_label",
+            "roster_need_level",
+            "roster_need_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_note",
+            "team_availability_priority_adjustment",
             "has_active_offer",
             "active_offer_amount",
             "active_offer_decision",
@@ -251,6 +303,11 @@ def generate_ai_advice(
             "football_signal_score",
             "sell_priority_score",
             "squad_action",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_note",
+            "team_availability_sell_adjustment",
         ],
         limit=12,
     )
@@ -262,6 +319,24 @@ def generate_ai_advice(
     recent_outbid_text = format_prompt_table(
         recent_outbid_df,
         ["player_name", "offer_amount", "winning_price", "lost_to", "resolved_at"],
+        limit=8,
+    )
+    position_needs_text = format_prompt_table(
+        pd.DataFrame(position_need_rows),
+        ["position_label", "current_count", "minimum_count", "market_option_count", "need_level", "need_note"],
+        limit=8,
+    )
+    api_football_affected_teams_text = format_prompt_table(
+        api_football_top_teams_df,
+        [
+            "team_name",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_score",
+            "next_opponent",
+            "fixture_difficulty",
+        ],
         limit=8,
     )
     validation_notes_text = "\n".join(f"- {note}" for note in validation_notes) if validation_notes else "- Keine"
@@ -328,11 +403,26 @@ TAGE BIS ZUM NAECHSTEN SPIELTAG: {matchday_context['days_until_next_matchday']}
 TRADING_WINDOW_MODE: {matchday_context['trading_window_mode']}
 FRIDAY_SAFETY_MODE: {matchday_context['friday_safety_mode']}
 SPIELPLAN-KONTEXT: {'aktiv' if fixture_context_active else 'nicht verfuegbar'}
+API-FOOTBALL-KONTEXT: {'aktiv' if api_football_available else 'nicht verfuegbar'}
+API-FOOTBALL LIGA: {api_football_league_name}
+API-FOOTBALL TEAMS MIT KONTEXT: {api_football_team_count}
+API-FOOTBALL GEMELDETE AUSFAELLE: {api_football_injured_player_count}
+API-FOOTBALL QUESTIONABLE FLAGS: {api_football_questionable_player_count}
+API-FOOTBALL MARKET-CAUTION-ANPASSUNGEN: {api_football_adjustment_summary.get('market_caution_count', 0)}
+API-FOOTBALL MARKET-OPPORTUNITY-ANPASSUNGEN: {api_football_adjustment_summary.get('market_opportunity_count', 0)}
+API-FOOTBALL SELL-DRUCK HOCH: {api_football_adjustment_summary.get('squad_sell_pressure_up', 0)}
+API-FOOTBALL SELL-DRUCK RUNTER: {api_football_adjustment_summary.get('squad_sell_pressure_down', 0)}
 KADERSTRUKTUR: {core_starter_count} core_starter, {rotation_hold_count} rotation_hold, {sell_candidate_count} sell_candidate
 PERSOENLICHER OVERBID-DRUCK LETZTE 14 TAGE: {overbid_pressure_level}
 ANZAHL UEBERBOTENE GEBOTE LETZTE 14 TAGE: {recent_outbid_count_14d}
 DURCHSCHNITTLICHER ABSTAND ZUM GEWINNERGEBOT: {avg_outbid_gap_text} Euro ({avg_outbid_gap_pct:.2%})
 ALGORITHMISCH EMPFOHLENER PERSOENLICHER AUFSCHLAG FUER HART UMKAEMPFTE GEBOTE: {suggested_markup_pct:.2%}
+MARKTKNAPPHEIT FUER GUTE ERSATZ-/UPGRADE-SPIELER: {market_scarcity_level}
+STARKE VERFUEGBARE ERSATZOPTIONEN AM MARKT: {strong_replacement_count}
+SYSTEMISCH GESCHUETZTE KADERSPIELER WEGEN DUENNEM MARKT: {protected_player_count}
+PRIMAERER KADERBEDARF NACH POSITION: {primary_need_position}
+DRINGLICHKEIT DIESES POSITIONSBEDARFS: {primary_need_level}
+ANZAHL POSITIONEN MIT AKUTEM ODER ERHOEHTEM BEDARF: {urgent_need_count}
 
 MEHRFACHBELEGUNG PRO VEREIN IM KADER:
 {squad_team_counts_text}
@@ -345,6 +435,12 @@ KUERZLICH UEBERBOTENE EIGENE GEBOTE:
 
 VALIDIERUNGSHINWEISE AUS DER SYSTEMLOGIK:
 {validation_notes_text}
+
+POSITIONSBEDARF AUS DER SYSTEMLOGIK:
+{position_needs_text}
+
+API-FOOTBALL TEAM-VERFUEGBARKEIT:
+{api_football_affected_teams_text}
 
 MEIN KADER:
 {squad_text}
@@ -373,6 +469,10 @@ HINWEIS ZU DEN SCORES:
 - competitive_bid_max ist dein wettbewerbsfaehiges Maximalgebot, solange der Preis historisch noch profitabel bzw. vertretbar erscheint. Wenn bid_strategy_note auf avoid_price_war oder stay_disciplined steht, sollst du gerade NICHT stumpf auf den geschaetzten Marktpreis hochgehen.
 - personal_bid_feedback zeigt, ob competitive_bid_max wegen deiner juengsten Overbid-Historie bereits leicht angehoben wurde.
 - active_offer_decision und active_offer_recommended_new_bid sind vorgelagerte Systementscheidungen fuer bereits laufende Gebote.
+- squad_strategy_note zeigt, ob ein Kaderspieler wegen Marktknappheit bewusst eher gehalten werden sollte.
+- roster_need_level und roster_need_note zeigen, ob ein Marktspieler wegen einer echten Kaderluecke strukturell wichtiger ist als sein reiner Trading-Wert.
+- team_missing_count, team_questionable_count, team_availability_level und team_availability_note kommen aus API-Football und zeigen teamweite Ausfall- bzw. Verfuegbarkeitsrisiken.
+- team_availability_priority_adjustment und team_availability_sell_adjustment zeigen, wie diese Teamrisiken bereits deterministisch in Kauf- bzw. Sell-Scores eingepreist wurden.
 - recent_bid_competition beschreibt den zuletzt beobachteten Konkurrenzdruck in aehnlichen Deals als low, medium oder high.
 - next_opponent, home_or_away und fixture_difficulty kommen, falls verfuegbar, aus einem externen Spielplan-Feed ohne zusaetzlichen KI-Aufruf.
 - ECHT SOFORT VERFUEGBARES CASH OHNE INS MINUS ZU GEHEN ist das aktuell wirklich freie Budget in der App.
@@ -399,6 +499,10 @@ Erstelle eine konkrete Abendstrategie fuer mein Kickbase-Team.
 - Behandle AKTIVE GEBOTS-EMPFEHLUNGEN AUS DER SYSTEMLOGIK als Default-Handlungsbasis. Weiche nur begruendet davon ab.
 - Behandle das bereits gebundene Kapital aus offenen Geboten als nicht erneut verfuegbares Cash.
 - Wenn ein Spieler bereits ein aktives Gebot hat, gib keine redundante Neuempfehlung ohne explizite Aussage "Gebot halten", "leicht erhoehen" oder "abbrechen".
+- Wenn MARKTKNAPPHEIT FUER GUTE ERSATZ-/UPGRADE-SPIELER = high oder medium, priorisiere das Halten guter, schwer ersetzbarer Kaderspieler. Verkaufe solche Spieler nicht nur, weil sie kurzfristig nicht den maximalen Trading-Gewinn bringen.
+- Wenn squad_strategy_note = keep_due_to_thin_market oder lean_keep_due_to_market_scarcity, dann ist Halten der Default. Eine Verkaufsempfehlung braucht dann eine klare, konkrete Begruendung.
+- Wenn PRIMAERER KADERBEDARF NACH POSITION nicht "none" ist, behandle diese Luecke als echte Management-Prioritaet. Das gilt besonders fuer GK/Torwart: selbst in der Laenderspielpause darf ein fehlender Torwart nicht nur wegen besserer Trading-Chancen auf spaeter verschoben werden.
+- Wenn roster_need_level = high oder medium, darf ein Spieler dieser Position gegenueber rein besseren Trading-Kandidaten vorgezogen werden, sofern das Budget realistisch bleibt.
 - Wenn PERSOENLICHER OVERBID-DRUCK = medium oder high, pruefe aktiv, ob competitive_bid_max bei Prioritaet-A-Kandidaten leicht angehoben werden sollte, statt immer nur dieselbe disziplinierte Grenze zu wiederholen.
 - Wenn historical bid pressure hoch ist, entscheide explizit zwischen "mitgehen" und "Preiskrieg vermeiden". Ein hohes estimated_market_winning_bid ist kein Kaufzwang.
 - Unterscheide klar zwischen:

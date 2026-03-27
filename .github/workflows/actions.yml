@@ -4,6 +4,11 @@ permissions:
   contents: write
 
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - reports/**
   schedule:
     - cron: '30 21 * * *'  # Runs every day at 22:30 UTC
   workflow_dispatch:
@@ -34,6 +39,7 @@ jobs:
           KICK_PASS: ${{ secrets.KICK_PASS }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           mkdir -p run_outputs
           mkdir -p reports

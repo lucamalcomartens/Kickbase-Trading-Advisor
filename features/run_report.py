@@ -47,7 +47,7 @@ def write_run_report(
         "ai_status": ai_status,
         "mail_status": mail_status,
         "offer_tracking_summary": offer_tracking_summary or {"counts": {}, "recent_outbid": []},
-        "strategy_context": strategy_context or {"management_summary": {}, "active_offer_actions": [], "validation_notes": []},
+        "strategy_context": strategy_context or {"management_summary": {}, "squad_management": {}, "roster_needs": {}, "active_offer_actions": [], "validation_notes": []},
         "top_market_candidates": _summarize_market(market_df),
         "top_sell_candidates": _summarize_squad(squad_df),
         "budget_table": _frame_to_text(manager_budgets_df, limit=10),
@@ -62,6 +62,12 @@ def write_run_report(
             "competitive_bid_max",
             "recent_bid_competition",
             "bid_strategy_note",
+            "position_label",
+            "roster_need_level",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_priority_adjustment",
             "active_offer_decision",
             "active_offer_recommended_new_bid",
             "hours_to_exp",
@@ -74,6 +80,11 @@ def write_run_report(
             "predicted_mv_change",
             "sell_priority_score",
             "squad_role",
+            "squad_strategy_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_sell_adjustment",
             "s_11_prob",
             "next_opponent",
         ], limit=15),
@@ -264,6 +275,10 @@ def _render_markdown(payload):
 
     strategy_context = payload.get("strategy_context", {})
     management_summary = strategy_context.get("management_summary", {})
+    squad_management = strategy_context.get("squad_management", {})
+    roster_needs = strategy_context.get("roster_needs", {})
+    api_football_summary = strategy_context.get("external_data", {}).get("api_football", {})
+    availability_adjustment_summary = api_football_summary.get("availability_adjustment_summary", {})
     validation_lines = "\n".join(
         f"- {item}" for item in strategy_context.get("validation_notes", [])
     ) or "- Keine Hinweise"
@@ -271,6 +286,14 @@ def _render_markdown(payload):
         f"- {item.get('player_name')} | Aktion: {item.get('recommended_action_label')} | Aktuelles Gebot: {item.get('current_offer_amount')} | Neues Max Gebot: {item.get('recommended_new_bid')} | Grund: {item.get('decision_reason_label')}"
         for item in strategy_context.get("active_offer_actions", [])
     ) or "- Keine aktiven Gebotsentscheidungen gespeichert"
+    roster_need_lines = "\n".join(
+        f"- {item.get('position_label')} | Im Kader: {item.get('current_count')} | Minimum: {item.get('minimum_count')} | Marktoptionen: {item.get('market_option_count')} | Bedarf: {item.get('need_level')} | Hinweis: {item.get('need_note')}"
+        for item in roster_needs.get("position_needs", [])
+    ) or "- Kein akuter Positionsbedarf erkannt"
+    api_football_lines = "\n".join(
+        f"- {item.get('team_name')} | Missing: {item.get('team_missing_count')} | Questionable: {item.get('team_questionable_count')} | Level: {item.get('team_availability_level')} | Score: {item.get('team_availability_score')} | Gegner: {item.get('next_opponent')} | Fixture: {item.get('fixture_difficulty')}"
+        for item in api_football_summary.get("top_affected_teams", [])
+    ) or "- Keine auffaelligen Team-Ausfaelle im API-Football Kontext"
 
     offer_counts = payload["offer_tracking_summary"].get("counts", {})
     budget_row = payload.get("own_budget_row", {})
@@ -352,6 +375,37 @@ def _render_markdown(payload):
 - Aktive Gebote halten: {management_summary.get('action_counts', {}).get('hold', 0)}
 - Aktive Gebote leicht erhoehen: {management_summary.get('action_counts', {}).get('raise_small', 0)}
 - Aktive Gebote abbrechen: {management_summary.get('action_counts', {}).get('abort', 0)}
+
+## Squad Retention Summary
+
+- Marktknappheit: {squad_management.get('market_scarcity_level')}
+- Starke Ersatzoptionen am Markt: {squad_management.get('strong_replacement_count')}
+- Geschuetzte Kaderspieler: {squad_management.get('protected_player_count')}
+
+## Roster Need Summary
+
+- Primaerer Positionsbedarf: {roster_needs.get('primary_need_position')}
+- Dringlichkeit: {roster_needs.get('primary_need_level')}
+- Positionen mit Bedarf: {roster_needs.get('urgent_need_count')}
+
+{roster_need_lines}
+
+## API-Football Summary
+
+- API-Football aktiv: {api_football_summary.get('available')}
+- Liga: {api_football_summary.get('league_name')}
+- Season: {api_football_summary.get('season')}
+- Teams mit Kontext: {api_football_summary.get('team_count')}
+- Geladene Fixtures: {api_football_summary.get('fixtures_loaded')}
+- Injury Entries: {api_football_summary.get('injury_entries_loaded')}
+- Missing Player Flags: {api_football_summary.get('injured_player_count')}
+- Questionable Flags: {api_football_summary.get('questionable_player_count')}
+- Market Caution Adjustments: {availability_adjustment_summary.get('market_caution_count')}
+- Market Opportunity Adjustments: {availability_adjustment_summary.get('market_opportunity_count')}
+- Squad Sell Pressure Up: {availability_adjustment_summary.get('squad_sell_pressure_up')}
+- Squad Sell Pressure Down: {availability_adjustment_summary.get('squad_sell_pressure_down')}
+
+{api_football_lines}
 
 ## Strategy Validation
 

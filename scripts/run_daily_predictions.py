@@ -25,6 +25,7 @@ from features.analysis_support import (
 )
 from features.bid_history import apply_personal_bid_tuning, build_transfer_history_df, enrich_market_with_bid_history
 from features.budgets import calc_manager_budgets
+from features.external import enrich_with_api_football_context, get_api_football_context
 from features.notifier import send_mail
 from features.offer_tracking import extract_current_market_offers, summarize_market_feed_debug, summarize_offer_feed_debug
 from features.predictions.data_handler import (
@@ -37,7 +38,7 @@ from features.predictions.modeling import evaluate_model, train_model
 from features.predictions.predictions import join_current_market, join_current_squad, live_data_predictions
 from features.predictions.preprocessing import preprocess_player_data, split_data
 from features.run_report import write_run_report
-from features.strategy_engine import build_strategy_context
+from features.strategy_engine import apply_roster_need_context, apply_squad_retention_context, apply_team_availability_context, build_strategy_context
 from kickbase_api.league import get_league_id, get_league_market_raw
 from kickbase_api.manager import get_manager_transfer_feed, get_managers
 from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
@@ -116,6 +117,7 @@ def main() -> None:
 
     live_predictions_df = live_data_predictions(today_df, model, system_settings.features)
     fixture_context = get_fixture_context(user_settings.competition_ids[0])
+    api_football_context = get_api_football_context(user_settings.competition_ids[0])
     transfer_history_df = build_transfer_history_df(
         token,
         league_id,
@@ -172,11 +174,32 @@ def main() -> None:
     market_all_df = enrich_market_with_bid_history(market_all_df, transfer_history_df)
     market_all_df = apply_personal_bid_tuning(market_all_df, offer_tracking_summary)
     market_all_df = enrich_with_fixture_context(market_all_df, fixture_context)
+    market_all_df = enrich_with_api_football_context(market_all_df, api_football_context)
+    squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
+    squad_recommendations_df = enrich_with_fixture_context(squad_recommendations_df, fixture_context)
+    squad_recommendations_df = enrich_with_api_football_context(squad_recommendations_df, api_football_context)
+    market_all_df, squad_recommendations_df, availability_summary = apply_team_availability_context(
+        market_all_df,
+        squad_recommendations_df,
+    )
     market_all_df, strategy_context = build_strategy_context(market_all_df, offer_tracking_summary, own_budget)
+    strategy_context["external_data"] = {
+        "api_football": {
+            **api_football_context.get("summary", {}),
+            "availability_adjustment_summary": availability_summary,
+        }
+    }
+    print(f"\nAnzahl Spieler auf dem Markt: {len(market_all_df)}")
+
+    squad_recommendations_df, squad_management_summary = apply_squad_retention_context(squad_recommendations_df, market_all_df)
+    strategy_context["squad_management"] = squad_management_summary
+    market_all_df, roster_need_summary = apply_roster_need_context(squad_recommendations_df, market_all_df)
+    strategy_context["roster_needs"] = roster_need_summary
     market_email_df = market_all_df[
         [
             "last_name",
             "team_name",
+            "position_label",
             "mv",
             "mv_change_yesterday",
             "predicted_mv_change",
@@ -187,6 +210,12 @@ def main() -> None:
             "competitive_bid_max",
             "recent_bid_competition",
             "bid_strategy_note",
+            "roster_need_level",
+            "roster_need_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_priority_adjustment",
             "active_offer_decision",
             "active_offer_recommended_new_bid",
             "hours_to_exp",
@@ -196,10 +225,6 @@ def main() -> None:
             "fixture_difficulty",
         ]
     ].copy()
-    print(f"\nAnzahl Spieler auf dem Markt: {len(market_all_df)}")
-
-    squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
-    squad_recommendations_df = enrich_with_fixture_context(squad_recommendations_df, fixture_context)
     squad_email_df = squad_recommendations_df[
         [
             "last_name",
@@ -210,6 +235,11 @@ def main() -> None:
             "predicted_mv_target",
             "sell_priority_score",
             "squad_role",
+            "squad_strategy_note",
+            "team_missing_count",
+            "team_questionable_count",
+            "team_availability_level",
+            "team_availability_sell_adjustment",
             "s_11_prob",
             "next_opponent",
             "home_or_away",
@@ -234,7 +264,7 @@ def main() -> None:
             report_date=report_date,
             matchday_context=matchday_context,
             analysis_history=analysis_history,
-            fixture_context_active=bool(fixture_context),
+            fixture_context_active=bool(fixture_context) or bool(api_football_context.get("summary", {}).get("available")),
         )
 
         history_entry = build_history_entry(
@@ -314,7 +344,7 @@ def main() -> None:
         ai_status=ai_status,
         ai_advice=ai_advice,
         mail_status=mail_status,
-        fixture_context_active=bool(fixture_context),
+        fixture_context_active=bool(fixture_context) or bool(api_football_context.get("summary", {}).get("available")),
         offer_tracking_summary=offer_tracking_summary,
         strategy_context=strategy_context,
     )

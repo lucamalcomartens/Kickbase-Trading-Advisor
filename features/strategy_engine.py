@@ -2,11 +2,258 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 import pandas as pd
 
 
 MIN_ACTIVE_OFFER_RAISE_EUR = 25_000
 MIN_ACTIVE_OFFER_RAISE_PCT = 0.005
+POSITION_LABELS = {
+    1: "GK",
+    2: "DEF",
+    3: "MID",
+    4: "ST",
+    "1": "GK",
+    "2": "DEF",
+    "3": "MID",
+    "4": "ST",
+    "gk": "GK",
+    "goalkeeper": "GK",
+    "torwart": "GK",
+    "def": "DEF",
+    "abwehr": "DEF",
+    "mid": "MID",
+    "mittelfeld": "MID",
+    "st": "ST",
+    "striker": "ST",
+    "sturm": "ST",
+}
+MIN_POSITION_COUNTS = {
+    "GK": 1,
+    "DEF": 3,
+    "MID": 3,
+    "ST": 2,
+}
+POSITION_NEED_PRIORITY_BOOST = {
+    "high": 18.0,
+    "medium": 10.0,
+    "low": 0.0,
+}
+POSITION_NEED_IMPORTANCE = {
+    "GK": 0,
+    "DEF": 1,
+    "MID": 2,
+    "ST": 3,
+}
+TEAM_AVAILABILITY_MARKET_PENALTY = {
+    "stable": 0.0,
+    "watch": -2.5,
+    "depleted": -6.0,
+}
+TEAM_AVAILABILITY_SQUAD_PRESSURE = {
+    "stable": 0.0,
+    "watch": 2.0,
+    "depleted": 5.0,
+}
+
+
+def apply_team_availability_context(market_df, squad_df):
+    """Translate team-level availability context into deterministic market and squad adjustments."""
+
+    working_market_df = market_df.copy()
+    working_squad_df = squad_df.copy()
+    _ensure_team_availability_columns(working_market_df)
+    _ensure_team_availability_columns(working_squad_df)
+
+    if not working_market_df.empty:
+        market_adjustment = _calculate_market_availability_adjustment(
+            level_series=working_market_df["team_availability_level"],
+            starter_series=working_market_df.get("s_11_prob", pd.Series(index=working_market_df.index, dtype=float)),
+            role_series=working_market_df.get("asset_role", pd.Series("", index=working_market_df.index)),
+            missing_series=working_market_df["team_missing_count"],
+            questionable_series=working_market_df["team_questionable_count"],
+        )
+        current_priority = pd.to_numeric(working_market_df.get("priority_score"), errors="coerce").fillna(0)
+        current_buy_action = working_market_df.get("buy_action", pd.Series("pass", index=working_market_df.index)).fillna("pass")
+        delta_prediction = pd.to_numeric(working_market_df.get("delta_prediction"), errors="coerce").fillna(0)
+        football_signal_score = pd.to_numeric(working_market_df.get("football_signal_score"), errors="coerce").fillna(0)
+
+        working_market_df["team_availability_priority_adjustment"] = np.round(market_adjustment, 1)
+        working_market_df["priority_score"] = np.round(current_priority + market_adjustment, 1)
+        working_market_df["buy_action"] = np.select(
+            [
+                (market_adjustment <= -5.5) & current_buy_action.eq("buy_now"),
+                (market_adjustment <= -7.5) & current_buy_action.eq("watchlist"),
+                (market_adjustment >= 3.0) & current_buy_action.eq("watchlist") & (delta_prediction > 0) & (football_signal_score >= 58),
+                (market_adjustment >= 5.0) & current_buy_action.eq("pass") & (delta_prediction > 0) & (football_signal_score >= 62),
+            ],
+            ["watchlist", "pass", "buy_now", "watchlist"],
+            default=current_buy_action,
+        )
+
+    if not working_squad_df.empty:
+        squad_adjustment = _calculate_squad_availability_adjustment(
+            level_series=working_squad_df["team_availability_level"],
+            starter_series=working_squad_df.get("s_11_prob", pd.Series(index=working_squad_df.index, dtype=float)),
+            role_series=working_squad_df.get("squad_role", pd.Series("", index=working_squad_df.index)),
+            missing_series=working_squad_df["team_missing_count"],
+            questionable_series=working_squad_df["team_questionable_count"],
+        )
+        current_sell_priority = pd.to_numeric(working_squad_df.get("sell_priority_score"), errors="coerce").fillna(0)
+        working_squad_df["team_availability_sell_adjustment"] = np.round(squad_adjustment, 1)
+        working_squad_df["sell_priority_score"] = np.round(np.maximum(0, current_sell_priority + squad_adjustment), 1)
+
+    summary = _build_team_availability_summary(working_market_df, working_squad_df)
+    return working_market_df, working_squad_df, summary
+
+
+def apply_squad_retention_context(squad_df, market_df):
+    """Protect strong, hard-to-replace squad players when the current market is thin."""
+
+    if squad_df.empty:
+        return squad_df.copy(), _build_squad_management_summary("unknown", 0, 0)
+
+    working_squad_df = squad_df.copy()
+    _ensure_squad_context_columns(working_squad_df)
+
+    market_scarcity_level, strong_replacement_count, replacement_pool_size = _evaluate_market_scarcity(market_df)
+    scarcity_discount = {"high": 18.0, "medium": 9.0, "low": 0.0}.get(market_scarcity_level, 0.0)
+
+    starter_probability = pd.to_numeric(working_squad_df.get("s_11_prob"), errors="coerce").fillna(55)
+    football_signal_score = pd.to_numeric(working_squad_df.get("football_signal_score"), errors="coerce").fillna(50)
+    delta_prediction = pd.to_numeric(working_squad_df.get("delta_prediction"), errors="coerce").fillna(0)
+    market_value = pd.to_numeric(working_squad_df.get("mv"), errors="coerce").fillna(0)
+    original_sell_priority = pd.to_numeric(working_squad_df.get("sell_priority_score"), errors="coerce").fillna(0)
+
+    keep_quality_mask = (
+        ((starter_probability >= 68) & (football_signal_score >= 60))
+        | ((starter_probability >= 74) & (market_value >= 8_000_000))
+        | ((football_signal_score >= 68) & (market_value >= 12_000_000))
+    )
+    stable_value_mask = delta_prediction >= -180_000
+    protect_mask = keep_quality_mask & stable_value_mask & (scarcity_discount > 0)
+
+    working_squad_df["sell_priority_score"] = np.where(
+        protect_mask,
+        np.maximum(0, original_sell_priority - scarcity_discount),
+        original_sell_priority,
+    )
+    working_squad_df["sell_priority_score"] = np.round(working_squad_df["sell_priority_score"], 1)
+
+    working_squad_df["retention_priority"] = np.where(
+        protect_mask,
+        np.round((starter_probability * 0.55) + (football_signal_score * 0.45), 1),
+        0.0,
+    )
+    working_squad_df["market_scarcity_level"] = market_scarcity_level
+    working_squad_df["replacement_pool_size"] = replacement_pool_size
+    working_squad_df["strong_replacement_count"] = strong_replacement_count
+    working_squad_df["squad_strategy_note"] = np.where(
+        protect_mask,
+        np.where(
+            market_scarcity_level == "high",
+            "keep_due_to_thin_market",
+            "lean_keep_due_to_market_scarcity",
+        ),
+        "model_only",
+    )
+
+    working_squad_df["squad_role"] = np.select(
+        [
+            protect_mask,
+            working_squad_df["sell_priority_score"] >= 60,
+        ],
+        ["core_starter", "sell_candidate"],
+        default=np.where(
+            (starter_probability >= 72) & (football_signal_score >= 65) & (delta_prediction >= -150000),
+            "core_starter",
+            "rotation_hold",
+        ),
+    )
+    working_squad_df["squad_action"] = np.select(
+        [
+            protect_mask,
+            working_squad_df["sell_priority_score"] >= 60,
+            working_squad_df["sell_priority_score"] >= 40,
+        ],
+        ["hold", "sell", "monitor"],
+        default="hold",
+    )
+
+    protected_count = int(protect_mask.sum())
+    squad_management_summary = _build_squad_management_summary(
+        market_scarcity_level,
+        strong_replacement_count,
+        protected_count,
+    )
+
+    return working_squad_df.sort_values(["sell_priority_score", "delta_prediction"], ascending=[False, True]), squad_management_summary
+
+
+def apply_roster_need_context(squad_df, market_df):
+    """Boost market priorities for positions that are currently thin in the squad."""
+
+    if market_df.empty:
+        return market_df.copy(), _build_roster_need_summary([], "none", "none", 0)
+
+    working_market_df = market_df.copy()
+    _ensure_market_need_columns(working_market_df)
+
+    squad_counts = _count_positions(squad_df)
+    market_depth = _count_actionable_market_positions(working_market_df)
+    position_needs = _build_position_needs(squad_counts, market_depth)
+
+    if not position_needs:
+        return working_market_df.sort_values(["priority_score", "delta_prediction", "hours_to_exp"], ascending=[False, False, True]), _build_roster_need_summary([], "none", "none", 0)
+
+    need_by_position = {item["position_label"]: item for item in position_needs}
+    normalized_positions = working_market_df.get("position", pd.Series(index=working_market_df.index)).map(_normalize_position_label)
+    current_priority_score = pd.to_numeric(working_market_df.get("priority_score"), errors="coerce").fillna(0)
+    football_signal_score = pd.to_numeric(working_market_df.get("football_signal_score"), errors="coerce").fillna(0)
+    delta_prediction = pd.to_numeric(working_market_df.get("delta_prediction"), errors="coerce").fillna(0)
+    expiring_today = working_market_df.get("expiring_today", pd.Series(False, index=working_market_df.index)).fillna(False)
+    current_buy_action = working_market_df.get("buy_action", pd.Series("pass", index=working_market_df.index)).fillna("pass")
+
+    working_market_df["position_label"] = normalized_positions
+    working_market_df["roster_need_level"] = normalized_positions.map(
+        lambda value: need_by_position.get(value, {}).get("need_level", "none")
+    )
+    working_market_df["roster_need_priority_boost"] = normalized_positions.map(
+        lambda value: need_by_position.get(value, {}).get("priority_boost", 0.0)
+    ).fillna(0.0)
+    working_market_df["roster_need_note"] = normalized_positions.map(
+        lambda value: need_by_position.get(value, {}).get("need_note", "")
+    ).fillna("")
+
+    working_market_df["priority_score"] = np.round(
+        current_priority_score + working_market_df["roster_need_priority_boost"],
+        1,
+    )
+
+    high_need_mask = working_market_df["roster_need_level"].eq("high")
+    medium_need_mask = working_market_df["roster_need_level"].eq("medium")
+    can_be_watchlist = football_signal_score >= 48
+    can_be_buy_now = football_signal_score >= 58
+
+    working_market_df["buy_action"] = np.select(
+        [
+            high_need_mask & expiring_today & can_be_buy_now & (delta_prediction >= -120_000),
+            high_need_mask & can_be_watchlist & (delta_prediction >= -180_000),
+            medium_need_mask & current_buy_action.eq("pass") & can_be_watchlist & (delta_prediction >= -100_000),
+        ],
+        ["buy_now", "watchlist", "watchlist"],
+        default=current_buy_action,
+    )
+
+    primary_need = position_needs[0]
+    roster_need_summary = _build_roster_need_summary(
+        position_needs,
+        primary_need.get("position_label", "none"),
+        primary_need.get("need_level", "none"),
+        sum(1 for item in position_needs if item.get("need_level") in {"high", "medium"}),
+    )
+
+    return working_market_df.sort_values(["priority_score", "delta_prediction", "hours_to_exp"], ascending=[False, False, True]), roster_need_summary
 
 
 def build_strategy_context(market_df, offer_tracking_summary, own_budget):
@@ -84,6 +331,46 @@ def _ensure_active_offer_columns(market_df):
     for column, default_value in defaults.items():
         if column not in market_df.columns:
             market_df[column] = default_value
+
+
+def _ensure_market_need_columns(market_df):
+    defaults = {
+        "position_label": None,
+        "roster_need_level": "none",
+        "roster_need_priority_boost": 0.0,
+        "roster_need_note": "",
+    }
+    for column, default_value in defaults.items():
+        if column not in market_df.columns:
+            market_df[column] = default_value
+
+
+def _ensure_squad_context_columns(squad_df):
+    defaults = {
+        "retention_priority": 0.0,
+        "market_scarcity_level": "unknown",
+        "replacement_pool_size": 0,
+        "strong_replacement_count": 0,
+        "squad_strategy_note": "model_only",
+    }
+    for column, default_value in defaults.items():
+        if column not in squad_df.columns:
+            squad_df[column] = default_value
+
+
+def _ensure_team_availability_columns(df):
+    defaults = {
+        "team_missing_count": 0,
+        "team_questionable_count": 0,
+        "team_availability_score": 100.0,
+        "team_availability_level": "stable",
+        "team_availability_note": "Keine API-Football Hinweise vorhanden",
+        "team_availability_priority_adjustment": 0.0,
+        "team_availability_sell_adjustment": 0.0,
+    }
+    for column, default_value in defaults.items():
+        if column not in df.columns:
+            df[column] = default_value
 
 
 def _build_market_index(market_df):
@@ -276,6 +563,202 @@ def _build_management_summary(
         "unmatched_active_offer_count": unmatched_offers,
         "action_counts": action_counts,
         "validation_notes": validation_notes,
+    }
+
+
+def _evaluate_market_scarcity(market_df):
+    if market_df is None or market_df.empty:
+        return "high", 0, 0
+
+    working_market_df = market_df.copy()
+    priority_score = pd.to_numeric(working_market_df.get("priority_score"), errors="coerce").fillna(0)
+    football_signal_score = pd.to_numeric(working_market_df.get("football_signal_score"), errors="coerce").fillna(0)
+    delta_prediction = pd.to_numeric(working_market_df.get("delta_prediction"), errors="coerce").fillna(0)
+    asset_role = working_market_df.get("asset_role", pd.Series("", index=working_market_df.index)).fillna("")
+    buy_action = working_market_df.get("buy_action", pd.Series("pass", index=working_market_df.index)).fillna("pass")
+
+    replacement_mask = (
+        buy_action.isin(["buy_now", "watchlist"])
+        & asset_role.isin(["core_starter", "medium_term_hold"])
+        & (delta_prediction > 0)
+        & (football_signal_score >= 55)
+    )
+    strong_replacement_mask = replacement_mask & (priority_score >= 62)
+
+    replacement_pool_size = int(replacement_mask.sum())
+    strong_replacement_count = int(strong_replacement_mask.sum())
+
+    if strong_replacement_count <= 2 or replacement_pool_size <= 4:
+        return "high", strong_replacement_count, replacement_pool_size
+    if strong_replacement_count <= 5 or replacement_pool_size <= 8:
+        return "medium", strong_replacement_count, replacement_pool_size
+    return "low", strong_replacement_count, replacement_pool_size
+
+
+def _build_squad_management_summary(market_scarcity_level, strong_replacement_count, protected_player_count):
+    return {
+        "market_scarcity_level": market_scarcity_level,
+        "strong_replacement_count": int(strong_replacement_count),
+        "protected_player_count": int(protected_player_count),
+    }
+
+
+def _count_positions(df):
+    if df is None or df.empty or "position" not in df.columns:
+        return {}
+
+    normalized_positions = df["position"].map(_normalize_position_label)
+    counts = normalized_positions.value_counts(dropna=True).to_dict()
+    return {str(key): int(value) for key, value in counts.items()}
+
+
+def _count_actionable_market_positions(market_df):
+    if market_df is None or market_df.empty:
+        return {}
+
+    working_market_df = market_df.copy()
+    normalized_positions = working_market_df.get("position", pd.Series(index=working_market_df.index)).map(_normalize_position_label)
+    buy_action = working_market_df.get("buy_action", pd.Series("pass", index=working_market_df.index)).fillna("pass")
+    football_signal_score = pd.to_numeric(working_market_df.get("football_signal_score"), errors="coerce").fillna(0)
+    actionable_mask = buy_action.ne("pass") | (football_signal_score >= 50)
+    counts = normalized_positions[actionable_mask].value_counts(dropna=True).to_dict()
+    return {str(key): int(value) for key, value in counts.items()}
+
+
+def _build_position_needs(squad_counts, market_depth):
+    position_needs = []
+
+    for position_label, minimum_count in MIN_POSITION_COUNTS.items():
+        current_count = int(squad_counts.get(position_label, 0))
+        market_option_count = int(market_depth.get(position_label, 0))
+        missing_count = max(0, minimum_count - current_count)
+        need_level = "low"
+
+        if missing_count > 0:
+            need_level = "high" if market_option_count <= 2 else "medium"
+        elif position_label == "GK" and current_count == 1 and market_option_count <= 2:
+            need_level = "medium"
+
+        if need_level == "low":
+            continue
+
+        priority_boost = _determine_position_need_boost(position_label, need_level, current_count)
+
+        position_needs.append(
+            {
+                "position_label": position_label,
+                "current_count": current_count,
+                "minimum_count": minimum_count,
+                "missing_count": missing_count,
+                "market_option_count": market_option_count,
+                "need_level": need_level,
+                "priority_boost": priority_boost,
+                "need_note": _build_position_need_note(position_label, current_count, market_option_count, need_level),
+            }
+        )
+
+    position_needs.sort(
+        key=lambda item: (
+            0 if item["need_level"] == "high" else 1,
+            POSITION_NEED_IMPORTANCE.get(item["position_label"], 99),
+            -item["priority_boost"],
+            -item["missing_count"],
+            item["market_option_count"],
+        )
+    )
+    return position_needs
+
+
+def _build_roster_need_summary(position_needs, primary_need_position, primary_need_level, urgent_need_count):
+    return {
+        "primary_need_position": primary_need_position,
+        "primary_need_level": primary_need_level,
+        "urgent_need_count": int(urgent_need_count),
+        "position_needs": position_needs,
+    }
+
+
+def _build_position_need_note(position_label, current_count, market_option_count, need_level):
+    if position_label == "GK" and current_count == 0:
+        return "Torwart fehlt im Kader, verfuegbare Optionen frueh priorisieren."
+    if position_label == "GK" and current_count == 1:
+        return "Nur ein Torwart im Kader, Ersatzoptionen nicht zu spaet angehen."
+    if need_level == "high":
+        return f"Position {position_label} ist duenn besetzt und der Markt bietet wenig Alternativen."
+    return f"Position {position_label} sollte zeitnah verstaerkt werden, bevor der Markt noch duenner wird."
+
+
+def _determine_position_need_boost(position_label, need_level, current_count):
+    base_boost = POSITION_NEED_PRIORITY_BOOST[need_level]
+
+    if position_label == "GK" and current_count == 0:
+        return base_boost + 18.0
+    if position_label == "GK" and current_count == 1 and need_level == "medium":
+        return base_boost + 4.0
+    return base_boost
+
+
+def _normalize_position_label(value):
+    if value is None or pd.isna(value):
+        return None
+    normalized_value = str(value).strip().lower()
+    return POSITION_LABELS.get(value) or POSITION_LABELS.get(normalized_value)
+
+
+def _calculate_market_availability_adjustment(level_series, starter_series, role_series, missing_series, questionable_series):
+    starter_score = pd.to_numeric(starter_series, errors="coerce").fillna(55)
+    missing_count = pd.to_numeric(missing_series, errors="coerce").fillna(0)
+    questionable_count = pd.to_numeric(questionable_series, errors="coerce").fillna(0)
+    role_values = role_series.fillna("").astype(str)
+    level_values = level_series.fillna("stable").astype(str)
+
+    base_adjustment = level_values.map(TEAM_AVAILABILITY_MARKET_PENALTY).fillna(0.0).astype(float)
+    starter_bonus = np.where((level_values != "stable") & (starter_score >= 72), 3.0, 0.0)
+    starter_penalty = np.where((level_values != "stable") & (starter_score < 55), -2.0, 0.0)
+    hold_penalty = np.where((level_values == "depleted") & role_values.eq("medium_term_hold"), -1.0, 0.0)
+    missing_pressure = np.where(missing_count >= 5, -1.0, 0.0)
+    questionable_pressure = np.where(questionable_count >= 3, -0.5, 0.0)
+    return base_adjustment + starter_bonus + starter_penalty + hold_penalty + missing_pressure + questionable_pressure
+
+
+def _calculate_squad_availability_adjustment(level_series, starter_series, role_series, missing_series, questionable_series):
+    starter_score = pd.to_numeric(starter_series, errors="coerce").fillna(55)
+    missing_count = pd.to_numeric(missing_series, errors="coerce").fillna(0)
+    questionable_count = pd.to_numeric(questionable_series, errors="coerce").fillna(0)
+    role_values = role_series.fillna("").astype(str)
+    level_values = level_series.fillna("stable").astype(str)
+
+    base_pressure = level_values.map(TEAM_AVAILABILITY_SQUAD_PRESSURE).fillna(0.0).astype(float)
+    core_relief = np.where(
+        (level_values == "depleted") & ((starter_score >= 72) | role_values.eq("core_starter")),
+        -7.0,
+        np.where(
+            (level_values == "watch") & ((starter_score >= 72) | role_values.eq("core_starter")),
+            -3.0,
+            0.0,
+        ),
+    )
+    fringe_pressure = np.where((level_values != "stable") & (starter_score < 55), 3.0, 0.0)
+    depleted_fringe_pressure = np.where((level_values == "depleted") & role_values.eq("rotation_hold"), 2.0, 0.0)
+    missing_pressure = np.where(missing_count >= 5, 1.0, 0.0)
+    questionable_relief = np.where((questionable_count >= 3) & (starter_score >= 70), -1.0, 0.0)
+    return base_pressure + core_relief + fringe_pressure + depleted_fringe_pressure + missing_pressure + questionable_relief
+
+
+def _build_team_availability_summary(market_df, squad_df):
+    market_adjustments = pd.to_numeric(market_df.get("team_availability_priority_adjustment"), errors="coerce").fillna(0) if market_df is not None else pd.Series(dtype=float)
+    squad_adjustments = pd.to_numeric(squad_df.get("team_availability_sell_adjustment"), errors="coerce").fillna(0) if squad_df is not None else pd.Series(dtype=float)
+    market_levels = market_df.get("team_availability_level", pd.Series(dtype=object)).fillna("stable") if market_df is not None else pd.Series(dtype=object)
+    squad_levels = squad_df.get("team_availability_level", pd.Series(dtype=object)).fillna("stable") if squad_df is not None else pd.Series(dtype=object)
+
+    return {
+        "market_players_with_adjustment": int((market_adjustments != 0).sum()),
+        "market_caution_count": int((market_adjustments < 0).sum()),
+        "market_opportunity_count": int((market_adjustments > 0).sum()),
+        "squad_sell_pressure_up": int((squad_adjustments > 0).sum()),
+        "squad_sell_pressure_down": int((squad_adjustments < 0).sum()),
+        "market_depleted_teams": int((market_levels == "depleted").sum()),
+        "squad_depleted_teams": int((squad_levels == "depleted").sum()),
     }
 
 

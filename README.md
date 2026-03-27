@@ -53,6 +53,7 @@
         <li><code>KICK_USER</code>: Your Kickbase Username (usually your email)</li>
         <li><code>KICK_PASS</code>: Your Kickbase Password (handled securely)</li>
         <li><code>FOOTBALL_DATA_API_KEY</code> (optional): Enables next opponent, home/away, and a simple fixture difficulty without any extra AI call</li>
+        <li><code>API_FOOTBALL_KEY</code> (optional): Enables richer external team context via API-Football, including upcoming fixtures and team-wide injury / questionable signals</li>
         <li><code>EMAIL_USER</code>: Your Gmail Address (for sending and receiving emails)</li>
         <li><code>EMAIL_PASS</code>: Password for your Gmail account (usually an app password)
           <ul>
@@ -72,12 +73,25 @@
   <strong>Other Use Case Options:</strong> The tool can be used without the email notifier. Just leave out the secrets, and the results will still be displayed in the GitHub Action execution log. As described in the fourth step "Test Your Setup," you can also always execute the workflow manually and are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed along with the packages listed in <code>requirements.txt</code>. Create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If <code>FOOTBALL_DATA_API_KEY</code> is set, the prompt and email also receive opponent and simple fixture context without consuming additional AI resources. If you have any further questions or encounter issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
 </div>
 
+<div align="justify">
+  <strong>External Data Strategy:</strong> The project supports optional external football feeds. The existing <code>FOOTBALL_DATA_API_KEY</code> path provides a lightweight fixture view. If <code>API_FOOTBALL_KEY</code> is set, the advisor additionally enriches market and squad rows with API-Football team context such as next fixtures, team-wide missing/questionable counts, and a compact availability signal. The run stays fully functional without either key; missing external data only removes those optional context columns.
+</div>
+
+<div align="justify">
+  <strong>API-Football Caching:</strong> API-Football responses are cached locally under <code>data/external_cache/api_football/</code>. This keeps request usage low enough for practical daily runs and avoids wasting quota on unchanged league metadata.
+</div>
+
+<div align="justify">
+  <strong>Live Validation:</strong> Once <code>API_FOOTBALL_KEY</code> is available, you can validate the integration locally with <code>python scripts/validate_api_football.py --competition-id 1</code>. Add <code>--force-refresh</code> to bypass the local cache for a fresh API check.
+</div>
+
 <h2 align="center">Project Structure</h2>
 <div align="justify">
   <ul>
     <li><code>config/</code>: Central project settings and path management.</li>
     <li><code>scripts/</code>: Executable workflow entrypoints. The actual daily run lives in <code>scripts/run_daily_predictions.py</code>.</li>
     <li><code>features/</code>: Domain logic such as bidding strategy, reports, AI prompt preparation, offer tracking, and prediction helpers.</li>
+    <li><code>features/external/</code>: Optional external enrichment providers such as API-Football.</li>
     <li><code>kickbase_api/</code>: Encapsulated Kickbase API access layer.</li>
     <li><code>data/</code>: Generated runtime data such as the SQLite database, analysis history, and local run outputs.</li>
     <li><code>reports/</code>: Versioned markdown reports that stay inside the repository.</li>
