@@ -27,16 +27,16 @@ DEFAULT_CACHE_TTL_MINUTES = {
     "/injuries": 180,
 }
 COMPETITION_LOOKUP = {
-    1: {"country": "Germany", "preferred_names": ["Bundesliga"]},
-    2: {"country": "Germany", "preferred_names": ["2. Bundesliga"]},
-    3: {"country": "Spain", "preferred_names": ["La Liga"]},
+    1: {"country": "Germany", "preferred_names": ["Bundesliga"], "default_league_ids": [78]},
+    2: {"country": "Germany", "preferred_names": ["2. Bundesliga"], "default_league_ids": [79]},
+    3: {"country": "Spain", "preferred_names": ["La Liga"], "default_league_ids": [140]},
 }
 
 
 def get_api_football_context(competition_id, current_dt=None, force_refresh=False):
     """Load optional API-Football team context for fixtures and availability."""
 
-    api_key = os.getenv("API_FOOTBALL_KEY")
+    api_key = (os.getenv("API_FOOTBALL_KEY") or "").strip()
     season = _resolve_current_season(current_dt)
     descriptor = COMPETITION_LOOKUP.get(competition_id)
 
@@ -174,38 +174,53 @@ def _resolve_current_season(current_dt=None):
 def _resolve_league(api_key, competition_id, descriptor, season):
     override_key = os.getenv(f"API_FOOTBALL_LEAGUE_ID_{competition_id}")
     if override_key:
-        response = _request_api_football(api_key, "/leagues", {"id": override_key, "season": season})
-        if response:
-            return response[0]
-
-    for preferred_name in descriptor["preferred_names"]:
-        response = _request_api_football(
-            api_key,
-            "/leagues",
-            {"country": descriptor["country"], "season": season, "search": preferred_name},
-        )
-        candidate = _select_league_candidate(response, descriptor, preferred_name)
+        candidate = _fetch_league_by_id(api_key, override_key, season, descriptor)
         if candidate:
             return candidate
+
+    for league_id in descriptor.get("default_league_ids", []):
+        candidate = _fetch_league_by_id(api_key, league_id, season, descriptor)
+        if candidate:
+            return candidate
+
+    for preferred_name in descriptor["preferred_names"]:
+        request_variants = [
+            {"country": descriptor["country"], "season": season, "search": preferred_name},
+            {"country": descriptor["country"], "search": preferred_name},
+            {"season": season, "search": preferred_name},
+            {"search": preferred_name},
+        ]
+        for params in request_variants:
+            response = _request_api_football(api_key, "/leagues", params)
+            candidate = _select_league_candidate(response, descriptor, preferred_name, season)
+            if candidate:
+                return candidate
 
     return None
 
 
-def _select_league_candidate(response_rows, descriptor, preferred_name):
+def _fetch_league_by_id(api_key, league_id, season, descriptor):
+    response = _request_api_football(api_key, "/leagues", {"id": league_id, "season": season})
+    if not response:
+        response = _request_api_football(api_key, "/leagues", {"id": league_id})
+
+    for row in response:
+        if _league_matches_descriptor(row, descriptor, season):
+            return row
+    return None
+
+
+def _select_league_candidate(response_rows, descriptor, preferred_name, season):
     preferred_tokens = _normalize_competition_name(preferred_name)
-    country_name = descriptor["country"].lower()
 
     exact_matches = []
     fallback_matches = []
     for row in response_rows:
-        league = row.get("league", {})
-        country = row.get("country", {})
-        league_name = str(league.get("name") or "")
-        if str(league.get("type") or "").lower() != "league":
-            continue
-        if str(country.get("name") or "").lower() != country_name:
+        if not _league_matches_descriptor(row, descriptor, season):
             continue
 
+        league = row.get("league", {})
+        league_name = str(league.get("name") or "")
         normalized_name = _normalize_competition_name(league_name)
         if normalized_name == preferred_tokens:
             exact_matches.append(row)
@@ -217,6 +232,26 @@ def _select_league_candidate(response_rows, descriptor, preferred_name):
     if fallback_matches:
         return fallback_matches[0]
     return None
+
+
+def _league_matches_descriptor(row, descriptor, season):
+    league = row.get("league", {})
+    country = row.get("country", {})
+    if str(league.get("type") or "").lower() != "league":
+        return False
+    if str(country.get("name") or "").strip().lower() != str(descriptor.get("country") or "").strip().lower():
+        return False
+    return _league_supports_season(row, season)
+
+
+def _league_supports_season(row, season):
+    seasons = row.get("seasons") or []
+    if not seasons:
+        return True
+    for season_row in seasons:
+        if int(season_row.get("year") or 0) == int(season):
+            return True
+    return False
 
 
 def _request_api_football(api_key, endpoint, params, force_refresh=False):

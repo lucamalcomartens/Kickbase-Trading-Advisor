@@ -393,6 +393,7 @@ def _render_markdown(payload):
 ## API-Football Summary
 
 - API-Football aktiv: {api_football_summary.get('available')}
+- Grund: {api_football_summary.get('reason')}
 - Liga: {api_football_summary.get('league_name')}
 - Season: {api_football_summary.get('season')}
 - Teams mit Kontext: {api_football_summary.get('team_count')}
