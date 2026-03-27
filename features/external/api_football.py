@@ -235,6 +235,10 @@ def _is_empty(value):
 
 
 def _resolve_current_season(current_dt=None):
+    configured_season = (os.getenv("API_FOOTBALL_SEASON") or "").strip()
+    if configured_season.isdigit():
+        return int(configured_season)
+
     reference_dt = current_dt or datetime.now(timezone.utc)
     return reference_dt.year if reference_dt.month >= 7 else reference_dt.year - 1
 
