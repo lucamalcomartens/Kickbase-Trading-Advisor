@@ -1,0 +1,204 @@
+{
+  "generated_at": "2026-03-27T09:06:42.625225Z",
+  "report_date": "27. March 2026",
+  "own_username": "Luca Malco",
+  "own_budget": 11531860.0,
+  "own_budget_row": {
+    "User": "Luca Malco",
+    "Budget": 11531860.0,
+    "Current Cash": 11531860.0,
+    "Spendable Without Debt": 11531860.0,
+    "Temporary Negative Buffer": 52517163.27,
+    "Available Budget": 64049023.27,
+    "Max Negative": -52517163.27,
+    "Friday Recovery Need At Floor": 52517163.27
+  },
+  "matchday_context": {
+    "next_matchday": 28,
+    "next_matchday_date": "05-04-2026 17:30",
+    "days_until_next_matchday": 9,
+    "trading_window_mode": "extended_break",
+    "friday_safety_mode": "inactive"
+  },
+  "model_metrics": {
+    "signs_percent": 67.27,
+    "rmse": 1839032677.81,
+    "mae": 21568.78,
+    "r2": 0.9154
+  },
+  "market_player_count": 24,
+  "squad_player_count": 12,
+  "fixture_context_active": true,
+  "ai_status": "failed",
+  "mail_status": "success",
+  "offer_tracking_summary": {
+    "counts": {
+      "active_offers": 25,
+      "outbid_offers": 0,
+      "won_offers": 0,
+      "unresolved_offers": 0
+    },
+    "recent_outbid": [],
+    "recent_active": [
+      {
+        "player_name": "Pieringer",
+        "offer_amount": 1850000.0,
+        "market_value": null,
+        "expires_at": "2026-03-27T05:37:59Z",
+        "last_seen_at": "2026-03-27T09:06:13Z"
+      },
+      {
+        "player_name": "Gnabry",
+        "offer_amount": 32555555.0,
+        "market_value": null,
+        "expires_at": "2026-03-26T08:41:38Z",
+        "last_seen_at": "2026-03-27T09:06:13Z"
+      },
+      {
+        "player_name": "Friedl",
+        "offer_amount": 18200000.0,
+        "market_value": null,
+        "expires_at": "2026-03-25T15:30:56Z",
+        "last_seen_at": "2026-03-27T09:06:13Z"
+      },
+      {
+        "player_name": "Tietz",
+        "offer_amount": 5359936.0,
+        "market_value": null,
+        "expires_at": "2026-03-25T13:36:39Z",
+        "last_seen_at": "2026-03-27T09:06:13Z"
+      },
+      {
+        "player_name": "Vasilj",
+        "offer_amount": 9530137.0,
+        "market_value": null,
+        "expires_at": "2026-03-25T13:36:29Z",
+        "last_seen_at": "2026-03-27T09:06:13Z"
+      }
+    ]
+  },
+  "top_market_candidates": [
+    {
+      "player": "Dimitris Giannoulis",
+      "team_name": "Augsburg",
+      "priority_score": 74.2,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 84178.97,
+      "recommended_bid_max": 6293636.0,
+      "competitive_bid_max": 6293636.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 0.94,
+      "next_opponent": "Hamburger SV",
+      "fixture_difficulty": "good"
+    },
+    {
+      "player": "Péter Gulácsi",
+      "team_name": "Leipzig",
+      "priority_score": 67.9,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 221633.54,
+      "recommended_bid_max": 6198331.0,
+      "competitive_bid_max": 6198331.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 3.76,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "Chrislain Matsima",
+      "team_name": "Augsburg",
+      "priority_score": 66.8,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 200310.11,
+      "recommended_bid_max": 874364.0,
+      "competitive_bid_max": 874364.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 15.94,
+      "next_opponent": "Hamburger SV",
+      "fixture_difficulty": "good"
+    },
+    {
+      "player": "Frederik Rönnow",
+      "team_name": "Union Berlin",
+      "priority_score": 59.6,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 80283.17,
+      "recommended_bid_max": 7150590.0,
+      "competitive_bid_max": 7150590.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 5.31,
+      "next_opponent": "FC St. Pauli 1910",
+      "fixture_difficulty": "good"
+    },
+    {
+      "player": "Loïc Badé",
+      "team_name": "Leverkusen",
+      "priority_score": 59.2,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 278900.26,
+      "recommended_bid_max": 5391390.0,
+      "competitive_bid_max": 5395293.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 24.6,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    }
+  ],
+  "top_sell_candidates": [
+    {
+      "player": "Marius Wolf",
+      "team_name": "Augsburg",
+      "sell_priority_score": 21.6,
+      "squad_role": "rotation_hold",
+      "predicted_mv_change": 168.43,
+      "s_11_prob": null,
+      "next_opponent": "Hamburger SV",
+      "fixture_difficulty": "good"
+    },
+    {
+      "player": "Lucas Höler",
+      "team_name": "Freiburg",
+      "sell_priority_score": 19.0,
+      "squad_role": "rotation_hold",
+      "predicted_mv_change": 2892.51,
+      "s_11_prob": null,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "Josha Vagnoman",
+      "team_name": "Stuttgart",
+      "sell_priority_score": 18.9,
+      "squad_role": "rotation_hold",
+      "predicted_mv_change": 229845.13,
+      "s_11_prob": null,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "Ermedin Demirović",
+      "team_name": "Stuttgart",
+      "sell_priority_score": 17.9,
+      "squad_role": "rotation_hold",
+      "predicted_mv_change": 12305.17,
+      "s_11_prob": null,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "Marvin Pieringer",
+      "team_name": "Heidenheim",
+      "sell_priority_score": 17.1,
+      "squad_role": "rotation_hold",
+      "predicted_mv_change": 191599.03,
+      "s_11_prob": null,
+      "next_opponent": "Borussia Mönchengladbach",
+      "fixture_difficulty": "good"
+    }
+  ],
+  "budget_table": "      User     Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor\n      joel 85.201.082 226.235.987    85.201.082  -102.774.233       187.975.315              85.201.082                102.774.233                    102.774.233\n     David 82.499.024 235.172.073    82.499.024  -104.831.462       187.330.486              82.499.024                104.831.462                    104.831.462\n      Till 73.398.423 255.256.068    73.398.423  -108.455.982       181.854.405              73.398.423                108.455.982                    108.455.982\n FlippiXxp 52.334.913 333.318.849    52.334.913  -127.265.741       179.600.654              52.334.913                127.265.741                    127.265.741\n       Jan 90.925.473 174.660.025    90.925.473   -87.643.214       178.568.687              90.925.473                 87.643.214                     87.643.214\n       Rob 82.325.240 189.595.857    82.325.240   -89.733.962       172.059.202              82.325.240                 89.733.962                     89.733.962\n     Jonas 70.956.552 162.720.673    70.956.552   -77.113.484       148.070.036              70.956.552                 77.113.484                     77.113.484\nLuca Malco 11.531.860 147.611.059    11.531.860   -52.517.163        64.049.023              11.531.860                 52.517.163                     52.517.163",
+  "market_table": "first_name     last_name    team_name         mv  predicted_mv_change priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note  hours_to_exp\n  Dimitris    Giannoulis     Augsburg  6.253.230               84.179             74           6.293.636            6.293.636                   high               avoid_price_war             1\n     Péter       Gulácsi      Leipzig  6.091.947              221.634             68           6.198.331            6.198.331                   high               avoid_price_war             4\n Chrislain       Matsima     Augsburg    813.968              200.310             67             874.364              874.364                   high               avoid_price_war            16\n  Frederik        Rönnow Union Berlin  7.112.054               80.283             60           7.150.590            7.150.590                   high               avoid_price_war             5\n      Loïc          Badé   Leverkusen  5.257.518              278.900             59           5.391.390            5.395.293                   high aggressive_only_if_priority_a            25\n    Manuel         Neuer       Bayern  6.269.867              276.749             59           6.402.707            6.402.707                   high               avoid_price_war            10\n       Max     Moerstedt   Hoffenheim    500.000                  238             58             500.114              500.114                   high               avoid_price_war             3\n   Danilho        Doekhi Union Berlin 18.265.637              139.365             54          18.332.532           18.332.532                   high               avoid_price_war            11\n Alexander         Nübel    Stuttgart 20.010.110               18.146             50          20.018.820           20.018.820                   high               avoid_price_war            12\n     Bilal  El Khannouss    Stuttgart 25.605.094               34.495             49          25.617.512           25.617.512                   high               avoid_price_war            13\nMaximilian     Eggestein     Freiburg 15.835.943               50.269             49          15.854.040           15.854.040                   high aggressive_only_if_priority_a            29\n      Rani       Khedira Union Berlin  6.442.631             -135.605             48           6.442.631            6.442.631                   high               avoid_price_war             3\n Christian        Conteh   Heidenheim    500.000                1.452             48             500.523              500.523                   high               avoid_price_war            22\n  Ransford Königsdörffer      Hamburg  4.865.162              -71.060             46           4.865.162            4.865.162                   high               avoid_price_war             4\n    Robert       Glatzel      Hamburg    500.000                  224             46             500.107              500.107                   high               avoid_price_war             8",
+  "squad_table": "first_name last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role s_11_prob            next_opponent\n    Marius      Wolf   Augsburg    500.000                  168                   22 rotation_hold         -             Hamburger SV\n     Lucas     Höler   Freiburg    500.000                2.893                   19 rotation_hold         -                        -\n     Josha  Vagnoman  Stuttgart  5.163.488              229.845                   19 rotation_hold         -                        -\n   Ermedin Demirović  Stuttgart 20.586.494               12.305                   18 rotation_hold         -                        -\n    Marvin Pieringer Heidenheim  1.745.376              191.599                   17 rotation_hold         - Borussia Mönchengladbach\n    Robert   Andrich Leverkusen 18.885.795               11.060                   16 rotation_hold         -                        -\n Christian   Eriksen  Wolfsburg 10.543.667               99.729                   16 rotation_hold         -                        -\n    Kaishu      Sano      Mainz 11.565.345              111.401                   16 rotation_hold         -      TSG 1899 Hoffenheim\n      Finn   Jeltsch  Stuttgart 10.617.512               77.739                   16 rotation_hold         -                        -\n     Jakub  Kaminski       Köln 19.655.090              103.875                   16 rotation_hold         -      Eintracht Frankfurt\n     Marco    Friedl     Bremen 17.429.222               28.735                   15 rotation_hold         -                        -\n     Serge    Gnabry     Bayern 29.919.070               94.009                   15 rotation_hold         -                        -",
+  "ai_excerpt": "KI-Analyse fehlgeschlagen: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",
+  "ai_full_text": "KI-Analyse fehlgeschlagen: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+}
