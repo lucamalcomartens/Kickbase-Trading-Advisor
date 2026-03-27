@@ -43,7 +43,7 @@ def build_player_name(df):
     return (df["first_name"].fillna("") + " " + df["last_name"].fillna("")).str.strip()
 
 
-def prepare_top_actions(market_df, squad_df):
+def prepare_top_actions(market_df, squad_df, strategy_context=None):
     """Build compact top-action tables for the email header and mobile-first reading."""
 
     market_df = market_df.copy()
@@ -98,7 +98,7 @@ def prepare_top_actions(market_df, squad_df):
             }
         )
 
-    return {
+    sections = {
         "Jetzt kaufen": {
             "subtitle": "Die wichtigsten Deals vor dem naechsten Marktwertupdate.",
             "data": buy_now_df,
@@ -112,6 +112,30 @@ def prepare_top_actions(market_df, squad_df):
             "data": sell_df,
         },
     }
+
+    active_offer_actions = pd.DataFrame((strategy_context or {}).get("active_offer_actions", []))
+    if not active_offer_actions.empty:
+        active_offer_actions = active_offer_actions[
+            [
+                "player_name",
+                "recommended_action_label",
+                "current_offer_amount",
+                "recommended_new_bid",
+            ]
+        ].rename(
+            columns={
+                "player_name": "Spieler",
+                "recommended_action_label": "Aktion",
+                "current_offer_amount": "Aktuelles Gebot",
+                "recommended_new_bid": "Neues Max Gebot",
+            }
+        )
+        sections["Aktive Gebote"] = {
+            "subtitle": "Bereits laufende Gebote mit vorbewerteter Aktion.",
+            "data": active_offer_actions.head(5),
+        }
+
+    return sections
 
 
 def load_analysis_history(file_path):
@@ -175,7 +199,9 @@ def format_history_for_prompt(history_entries, max_entries=PROMPT_HISTORY_ENTRIE
             "\n".join(
                 [
                     f"- Analyse vom {entry.get('report_date', 'unbekannt')} | Window: {entry.get('trading_window_mode', 'unknown')} | Friday: {entry.get('friday_safety_mode', 'unknown')} | Budget: {entry.get('own_budget', 'n/a')}",
+                    f"  Gebundenes Gebotskapital: {entry.get('reserved_offer_budget', 'n/a')} | Effektives Cash: {entry.get('effective_cash_after_active_offers', 'n/a')}",
                     f"  Top Buys: {', '.join(entry.get('top_buys', [])) or 'keine'}",
+                    f"  Aktive Gebote: {', '.join(entry.get('active_offer_actions', [])) or 'keine'}",
                     f"  Top Holds: {', '.join(entry.get('top_holds', [])) or 'keine'}",
                     f"  Top Sells: {', '.join(entry.get('top_sells', [])) or 'keine'}",
                     f"  Letzte KI-Kernaussage: {entry.get('ai_excerpt', 'keine')}",
@@ -186,7 +212,7 @@ def format_history_for_prompt(history_entries, max_entries=PROMPT_HISTORY_ENTRIE
     return "\n\n".join(history_lines)
 
 
-def build_history_entry(report_date, own_budget_value, matchday_info, market_df, squad_df, ai_text, ai_status):
+def build_history_entry(report_date, own_budget_value, matchday_info, market_df, squad_df, ai_text, ai_status, strategy_context=None):
     """Build a compact persisted summary for future analyses."""
 
     buy_candidates = market_df[market_df["buy_action"] == "buy_now"]
@@ -196,6 +222,8 @@ def build_history_entry(report_date, own_budget_value, matchday_info, market_df,
     ]
     sell_candidates = squad_df[squad_df["squad_action"] == "sell"]
     ai_excerpt = " ".join(str(ai_text).split())[:320] if ai_text else "keine"
+    management_summary = (strategy_context or {}).get("management_summary", {})
+    active_offer_actions = (strategy_context or {}).get("active_offer_actions", [])
 
     return {
         "report_date": report_date,
@@ -205,8 +233,14 @@ def build_history_entry(report_date, own_budget_value, matchday_info, market_df,
         "next_matchday": matchday_info.get("next_matchday", "unbekannt"),
         "days_until_next_matchday": matchday_info.get("days_until_next_matchday", "unbekannt"),
         "own_budget": format_currency(own_budget_value),
+        "reserved_offer_budget": format_currency(management_summary.get("active_offer_amount_total")),
+        "effective_cash_after_active_offers": format_currency(management_summary.get("effective_cash_after_active_offers")),
         "squad_size": int(len(squad_df)),
         "top_buys": summarise_player_rows(buy_candidates, "asset_role"),
+        "active_offer_actions": [
+            f"{item.get('player_name')} | {item.get('recommended_action_label')} | {format_currency(item.get('recommended_new_bid'))}"
+            for item in active_offer_actions[:3]
+        ],
         "top_holds": summarise_player_rows(hold_candidates, "asset_role"),
         "top_sells": summarise_player_rows(sell_candidates, "squad_role"),
         "ai_status": ai_status,

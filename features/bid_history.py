@@ -231,6 +231,79 @@ def enrich_market_with_bid_history(market_df, transfer_history_df):
     return enriched_df
 
 
+def apply_personal_bid_tuning(market_df, offer_tracking_summary):
+    """Adjust bid ceilings modestly when the user has recently been outbid often."""
+
+    if market_df.empty:
+        return market_df.copy()
+
+    stats = (offer_tracking_summary or {}).get("stats", {})
+    suggested_markup_pct = float(stats.get("suggested_markup_pct", 0) or 0)
+    overbid_pressure_level = stats.get("overbid_pressure_level", "low")
+    recent_outbid_count = int(stats.get("recent_outbid_count_14d", 0) or 0)
+
+    tuned_df = market_df.copy()
+    tuned_df["personal_bid_markup_pct"] = 0.0
+    tuned_df["personal_bid_feedback"] = "no_personal_adjustment"
+
+    if suggested_markup_pct <= 0 or recent_outbid_count == 0 or overbid_pressure_level == "low":
+        tuned_df["competitive_bid_range"] = tuned_df.apply(_build_competitive_bid_range, axis=1)
+        return tuned_df
+
+    mv_series = pd.to_numeric(tuned_df.get("mv"), errors="coerce").fillna(0)
+    predicted_delta = pd.to_numeric(tuned_df.get("delta_prediction"), errors="coerce").fillna(0)
+    competitive_bid_max = pd.to_numeric(tuned_df.get("competitive_bid_max"), errors="coerce").fillna(mv_series)
+    estimated_winning_bid = pd.to_numeric(tuned_df.get("estimated_market_winning_bid"), errors="coerce").fillna(competitive_bid_max)
+    recent_competition = tuned_df.get("recent_bid_competition", pd.Series("low", index=tuned_df.index)).fillna("low")
+    bid_strategy_note = tuned_df.get("bid_strategy_note", pd.Series("model_range_ok", index=tuned_df.index)).fillna("model_range_ok")
+    buy_action = tuned_df.get("buy_action", pd.Series("pass", index=tuned_df.index)).fillna("pass")
+
+    competition_multiplier = np.select(
+        [recent_competition.eq("high"), recent_competition.eq("medium")],
+        [1.0, 0.7],
+        default=0.4,
+    )
+    caution_multiplier = np.select(
+        [bid_strategy_note.eq("avoid_price_war"), bid_strategy_note.eq("stay_disciplined")],
+        [0.35, 0.2],
+        default=1.0,
+    )
+    action_multiplier = np.where(buy_action.eq("buy_now"), 1.0, np.where(buy_action.eq("watchlist"), 0.65, 0.0))
+
+    tuned_df["personal_bid_markup_pct"] = np.round(
+        suggested_markup_pct * competition_multiplier * caution_multiplier * action_multiplier,
+        4,
+    )
+
+    profit_guard = mv_series + predicted_delta.clip(lower=0)
+    personal_market_target = np.round(estimated_winning_bid * (1 + tuned_df["personal_bid_markup_pct"]), 0)
+    tuned_df["competitive_bid_max"] = np.where(
+        tuned_df["personal_bid_markup_pct"] > 0,
+        np.minimum(np.maximum(competitive_bid_max, personal_market_target), profit_guard),
+        competitive_bid_max,
+    )
+    tuned_df["competitive_bid_max"] = np.round(tuned_df["competitive_bid_max"], 0)
+    tuned_df["personal_bid_feedback"] = np.select(
+        [
+            tuned_df["personal_bid_markup_pct"] >= 0.025,
+            tuned_df["personal_bid_markup_pct"] > 0,
+        ],
+        [
+            "raise_due_to_frequent_outbids",
+            "small_raise_due_to_recent_outbids",
+        ],
+        default="no_personal_adjustment",
+    )
+    tuned_df["bid_strategy_note"] = np.where(
+        tuned_df["personal_bid_markup_pct"] > 0,
+        tuned_df["bid_strategy_note"].astype(str) + "|" + tuned_df["personal_bid_feedback"].astype(str),
+        tuned_df["bid_strategy_note"],
+    )
+    tuned_df["competitive_bid_range"] = tuned_df.apply(_build_competitive_bid_range, axis=1)
+
+    return tuned_df
+
+
 def _build_price_bucket(values):
     return pd.cut(
         values,

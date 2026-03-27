@@ -26,6 +26,7 @@ def write_run_report(
     mail_status,
     fixture_context_active,
     offer_tracking_summary=None,
+    strategy_context=None,
 ):
     """Write a sanitized summary of the latest run for later inspection."""
 
@@ -46,6 +47,7 @@ def write_run_report(
         "ai_status": ai_status,
         "mail_status": mail_status,
         "offer_tracking_summary": offer_tracking_summary or {"counts": {}, "recent_outbid": []},
+        "strategy_context": strategy_context or {"management_summary": {}, "active_offer_actions": [], "validation_notes": []},
         "top_market_candidates": _summarize_market(market_df),
         "top_sell_candidates": _summarize_squad(squad_df),
         "budget_table": _frame_to_text(manager_budgets_df, limit=10),
@@ -60,6 +62,8 @@ def write_run_report(
             "competitive_bid_max",
             "recent_bid_competition",
             "bid_strategy_note",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
             "hours_to_exp",
         ], limit=15),
         "squad_table": _frame_to_text(squad_df, columns=[
@@ -258,6 +262,16 @@ def _render_markdown(payload):
         for item in payload["top_market_candidates"]
     ) or "- Keine Daten"
 
+    strategy_context = payload.get("strategy_context", {})
+    management_summary = strategy_context.get("management_summary", {})
+    validation_lines = "\n".join(
+        f"- {item}" for item in strategy_context.get("validation_notes", [])
+    ) or "- Keine Hinweise"
+    active_offer_action_lines = "\n".join(
+        f"- {item.get('player_name')} | Aktion: {item.get('recommended_action_label')} | Aktuelles Gebot: {item.get('current_offer_amount')} | Neues Max Gebot: {item.get('recommended_new_bid')} | Grund: {item.get('decision_reason_label')}"
+        for item in strategy_context.get("active_offer_actions", [])
+    ) or "- Keine aktiven Gebotsentscheidungen gespeichert"
+
     offer_counts = payload["offer_tracking_summary"].get("counts", {})
     budget_row = payload.get("own_budget_row", {})
     active_offer_lines = "\n".join(
@@ -328,6 +342,21 @@ def _render_markdown(payload):
 - Max Negative: {budget_row.get('Max Negative')}
 - Friday Recovery Need At Floor: {budget_row.get('Friday Recovery Need At Floor')}
 
+## Management Summary
+
+- Aktive Gebotssumme: {management_summary.get('active_offer_amount_total')}
+- Effektives Cash nach aktiven Geboten: {management_summary.get('effective_cash_after_active_offers')}
+- Overbid-Druck: {management_summary.get('overbid_pressure_level')}
+- Suggested Markup: {management_summary.get('suggested_markup_pct')}
+- Outbid Count 14d: {management_summary.get('recent_outbid_count_14d')}
+- Aktive Gebote halten: {management_summary.get('action_counts', {}).get('hold', 0)}
+- Aktive Gebote leicht erhoehen: {management_summary.get('action_counts', {}).get('raise_small', 0)}
+- Aktive Gebote abbrechen: {management_summary.get('action_counts', {}).get('abort', 0)}
+
+## Strategy Validation
+
+{validation_lines}
+
 ## Manager Budget Snapshot
 
 ```text
@@ -357,6 +386,10 @@ def _render_markdown(payload):
 ## Active Offers
 
 {active_offer_lines}
+
+## Active Offer Actions
+
+{active_offer_action_lines}
 
 ## Recent Outbid Offers
 

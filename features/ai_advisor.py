@@ -5,6 +5,7 @@ import os
 import time
 from zoneinfo import ZoneInfo
 
+import pandas as pd
 from google import genai
 from google.genai import types
 
@@ -23,6 +24,7 @@ def generate_ai_advice(
     manager_budgets_df,
     market_all_df,
     squad_recommendations_df,
+    strategy_context,
     own_username,
     own_budget,
     report_date,
@@ -41,6 +43,20 @@ def generate_ai_advice(
     own_temporary_negative_buffer = own_budget_row["Temporary Negative Buffer"].iloc[0] if not own_budget_row.empty else None
     own_max_negative = own_budget_row["Max Negative"].iloc[0] if not own_budget_row.empty else None
     own_friday_recovery_need_at_floor = own_budget_row["Friday Recovery Need At Floor"].iloc[0] if not own_budget_row.empty else None
+
+    strategy_context = strategy_context or {}
+    management_summary = strategy_context.get("management_summary", {})
+    active_offer_actions_df = pd.DataFrame(strategy_context.get("active_offer_actions", []))
+    recent_outbid_df = pd.DataFrame(strategy_context.get("recent_outbid", []))
+    validation_notes = strategy_context.get("validation_notes", [])
+    active_offer_amount_total = float(management_summary.get("active_offer_amount_total", 0) or 0)
+    effective_cash_after_active_offers = float(management_summary.get("effective_cash_after_active_offers", own_budget) or own_budget)
+    overbid_pressure_level = management_summary.get("overbid_pressure_level", "low")
+    suggested_markup_pct = float(management_summary.get("suggested_markup_pct", 0) or 0)
+    avg_outbid_gap = float(management_summary.get("avg_outbid_gap", 0) or 0)
+    avg_outbid_gap_pct = float(management_summary.get("avg_outbid_gap_pct", 0) or 0)
+    recent_outbid_count_14d = int(management_summary.get("recent_outbid_count_14d", 0) or 0)
+
     squad_team_counts = squad_recommendations_df["team_name"].value_counts()
     squad_team_counts_text = squad_team_counts[squad_team_counts > 1].to_string() if not squad_team_counts.empty else "Keine auffaelligen Doppelungen"
 
@@ -67,40 +83,198 @@ def generate_ai_advice(
 
     squad_text = format_prompt_table(
         squad_recommendations_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_role", "next_opponent", "home_or_away", "fixture_difficulty"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "s_11_prob",
+            "football_signal_score",
+            "sell_priority_score",
+            "squad_role",
+            "next_opponent",
+            "home_or_away",
+            "fixture_difficulty",
+        ],
         limit=18,
     )
     expiring_now_text = format_prompt_table(
         market_expiring_now_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "priority_score",
+            "football_signal_score",
+            "asset_role",
+            "buy_action",
+            "recommended_bid_min",
+            "recommended_bid_max",
+            "competitive_bid_max",
+            "recent_bid_competition",
+            "estimated_market_winning_bid",
+            "bid_strategy_note",
+            "personal_bid_feedback",
+            "has_active_offer",
+            "active_offer_amount",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
+            "hours_to_exp",
+            "next_opponent",
+            "home_or_away",
+            "fixture_difficulty",
+        ],
         limit=18,
     )
     later_market_text = format_prompt_table(
         market_later_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "priority_score",
+            "football_signal_score",
+            "asset_role",
+            "buy_action",
+            "recommended_bid_min",
+            "recommended_bid_max",
+            "competitive_bid_max",
+            "recent_bid_competition",
+            "estimated_market_winning_bid",
+            "bid_strategy_note",
+            "personal_bid_feedback",
+            "has_active_offer",
+            "active_offer_amount",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
+            "hours_to_exp",
+            "next_opponent",
+            "home_or_away",
+            "fixture_difficulty",
+        ],
         limit=18,
     )
     trade_stash_text = format_prompt_table(
         market_trade_stash_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "priority_score",
+            "asset_role",
+            "recommended_bid_max",
+            "competitive_bid_max",
+            "recent_bid_competition",
+            "estimated_market_winning_bid",
+            "bid_strategy_note",
+            "personal_bid_feedback",
+            "has_active_offer",
+            "active_offer_amount",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
+            "hours_to_exp",
+            "next_opponent",
+            "home_or_away",
+            "fixture_difficulty",
+        ],
         limit=12,
     )
     hold_candidates_text = format_prompt_table(
         market_hold_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "priority_score",
+            "football_signal_score",
+            "asset_role",
+            "recommended_bid_min",
+            "recommended_bid_max",
+            "competitive_bid_max",
+            "recent_bid_competition",
+            "estimated_market_winning_bid",
+            "bid_strategy_note",
+            "personal_bid_feedback",
+            "has_active_offer",
+            "active_offer_amount",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
+            "hours_to_exp",
+            "next_opponent",
+            "home_or_away",
+            "fixture_difficulty",
+        ],
         limit=12,
     )
     squad_risk_text = format_prompt_table(
         squad_risk_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_action"],
+        [
+            "first_name",
+            "last_name",
+            "position",
+            "team_name",
+            "mv",
+            "predicted_mv_change",
+            "predicted_mv_target",
+            "delta_prediction",
+            "delta_percent",
+            "s_11_prob",
+            "football_signal_score",
+            "sell_priority_score",
+            "squad_action",
+        ],
         limit=12,
     )
+    active_offer_actions_text = format_prompt_table(
+        active_offer_actions_df,
+        ["player_name", "current_offer_amount", "recommended_action_label", "recommended_new_bid", "decision_reason_label", "expires_at"],
+        limit=8,
+    )
+    recent_outbid_text = format_prompt_table(
+        recent_outbid_df,
+        ["player_name", "offer_amount", "winning_price", "lost_to", "resolved_at"],
+        limit=8,
+    )
+    validation_notes_text = "\n".join(f"- {note}" for note in validation_notes) if validation_notes else "- Keine"
+
     theoretical_max_spend_text = format_currency(own_theoretical_max_spend) if own_theoretical_max_spend is not None else "n/a"
     spendable_without_debt_text = format_currency(own_spendable_without_debt) if own_spendable_without_debt is not None else "n/a"
     temporary_negative_buffer_text = format_currency(own_temporary_negative_buffer) if own_temporary_negative_buffer is not None else "n/a"
     max_negative_text = format_currency(own_max_negative) if own_max_negative is not None else "n/a"
     friday_recovery_need_text = format_currency(own_friday_recovery_need_at_floor) if own_friday_recovery_need_at_floor is not None else "n/a"
     own_budget_text = format_currency(own_budget)
+    reserved_offer_budget_text = format_currency(active_offer_amount_total)
+    effective_cash_after_active_offers_text = format_currency(effective_cash_after_active_offers)
+    avg_outbid_gap_text = format_currency(avg_outbid_gap)
     previous_analysis_text = format_history_for_prompt(analysis_history)
 
     prompt = f"""
@@ -140,6 +314,8 @@ HEUTIGES DATUM: {report_date}
 WOCHENTAG HEUTE: {datetime.datetime.now(ZoneInfo('Europe/Berlin')).strftime('%A')}
 MEIN USERNAME: {own_username}
 MEIN AKTUELLES BUDGET: {own_budget_text} Euro
+AKTUELL BEREITS DURCH OFFENE GEBOTE GEBUNDENES KAPITAL: {reserved_offer_budget_text} Euro
+EFFEKTIV VERFUEGBARES CASH NACH ABZUG DER AKTIVEN GEBOTE: {effective_cash_after_active_offers_text} Euro
 ECHT SOFORT VERFUEGBARES CASH OHNE INS MINUS ZU GEHEN: {spendable_without_debt_text} Euro
 THEORETISCHES MAXIMALES AUSGABENLIMIT BIS ZUR NEGATIVGRENZE: {theoretical_max_spend_text} Euro
 ZUSAETZLICHER TEMPORAERER NEGATIVPUFFER UEBER DEM CASH-BUDGET: {temporary_negative_buffer_text} Euro
@@ -153,9 +329,22 @@ TRADING_WINDOW_MODE: {matchday_context['trading_window_mode']}
 FRIDAY_SAFETY_MODE: {matchday_context['friday_safety_mode']}
 SPIELPLAN-KONTEXT: {'aktiv' if fixture_context_active else 'nicht verfuegbar'}
 KADERSTRUKTUR: {core_starter_count} core_starter, {rotation_hold_count} rotation_hold, {sell_candidate_count} sell_candidate
+PERSOENLICHER OVERBID-DRUCK LETZTE 14 TAGE: {overbid_pressure_level}
+ANZAHL UEBERBOTENE GEBOTE LETZTE 14 TAGE: {recent_outbid_count_14d}
+DURCHSCHNITTLICHER ABSTAND ZUM GEWINNERGEBOT: {avg_outbid_gap_text} Euro ({avg_outbid_gap_pct:.2%})
+ALGORITHMISCH EMPFOHLENER PERSOENLICHER AUFSCHLAG FUER HART UMKAEMPFTE GEBOTE: {suggested_markup_pct:.2%}
 
 MEHRFACHBELEGUNG PRO VEREIN IM KADER:
 {squad_team_counts_text}
+
+AKTIVE GEBOTS-EMPFEHLUNGEN AUS DER SYSTEMLOGIK:
+{active_offer_actions_text}
+
+KUERZLICH UEBERBOTENE EIGENE GEBOTE:
+{recent_outbid_text}
+
+VALIDIERUNGSHINWEISE AUS DER SYSTEMLOGIK:
+{validation_notes_text}
 
 MEIN KADER:
 {squad_text}
@@ -182,6 +371,8 @@ HINWEIS ZU DEN SCORES:
 - recommended_bid_min und recommended_bid_max sind bereits berechnete Fallback-Gebote aus Score, Ablaufzeit und erwarteter Marktwertchance.
 - estimated_market_winning_bid ist eine datenbasierte Schaetzung, zu welchem Preis die Liga in letzter Zeit aehnliche Spieler typischerweise weggeschnappt hat.
 - competitive_bid_max ist dein wettbewerbsfaehiges Maximalgebot, solange der Preis historisch noch profitabel bzw. vertretbar erscheint. Wenn bid_strategy_note auf avoid_price_war oder stay_disciplined steht, sollst du gerade NICHT stumpf auf den geschaetzten Marktpreis hochgehen.
+- personal_bid_feedback zeigt, ob competitive_bid_max wegen deiner juengsten Overbid-Historie bereits leicht angehoben wurde.
+- active_offer_decision und active_offer_recommended_new_bid sind vorgelagerte Systementscheidungen fuer bereits laufende Gebote.
 - recent_bid_competition beschreibt den zuletzt beobachteten Konkurrenzdruck in aehnlichen Deals als low, medium oder high.
 - next_opponent, home_or_away und fixture_difficulty kommen, falls verfuegbar, aus einem externen Spielplan-Feed ohne zusaetzlichen KI-Aufruf.
 - ECHT SOFORT VERFUEGBARES CASH OHNE INS MINUS ZU GEHEN ist das aktuell wirklich freie Budget in der App.
@@ -205,6 +396,10 @@ Erstelle eine konkrete Abendstrategie fuer mein Kickbase-Team.
 - Gib fuer jeden Kaufkandidaten ein maximales Gebot in Euro an. Das Gebot soll sich an Wichtigkeit, Cash-Budget, Trading-Chance, Startelf-Wahrscheinlichkeit und Ablaufzeit orientieren.
 - Nutze das theoretische Ausgabenlimit nur als Notfallobergrenze. Normale Empfehlungen sollen sich primaer am echten Cash-Budget orientieren.
 - Wenn ein Gebot nur mit Negativpuffer moeglich ist, schreibe das explizit dazu und nenne die wahrscheinlichsten Verkaeufe oder Rueckholhebel bis Freitag.
+- Behandle AKTIVE GEBOTS-EMPFEHLUNGEN AUS DER SYSTEMLOGIK als Default-Handlungsbasis. Weiche nur begruendet davon ab.
+- Behandle das bereits gebundene Kapital aus offenen Geboten als nicht erneut verfuegbares Cash.
+- Wenn ein Spieler bereits ein aktives Gebot hat, gib keine redundante Neuempfehlung ohne explizite Aussage "Gebot halten", "leicht erhoehen" oder "abbrechen".
+- Wenn PERSOENLICHER OVERBID-DRUCK = medium oder high, pruefe aktiv, ob competitive_bid_max bei Prioritaet-A-Kandidaten leicht angehoben werden sollte, statt immer nur dieselbe disziplinierte Grenze zu wiederholen.
 - Wenn historical bid pressure hoch ist, entscheide explizit zwischen "mitgehen" und "Preiskrieg vermeiden". Ein hohes estimated_market_winning_bid ist kein Kaufzwang.
 - Unterscheide klar zwischen:
   A) Sofort kaufen vor dem naechsten Marktwertupdate
@@ -217,8 +412,9 @@ Antwortformat (STRENG EINHALTEN):
 
 1. TEAMSTATUS: Kurze Einordnung meines Kaders, meines Budgets, des Tradingfensters und meines dringendsten Handlungsbedarfs heute Abend.
 2. VERKAUFS-BEFEHLE: Wer muss weg oder ist aktiv entbehrlich? Fokus auf fallende Werte, Risiko und Kapitalfreisetzung.
-3. SOFORT-KAEUFE BIS ZUM NAECHSTEN UPDATE: Nenne nur die wichtigsten Spieler aus Marktsegment A. Format je Spieler: \"Kauf [Name] | Prioritaet [A/B/C] | Max Gebot [Euro] | Rolle [Starter/Trader/Hold] | Warum jetzt\".
-4. SPAETERE CHANCEN UND HOLDS: Welche spaeter auslaufenden Spieler oder mehrtaegigen Holds darf ich nicht verpassen? Format je Spieler: \"Beobachte [Name] | Zielstrategie [Overnight/2-4 Tage/Spieltag] | Spaeteres Max Gebot | Warum relevant\".
+3. SOFORT-KAEUFE BIS ZUM NAECHSTEN UPDATE: Nenne nur die wichtigsten Spieler aus Marktsegment A. Format je Spieler: "Kauf [Name] | Prioritaet [A/B/C] | Max Gebot [Euro] | Rolle [Starter/Trader/Hold] | Warum jetzt".
+   Wenn du auf einen Spieler bereits aktiv bietest, nutze stattdessen das Format: "Aktives Gebot [Name] | Aktion [halten/leicht erhoehen/abbrechen] | Neues Max Gebot [Euro oder unveraendert] | Warum".
+4. SPAETERE CHANCEN UND HOLDS: Welche spaeter auslaufenden Spieler oder mehrtaegigen Holds darf ich nicht verpassen? Format je Spieler: "Beobachte [Name] | Zielstrategie [Overnight/2-4 Tage/Spieltag] | Spaeteres Max Gebot | Warum relevant".
 5. NEWS-CHECK: Welche belastbaren Infos aus der Websuche veraendern die Entscheidung wirklich?
 6. TRADING-PLAN: Was ist deine Strategie fuer die naechsten 2 bis 4 Tage, damit ich nicht nur heute, sondern auch langfristig besser trade?
 7. FRIDAY-CHECK: Was muss bis Freitag vor dem Spieltag unbedingt erledigt sein, damit ich nicht im Minus bin und ein funktionierendes Team habe?

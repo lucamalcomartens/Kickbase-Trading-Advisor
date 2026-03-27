@@ -6,6 +6,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 
+import numpy as np
 import pandas as pd
 
 
@@ -274,6 +275,8 @@ def load_offer_tracking_summary(db_path, league_id, own_username, limit=5):
     """Load compact stats and recent overbid cases for the user."""
 
     reference_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    cutoff_7d = (datetime.now(timezone.utc) - pd.Timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    cutoff_14d = (datetime.now(timezone.utc) - pd.Timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
     with sqlite3.connect(db_path) as conn:
         _expire_active_offers(conn, league_id, own_username, reference_time)
         summary_df = pd.read_sql_query(
@@ -302,7 +305,7 @@ def load_offer_tracking_summary(db_path, league_id, own_username, limit=5):
         )
         recent_active_df = pd.read_sql_query(
             """
-            SELECT player_name, offer_amount, market_value, expires_at, last_seen_at
+            SELECT player_id, player_name, offer_amount, market_value, expires_at, last_seen_at
             FROM tracked_market_offers
             WHERE league_id = ? AND own_username = ? AND status = 'active'
                 AND (expires_at IS NULL OR expires_at >= ?)
@@ -312,12 +315,78 @@ def load_offer_tracking_summary(db_path, league_id, own_username, limit=5):
             conn,
             params=[league_id, own_username, reference_time, limit],
         )
+        active_budget_df = pd.read_sql_query(
+            """
+            SELECT COALESCE(SUM(offer_amount), 0) AS active_offer_amount_total
+            FROM tracked_market_offers
+            WHERE league_id = ? AND own_username = ? AND status = 'active'
+                AND (expires_at IS NULL OR expires_at >= ?)
+            """,
+            conn,
+            params=[league_id, own_username, reference_time],
+        )
+        outbid_stats_df = pd.read_sql_query(
+            """
+            SELECT offer_amount, winning_price, resolved_at, player_name
+            FROM tracked_market_offers
+            WHERE league_id = ? AND own_username = ? AND status = 'outbid'
+                AND resolved_at IS NOT NULL
+                AND resolved_at >= ?
+            ORDER BY resolved_at DESC
+            """,
+            conn,
+            params=[league_id, own_username, cutoff_14d],
+        )
 
     counts = summary_df.iloc[0].fillna(0).to_dict() if not summary_df.empty else {}
     counts = {key: int(value) for key, value in counts.items()}
     recent_outbid = recent_outbid_df.where(pd.notna(recent_outbid_df), None).to_dict(orient="records")
     recent_active = recent_active_df.where(pd.notna(recent_active_df), None).to_dict(orient="records")
-    return {"counts": counts, "recent_outbid": recent_outbid, "recent_active": recent_active}
+    active_offer_amount_total = 0.0
+    if not active_budget_df.empty:
+        active_offer_amount_total = float(active_budget_df.iloc[0].get("active_offer_amount_total") or 0.0)
+
+    outbid_stats_df = outbid_stats_df.copy()
+    if not outbid_stats_df.empty:
+        outbid_stats_df["offer_amount"] = pd.to_numeric(outbid_stats_df["offer_amount"], errors="coerce")
+        outbid_stats_df["winning_price"] = pd.to_numeric(outbid_stats_df["winning_price"], errors="coerce")
+        outbid_stats_df["resolved_at"] = pd.to_datetime(outbid_stats_df["resolved_at"], utc=True, errors="coerce")
+        outbid_stats_df["outbid_gap"] = (outbid_stats_df["winning_price"] - outbid_stats_df["offer_amount"]).clip(lower=0)
+        outbid_stats_df["outbid_gap_pct"] = np.where(
+            outbid_stats_df["offer_amount"].fillna(0) > 0,
+            outbid_stats_df["outbid_gap"] / outbid_stats_df["offer_amount"],
+            np.nan,
+        )
+        recent_outbid_count_7d = int((outbid_stats_df["resolved_at"] >= pd.Timestamp(cutoff_7d)).sum())
+        recent_outbid_count_14d = int(len(outbid_stats_df))
+        avg_outbid_gap = outbid_stats_df["outbid_gap"].dropna().mean()
+        avg_outbid_gap_pct = outbid_stats_df["outbid_gap_pct"].dropna().mean()
+        avg_outbid_gap = 0.0 if pd.isna(avg_outbid_gap) else float(avg_outbid_gap)
+        avg_outbid_gap_pct = 0.0 if pd.isna(avg_outbid_gap_pct) else float(avg_outbid_gap_pct)
+    else:
+        recent_outbid_count_7d = 0
+        recent_outbid_count_14d = 0
+        avg_outbid_gap = 0.0
+        avg_outbid_gap_pct = 0.0
+
+    suggested_markup_pct = min(max(avg_outbid_gap_pct * 0.75, 0.0), 0.05)
+    if recent_outbid_count_14d >= 5 or avg_outbid_gap_pct >= 0.03:
+        overbid_pressure_level = "high"
+    elif recent_outbid_count_14d >= 2 or avg_outbid_gap_pct >= 0.015:
+        overbid_pressure_level = "medium"
+    else:
+        overbid_pressure_level = "low"
+
+    stats = {
+        "active_offer_amount_total": round(active_offer_amount_total, 2),
+        "recent_outbid_count_7d": recent_outbid_count_7d,
+        "recent_outbid_count_14d": recent_outbid_count_14d,
+        "avg_outbid_gap": round(avg_outbid_gap, 2),
+        "avg_outbid_gap_pct": round(avg_outbid_gap_pct, 4),
+        "suggested_markup_pct": round(suggested_markup_pct, 4),
+        "overbid_pressure_level": overbid_pressure_level,
+    }
+    return {"counts": counts, "recent_outbid": recent_outbid, "recent_active": recent_active, "stats": stats}
 
 
 def save_transfer_history_to_db(transfer_history_df, league_id, db_path):

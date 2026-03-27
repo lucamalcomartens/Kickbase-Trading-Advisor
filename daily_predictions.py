@@ -22,10 +22,11 @@ from features.analysis_support import (
     prepare_top_actions,
     save_analysis_history,
 )
-from features.bid_history import build_transfer_history_df, enrich_market_with_bid_history
+from features.bid_history import apply_personal_bid_tuning, build_transfer_history_df, enrich_market_with_bid_history
 from features.budgets import calc_manager_budgets
 from features.notifier import send_mail
 from features.offer_tracking import extract_current_market_offers, summarize_market_feed_debug, summarize_offer_feed_debug
+from features.strategy_engine import build_strategy_context
 from features.predictions.data_handler import (
     check_if_data_reload_needed,
     create_player_data_table,
@@ -172,7 +173,9 @@ def main() -> None:
         min_predicted_mv_target=None,
     )
     market_all_df = enrich_market_with_bid_history(market_all_df, transfer_history_df)
+    market_all_df = apply_personal_bid_tuning(market_all_df, offer_tracking_summary)
     market_all_df = enrich_with_fixture_context(market_all_df, fixture_context)
+    market_all_df, strategy_context = build_strategy_context(market_all_df, offer_tracking_summary, own_budget)
     market_email_df = market_all_df[
         [
             "last_name",
@@ -187,6 +190,8 @@ def main() -> None:
             "competitive_bid_max",
             "recent_bid_competition",
             "bid_strategy_note",
+            "active_offer_decision",
+            "active_offer_recommended_new_bid",
             "hours_to_exp",
             "expiring_today",
             "next_opponent",
@@ -214,7 +219,7 @@ def main() -> None:
             "fixture_difficulty",
         ]
     ].copy()
-    top_action_sections = prepare_top_actions(market_all_df, squad_recommendations_df)
+    top_action_sections = prepare_top_actions(market_all_df, squad_recommendations_df, strategy_context=strategy_context)
     print("\n=== Squad Recommendations ===")
     display(squad_recommendations_df)
 
@@ -226,6 +231,7 @@ def main() -> None:
             manager_budgets_df=manager_budgets_df,
             market_all_df=market_all_df,
             squad_recommendations_df=squad_recommendations_df,
+            strategy_context=strategy_context,
             own_username=own_username,
             own_budget=own_budget,
             report_date=report_date,
@@ -242,6 +248,7 @@ def main() -> None:
             squad_recommendations_df,
             ai_advice,
             ai_status,
+            strategy_context=strategy_context,
         )
         analysis_history.append(history_entry)
         save_analysis_history(system_settings.analysis_history_path, analysis_history)
@@ -260,6 +267,7 @@ def main() -> None:
             squad_recommendations_df,
             ai_advice,
             ai_status,
+            strategy_context=strategy_context,
         )
         analysis_history.append(history_entry)
         save_analysis_history(system_settings.analysis_history_path, analysis_history)
@@ -311,6 +319,7 @@ def main() -> None:
         mail_status=mail_status,
         fixture_context_active=bool(fixture_context),
         offer_tracking_summary=offer_tracking_summary,
+        strategy_context=strategy_context,
     )
 
 
