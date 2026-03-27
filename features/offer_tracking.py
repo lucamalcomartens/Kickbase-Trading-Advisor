@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 
 
-OFFER_AMOUNT_KEYS = ["offer", "amount", "value", "bid", "prc", "mvb", "v", "amt", "am"]
+OFFER_AMOUNT_KEYS = ["uop", "offer", "amount", "value", "bid", "prc", "mvb", "v", "amt", "am"]
 OFFER_EXPIRY_KEYS = ["expiresAt", "exp", "exs", "until", "expiry", "expires"]
-OFFER_ID_KEYS = ["offerId", "oid", "offer_id"]
+OFFER_ID_KEYS = ["uoid", "offerId", "oid", "offer_id"]
 OFFER_PATH_HINTS = ["offer", "bid", "bids", "mybid", "myoffer", "offers"]
 
 
@@ -197,11 +197,12 @@ def _iter_structure_nodes(payload, path="root"):
 
 def _looks_like_offer_candidate(candidate, path=""):
     player_id = _extract_player_id(candidate)
-    offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
+    offer_amount = _extract_offer_amount(candidate)
     has_offer_marker = (
         _extract_scalar(candidate, OFFER_ID_KEYS + ["id", "i"]) is not None
         or _extract_datetime(candidate, OFFER_EXPIRY_KEYS) is not None
         or _path_looks_like_offer(path)
+        or _looks_like_market_offer(candidate)
     )
     return (
         player_id is not None
@@ -213,12 +214,12 @@ def _looks_like_offer_candidate(candidate, path=""):
 
 def _normalize_offer_candidate(candidate, path, league_id, own_username, observed_at):
     player_id = _extract_player_id(candidate)
-    offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
+    offer_amount = _extract_offer_amount(candidate)
     if player_id is None or offer_amount is None:
         return None
 
     market_value = _extract_market_value(candidate)
-    expires_at = _extract_datetime(candidate, OFFER_EXPIRY_KEYS)
+    expires_at = _extract_offer_expiry(candidate, observed_at)
     offer_id = _extract_scalar(candidate, OFFER_ID_KEYS + ["id", "i"])
     player_name = _extract_player_name(candidate)
 
@@ -258,6 +259,9 @@ def _extract_player_id(candidate):
     if direct_value is not None:
         return _coerce_int(direct_value)
 
+    if _looks_like_market_player(candidate):
+        return _coerce_int(_extract_scalar(candidate, ["i"]))
+
     player_obj = candidate.get("player")
     if isinstance(player_obj, dict):
         return _coerce_int(_extract_scalar(player_obj, ["id", "i", "playerId", "pi"]))
@@ -266,6 +270,15 @@ def _extract_player_id(candidate):
 
 
 def _extract_player_name(candidate):
+    if _looks_like_market_player(candidate):
+        first_name = _extract_scalar(candidate, ["fn", "firstName", "first_name"])
+        last_name = _extract_scalar(candidate, ["n", "lastName", "last_name"])
+        combined = " ".join(
+            part for part in [str(first_name).strip() if first_name else "", str(last_name).strip() if last_name else ""] if part
+        )
+        if combined:
+            return combined
+
     direct_name = _extract_scalar(candidate, ["playerName", "pn", "name", "fullName"])
     if direct_name:
         return str(direct_name)
@@ -287,6 +300,11 @@ def _extract_player_name(candidate):
 
 
 def _extract_market_value(candidate):
+    if _looks_like_market_player(candidate):
+        market_value = _extract_numeric(candidate, ["mv", "marketValue", "market_value", "mvp", "marketvalue", "playerMarketValue", "pmv"])
+        if market_value is not None:
+            return market_value
+
     direct_market_value = _extract_numeric(candidate, ["marketValue", "market_value", "mv", "mvp", "marketvalue", "playerMarketValue", "pmv"])
     if direct_market_value is not None:
         return direct_market_value
@@ -321,6 +339,35 @@ def _sanitize_candidate(candidate):
         elif isinstance(value, list):
             sample[key] = f"<list:{len(value)}>"
     return sample
+
+
+def _extract_offer_amount(candidate):
+    if _looks_like_market_offer(candidate):
+        own_offer = _extract_numeric(candidate, ["uop"])
+        if own_offer is not None and own_offer > 0:
+            return own_offer
+    return _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
+
+
+def _extract_offer_expiry(candidate, observed_at):
+    if _looks_like_market_player(candidate):
+        seconds_left = _extract_numeric(candidate, ["exs"])
+        if seconds_left is not None:
+            observed_at_dt = pd.to_datetime(observed_at, utc=True, errors="coerce")
+            if pd.notna(observed_at_dt):
+                expires_at = observed_at_dt + timedelta(seconds=float(seconds_left))
+                return expires_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+    return _extract_datetime(candidate, OFFER_EXPIRY_KEYS)
+
+
+def _looks_like_market_player(candidate):
+    keys = {str(key).lower() for key in candidate.keys()}
+    market_markers = {"i", "fn", "n", "mv", "exs", "prc"}
+    return market_markers.issubset(keys)
+
+
+def _looks_like_market_offer(candidate):
+    return _looks_like_market_player(candidate) and _extract_numeric(candidate, ["uop"]) not in (None, 0)
 
 
 def _extract_numeric(candidate, keys):

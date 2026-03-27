@@ -132,7 +132,7 @@ def main() -> None:
     if own_manager_id is not None:
         try:
             raw_transfer_feed = get_manager_transfer_feed(token, league_id, own_manager_id)
-            current_offers_df = extract_current_market_offers(raw_transfer_feed, league_id, own_username)
+            current_offers_df = extract_current_market_offers(raw_market_feed, league_id, own_username)
             upsert_current_market_offers(current_offers_df, system_settings.database_path)
             reconcile_tracked_market_offers(
                 system_settings.database_path,
@@ -148,6 +148,11 @@ def main() -> None:
             )
             if offer_tracking_summary["counts"].get("active_offers", 0) == 0:
                 offer_tracking_summary["debug"] = summarize_offer_feed_debug(raw_transfer_feed)
+                offer_tracking_summary["market_debug"] = summarize_market_feed_debug(
+                    raw_market_feed,
+                    target_player_names=["Péter Gulácsi", "Peter Gulacsi", "Gulácsi", "Gulacsi"],
+                )
+            else:
                 offer_tracking_summary["market_debug"] = summarize_market_feed_debug(
                     raw_market_feed,
                     target_player_names=["Péter Gulácsi", "Peter Gulacsi", "Gulácsi", "Gulacsi"],
