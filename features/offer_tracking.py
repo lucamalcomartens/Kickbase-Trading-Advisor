@@ -7,6 +7,11 @@ from datetime import datetime, timezone
 import pandas as pd
 
 
+OFFER_AMOUNT_KEYS = ["offer", "amount", "value", "bid", "prc", "mvb"]
+OFFER_EXPIRY_KEYS = ["expiresAt", "exp", "exs", "until"]
+OFFER_ID_KEYS = ["offerId", "oid"]
+
+
 def extract_current_market_offers(raw_transfer_feed, league_id, own_username):
     """Best-effort extraction of the user's currently active market offers."""
 
@@ -73,19 +78,30 @@ def _iter_offer_candidates(payload):
 
 
 def _looks_like_offer_candidate(candidate):
-    return _extract_player_id(candidate) is not None and _extract_numeric(candidate, ["offer", "amount", "value", "bid", "prc", "mvb", "trp"]) is not None
+    player_id = _extract_player_id(candidate)
+    offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
+    has_offer_marker = _extract_scalar(candidate, OFFER_ID_KEYS) is not None or _extract_datetime(candidate, OFFER_EXPIRY_KEYS) is not None
+    return player_id is not None and offer_amount is not None and has_offer_marker
 
 
 def _normalize_offer_candidate(candidate, league_id, own_username, observed_at):
     player_id = _extract_player_id(candidate)
-    offer_amount = _extract_numeric(candidate, ["offer", "amount", "value", "bid", "prc", "mvb", "trp"])
+    offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
     if player_id is None or offer_amount is None:
         return None
 
-    market_value = _extract_numeric(candidate, ["marketValue", "market_value", "mv", "mvp"])
-    expires_at = _extract_datetime(candidate, ["expiresAt", "exp", "exs", "dt", "until"])
-    offer_id = _extract_scalar(candidate, ["offerId", "oid", "id", "i"])
+    market_value = _extract_market_value(candidate)
+    expires_at = _extract_datetime(candidate, OFFER_EXPIRY_KEYS)
+    offer_id = _extract_scalar(candidate, OFFER_ID_KEYS)
     player_name = _extract_player_name(candidate)
+
+    if expires_at is None:
+        return None
+
+    expires_at_dt = pd.to_datetime(expires_at, utc=True, errors="coerce")
+    observed_at_dt = pd.to_datetime(observed_at, utc=True, errors="coerce")
+    if pd.notna(expires_at_dt) and pd.notna(observed_at_dt) and expires_at_dt <= observed_at_dt:
+        return None
 
     return {
         "offer_key": _build_offer_key(league_id, offer_id, player_id, offer_amount, expires_at),
@@ -126,7 +142,7 @@ def _extract_player_id(candidate):
 
 
 def _extract_player_name(candidate):
-    direct_name = _extract_scalar(candidate, ["playerName", "pn", "name"])
+    direct_name = _extract_scalar(candidate, ["playerName", "pn", "name", "fullName"])
     if direct_name:
         return str(direct_name)
 
@@ -139,9 +155,23 @@ def _extract_player_name(candidate):
         )
         if combined:
             return combined
-        nested_name = _extract_scalar(player_obj, ["name", "pn"])
+        nested_name = _extract_scalar(player_obj, ["name", "pn", "fullName"])
         if nested_name:
             return str(nested_name)
+
+    return None
+
+
+def _extract_market_value(candidate):
+    direct_market_value = _extract_numeric(candidate, ["marketValue", "market_value", "mv", "mvp", "marketvalue", "playerMarketValue", "pmv"])
+    if direct_market_value is not None:
+        return direct_market_value
+
+    player_obj = candidate.get("player")
+    if isinstance(player_obj, dict):
+        nested_market_value = _extract_numeric(player_obj, ["marketValue", "market_value", "mv", "mvp", "marketvalue", "value"])
+        if nested_market_value is not None:
+            return nested_market_value
 
     return None
 

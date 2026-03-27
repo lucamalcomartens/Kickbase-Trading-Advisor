@@ -189,11 +189,13 @@ def upsert_current_market_offers(offers_df, db_path):
 def reconcile_tracked_market_offers(db_path, league_id, own_username, current_offers_df, transfer_history_df):
     """Resolve no-longer-visible offers as won, outbid, or unresolved."""
 
+    reference_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     current_offer_keys = set()
     if current_offers_df is not None and not current_offers_df.empty:
         current_offer_keys = set(current_offers_df["offer_key"].dropna().astype(str))
 
     with sqlite3.connect(db_path) as conn:
+        _expire_active_offers(conn, league_id, own_username, reference_time)
         active_offers = pd.read_sql_query(
             """
             SELECT offer_key, player_id, player_name, offer_amount, first_seen_at, last_seen_at
@@ -271,7 +273,9 @@ def reconcile_tracked_market_offers(db_path, league_id, own_username, current_of
 def load_offer_tracking_summary(db_path, league_id, own_username, limit=5):
     """Load compact stats and recent overbid cases for the user."""
 
+    reference_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with sqlite3.connect(db_path) as conn:
+        _expire_active_offers(conn, league_id, own_username, reference_time)
         summary_df = pd.read_sql_query(
             """
             SELECT
@@ -301,11 +305,12 @@ def load_offer_tracking_summary(db_path, league_id, own_username, limit=5):
             SELECT player_name, offer_amount, market_value, expires_at, last_seen_at
             FROM tracked_market_offers
             WHERE league_id = ? AND own_username = ? AND status = 'active'
+                AND (expires_at IS NULL OR expires_at >= ?)
             ORDER BY last_seen_at DESC
             LIMIT ?
             """,
             conn,
-            params=[league_id, own_username, limit],
+            params=[league_id, own_username, reference_time, limit],
         )
 
     counts = summary_df.iloc[0].fillna(0).to_dict() if not summary_df.empty else {}
@@ -463,6 +468,24 @@ def _json_safe_number(value):
     if isinstance(value, numbers.Real):
         return float(value)
     return value
+
+
+def _expire_active_offers(conn, league_id, own_username, reference_time):
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        UPDATE tracked_market_offers
+        SET status = 'inactive_unresolved',
+            resolved_at = COALESCE(resolved_at, ?)
+        WHERE league_id = ?
+            AND own_username = ?
+            AND status = 'active'
+            AND expires_at IS NOT NULL
+            AND expires_at < ?
+        """,
+        (reference_time, league_id, own_username, reference_time),
+    )
+    conn.commit()
 
 
 def _resolve_offer_resolution(offer_row, transfer_df, own_username):
