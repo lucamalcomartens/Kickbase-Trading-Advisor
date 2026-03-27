@@ -46,6 +46,17 @@ def build_player_name(df):
 def prepare_top_actions(market_df, squad_df):
     """Build compact top-action tables for the email header and mobile-first reading."""
 
+    market_df = market_df.copy()
+    if "competitive_bid_range" in market_df.columns:
+        market_df["display_bid_range"] = market_df["competitive_bid_range"].fillna(market_df.get("bid_range"))
+    else:
+        market_df["display_bid_range"] = market_df.get("bid_range")
+
+    if "competitive_bid_max" in market_df.columns:
+        market_df["display_bid_max"] = market_df["competitive_bid_max"].fillna(market_df.get("recommended_bid_max"))
+    else:
+        market_df["display_bid_max"] = market_df.get("recommended_bid_max")
+
     buy_now_df = market_df[market_df["buy_action"] == "buy_now"].copy().head(5)
     watchlist_df = market_df[
         (market_df["buy_action"] == "watchlist") & (~market_df["expiring_today"])
@@ -54,25 +65,25 @@ def prepare_top_actions(market_df, squad_df):
 
     if not buy_now_df.empty:
         buy_now_df["Spieler"] = build_player_name(buy_now_df)
-        buy_now_df = buy_now_df[["Spieler", "team_name", "asset_role", "priority_score", "bid_range"]].rename(
+        buy_now_df = buy_now_df[["Spieler", "team_name", "asset_role", "priority_score", "display_bid_range"]].rename(
             columns={
                 "team_name": "Team",
                 "asset_role": "Rolle",
                 "priority_score": "Score",
-                "bid_range": "Gebot",
+                "display_bid_range": "Gebot",
             }
         )
 
     if not watchlist_df.empty:
         watchlist_df["Spieler"] = build_player_name(watchlist_df)
         watchlist_df = watchlist_df[
-            ["Spieler", "team_name", "asset_role", "priority_score", "recommended_bid_max"]
+            ["Spieler", "team_name", "asset_role", "priority_score", "display_bid_max"]
         ].rename(
             columns={
                 "team_name": "Team",
                 "asset_role": "Zieltyp",
                 "priority_score": "Score",
-                "recommended_bid_max": "Max Gebot",
+                "display_bid_max": "Max Gebot",
             }
         )
 

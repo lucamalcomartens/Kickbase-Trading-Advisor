@@ -278,6 +278,6 @@ def join_current_market(token, league_id, today_df_results, min_predicted_mv_tar
     )
 
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "mv_trend_1d", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["player_id", "first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "mv_trend_1d", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return enrich_market_candidates(bid_df)

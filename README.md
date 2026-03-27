@@ -16,7 +16,13 @@
       <strong>Market Value Prediction:</strong> Using selected features such as points, minutes played, current market value, recent value changes, and more, a machine learning model predicts market value changes for the following day. This is done for all players currently on the market as well as those in your squad.
     </li>
     <li>
+      <strong>Historical Bid Pressure:</strong> Completed league transfers are evaluated to estimate how aggressively your league tends to overpay for similar players. The tool then distinguishes between bids that are worth matching and pure price wars that should be avoided.
+    </li>
+    <li>
       <strong>Email Notifier:</strong> The results from the previous features are sent to you via email daily around 23:00 (+-45 minutes), always after the market value updates around 22:00. You can also run this manually at any time without waiting for the scheduled execution.
+    </li>
+    <li>
+      <strong>SQLite Persistence Layer:</strong> Core advisor data is stored in a local SQLite database. Besides player history, the app now also persists completed league transfers as well as full market, squad, and budget snapshots per run for later analysis.
     </li>
     <li>
       <strong>More Features in the Future:</strong> ...

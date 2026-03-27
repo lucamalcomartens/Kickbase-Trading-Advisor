@@ -66,6 +66,37 @@ def get_league_activities(token, league_id, league_start_date):
 
     return trading, login, achievements
 
+
+def get_league_transfers(token, league_id, min_date=None, max_entries=5000):
+    """Get completed league transfers with timestamps for bid-history analysis."""
+
+    url = f"{BASE_URL}/leagues/{league_id}/activitiesFeed?max={max_entries}"
+    data = get_json_with_token(url, token)
+
+    transfers = []
+    for entry in data.get("af", []):
+        if entry.get("t") != 15:
+            continue
+
+        entry_date = entry.get("dt", "")
+        if min_date and entry_date < min_date:
+            continue
+
+        payload = entry.get("data", {})
+        transfers.append(
+            {
+                "timestamp": entry_date,
+                "buyer": payload.get("byr"),
+                "seller": payload.get("slr"),
+                "player_id": payload.get("pi"),
+                "player_name": payload.get("pn"),
+                "team_id": payload.get("tid"),
+                "transfer_price": payload.get("trp"),
+            }
+        )
+
+    return transfers
+
 def get_league_players_on_market(token, league_id):
     """Get all players currently available on the market in the league."""
 

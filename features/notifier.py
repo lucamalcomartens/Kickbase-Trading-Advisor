@@ -48,7 +48,7 @@ def send_mail(budget_df, market_df, squad_df, email, ai_advice=None, top_action_
 
     def cell_style(column_name, value):
         style = "padding:12px 14px;border-bottom:1px solid #e7ecf3;font-size:13px;color:#203040;vertical-align:top;"
-        right_aligned_columns = {"mv", "budget", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "s_11_prob", "hours_to_exp", "priority_score", "recommended_bid_max", "sell_priority_score", "Score", "Sell Score", "Delta", "Max Gebot"}
+        right_aligned_columns = {"mv", "budget", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "s_11_prob", "hours_to_exp", "priority_score", "recommended_bid_max", "competitive_bid_max", "sell_priority_score", "Score", "Sell Score", "Delta", "Max Gebot"}
         if column_name in right_aligned_columns:
             style += "text-align:right;font-variant-numeric:tabular-nums;"
 

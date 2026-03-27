@@ -8,6 +8,13 @@ from dotenv import load_dotenv
 from IPython.display import display
 
 from features.ai_advisor import generate_ai_advice
+from features.advisor_db import (
+    create_advisor_tables,
+    load_offer_tracking_summary,
+    reconcile_tracked_market_offers,
+    save_run_snapshot,
+    upsert_current_market_offers,
+)
 from features.analysis_support import (
     build_history_entry,
     get_next_matchday_context,
@@ -15,8 +22,10 @@ from features.analysis_support import (
     prepare_top_actions,
     save_analysis_history,
 )
+from features.bid_history import build_transfer_history_df, enrich_market_with_bid_history
 from features.budgets import calc_manager_budgets
 from features.notifier import send_mail
+from features.offer_tracking import extract_current_market_offers
 from features.predictions.data_handler import (
     check_if_data_reload_needed,
     create_player_data_table,
@@ -32,6 +41,7 @@ from features.predictions.predictions import (
 from features.predictions.preprocessing import preprocess_player_data, split_data
 from features.run_report import write_run_report
 from kickbase_api.league import get_league_id
+from kickbase_api.manager import get_manager_transfer_feed, get_managers
 from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
 from kickbase_api.user import get_budget, get_username, login
 from project_settings import SystemSettings, configure_display, load_user_settings
@@ -46,6 +56,8 @@ def main() -> None:
     system_settings = SystemSettings()
     user_settings = load_user_settings()
     report_date = datetime.date.today().strftime("%d. %B %Y")
+
+    create_advisor_tables(system_settings.database_path)
 
     username = os.getenv("KICK_USER")
     password = os.getenv("KICK_PASS")
@@ -66,19 +78,22 @@ def main() -> None:
 
     own_budget = get_budget(token, league_id)
     own_username = get_username(token)
+    manager_lookup = dict(get_managers(token, league_id))
+    own_manager_id = manager_lookup.get(own_username)
     matchday_context = get_next_matchday_context(token, user_settings.competition_ids[0])
     analysis_history = load_analysis_history(system_settings.analysis_history_path)
 
-    create_player_data_table()
-    reload_data = check_if_data_reload_needed()
+    create_player_data_table(system_settings.database_path)
+    reload_data = check_if_data_reload_needed(system_settings.database_path)
     save_player_data_to_db(
         token,
         user_settings.competition_ids,
         system_settings.last_mv_values,
         system_settings.last_pfm_values,
         reload_data,
+        system_settings.database_path,
     )
-    player_df = load_player_data_from_db()
+    player_df = load_player_data_from_db(system_settings.database_path)
     print("\nData loaded from database.")
 
     processed_player_df, today_df = preprocess_player_data(player_df)
@@ -103,6 +118,39 @@ def main() -> None:
 
     live_predictions_df = live_data_predictions(today_df, model, system_settings.features)
     fixture_context = get_fixture_context(user_settings.competition_ids[0])
+    transfer_history_df = build_transfer_history_df(
+        token,
+        league_id,
+        user_settings.league_start_date,
+        live_predictions_df,
+        system_settings.database_path,
+    )
+
+    offer_tracking_summary = {"counts": {}, "recent_outbid": []}
+    if own_manager_id is not None:
+        try:
+            raw_transfer_feed = get_manager_transfer_feed(token, league_id, own_manager_id)
+            current_offers_df = extract_current_market_offers(raw_transfer_feed, league_id, own_username)
+            upsert_current_market_offers(current_offers_df, system_settings.database_path)
+            reconcile_tracked_market_offers(
+                system_settings.database_path,
+                league_id,
+                own_username,
+                current_offers_df,
+                transfer_history_df,
+            )
+            offer_tracking_summary = load_offer_tracking_summary(
+                system_settings.database_path,
+                league_id,
+                own_username,
+            )
+            print(
+                f"\nOffer-Tracking: {offer_tracking_summary['counts'].get('active_offers', 0)} aktiv, "
+                f"{offer_tracking_summary['counts'].get('outbid_offers', 0)} ueberboten, "
+                f"{offer_tracking_summary['counts'].get('won_offers', 0)} gewonnen"
+            )
+        except Exception as error:
+            print(f"Warnung: Offer-Tracking konnte nicht geladen werden: {error}")
 
     market_all_df = join_current_market(
         token,
@@ -110,6 +158,7 @@ def main() -> None:
         live_predictions_df,
         min_predicted_mv_target=None,
     )
+    market_all_df = enrich_market_with_bid_history(market_all_df, transfer_history_df)
     market_all_df = enrich_with_fixture_context(market_all_df, fixture_context)
     market_email_df = market_all_df[
         [
@@ -122,6 +171,9 @@ def main() -> None:
             "priority_score",
             "asset_role",
             "recommended_bid_max",
+            "competitive_bid_max",
+            "recent_bid_competition",
+            "bid_strategy_note",
             "hours_to_exp",
             "expiring_today",
             "next_opponent",
@@ -215,11 +267,27 @@ def main() -> None:
         mail_status = f"failed: {error}"
         print(f"Warnung: E-Mail-Versand fehlgeschlagen: {error}")
 
+    save_run_snapshot(
+        db_path=system_settings.database_path,
+        report_date=report_date,
+        league_id=league_id,
+        own_username=own_username,
+        own_budget=own_budget,
+        matchday_context=matchday_context,
+        model_metrics=model_metrics,
+        ai_status=ai_status,
+        mail_status=mail_status,
+        manager_budgets_df=manager_budgets_df,
+        market_df=market_all_df,
+        squad_df=squad_recommendations_df,
+    )
+
     write_run_report(
         output_dir=system_settings.run_output_dir,
         report_date=report_date,
         own_username=own_username,
         own_budget=own_budget,
+        manager_budgets_df=manager_budgets_df,
         matchday_context=matchday_context,
         model_metrics=model_metrics,
         market_df=market_all_df,
@@ -228,6 +296,7 @@ def main() -> None:
         ai_advice=ai_advice,
         mail_status=mail_status,
         fixture_context_active=bool(fixture_context),
+        offer_tracking_summary=offer_tracking_summary,
     )
 
 

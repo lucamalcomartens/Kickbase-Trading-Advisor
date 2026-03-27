@@ -36,7 +36,11 @@ def generate_ai_advice(
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     own_budget_row = manager_budgets_df[manager_budgets_df["User"] == own_username]
-    own_available_budget = own_budget_row["Available Budget"].iloc[0] if not own_budget_row.empty else None
+    own_theoretical_max_spend = own_budget_row["Available Budget"].iloc[0] if not own_budget_row.empty else None
+    own_spendable_without_debt = own_budget_row["Spendable Without Debt"].iloc[0] if not own_budget_row.empty else None
+    own_temporary_negative_buffer = own_budget_row["Temporary Negative Buffer"].iloc[0] if not own_budget_row.empty else None
+    own_max_negative = own_budget_row["Max Negative"].iloc[0] if not own_budget_row.empty else None
+    own_friday_recovery_need_at_floor = own_budget_row["Friday Recovery Need At Floor"].iloc[0] if not own_budget_row.empty else None
     squad_team_counts = squad_recommendations_df["team_name"].value_counts()
     squad_team_counts_text = squad_team_counts[squad_team_counts > 1].to_string() if not squad_team_counts.empty else "Keine auffaelligen Doppelungen"
 
@@ -68,22 +72,22 @@ def generate_ai_advice(
     )
     expiring_now_text = format_prompt_table(
         market_expiring_now_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=18,
     )
     later_market_text = format_prompt_table(
         market_later_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "buy_action", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=18,
     )
     trade_stash_text = format_prompt_table(
         market_trade_stash_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "asset_role", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=12,
     )
     hold_candidates_text = format_prompt_table(
         market_hold_df,
-        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "recommended_bid_min", "recommended_bid_max", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
+        ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "priority_score", "football_signal_score", "asset_role", "recommended_bid_min", "recommended_bid_max", "competitive_bid_max", "recent_bid_competition", "estimated_market_winning_bid", "bid_strategy_note", "hours_to_exp", "next_opponent", "home_or_away", "fixture_difficulty"],
         limit=12,
     )
     squad_risk_text = format_prompt_table(
@@ -91,7 +95,11 @@ def generate_ai_advice(
         ["first_name", "last_name", "position", "team_name", "mv", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob", "football_signal_score", "sell_priority_score", "squad_action"],
         limit=12,
     )
-    available_budget_text = format_currency(own_available_budget) if own_available_budget is not None else "n/a"
+    theoretical_max_spend_text = format_currency(own_theoretical_max_spend) if own_theoretical_max_spend is not None else "n/a"
+    spendable_without_debt_text = format_currency(own_spendable_without_debt) if own_spendable_without_debt is not None else "n/a"
+    temporary_negative_buffer_text = format_currency(own_temporary_negative_buffer) if own_temporary_negative_buffer is not None else "n/a"
+    max_negative_text = format_currency(own_max_negative) if own_max_negative is not None else "n/a"
+    friday_recovery_need_text = format_currency(own_friday_recovery_need_at_floor) if own_friday_recovery_need_at_floor is not None else "n/a"
     own_budget_text = format_currency(own_budget)
     previous_analysis_text = format_history_for_prompt(analysis_history)
 
@@ -107,6 +115,9 @@ Du bist mein Kickbase Portfoliomanager fuer die 1. Bundesliga. Deine Aufgabe ist
 5. ZEITFAKTOR: Spieler mit Ablauf vor dem naechsten Marktwertupdate haben hohe operative Prioritaet. Das ist aber nur ein Faktor und kein Automatismus.
 6. LANGFRISTIGES TRADING: Beruecksichtige aktiv, ob ein Spieler ueber 2 bis 4 Tage oder bis zum naechsten Spieltag den besseren Gesamtertrag bringen kann als ein sofortiger Flip.
 7. SPIELTAGS-READINESS: Wenn kein verlaengertes Tradingfenster vorliegt, muss bis Freitag vor dem Spieltag ein funktionierendes Team stehen und der Kontostand spaetestens dann >= 0 Euro sein.
+8. CASH-FIRST: Behandle das aktuelle Budget als echtes frei verfuegbares Cash. Behandle theoretischen Negativspielraum nicht als normales Budget.
+9. NEGATIVE BUFFER: Nutze den Negativspielraum nur fuer wenige Ausnahmefaelle mit klarer Exit-Strategie. Jeder Euro oberhalb des echten Cash-Budgets muss bis Freitag wieder hereingeholt werden.
+10. FRIDAY DISCIPLINE: Wenn FRIDAY_SAFETY_MODE = active, dann nur ins Minus gehen, wenn du im Text konkret benennst, durch welche Verkaeufe oder sicheren Marktwertanstiege der Rueckweg auf >= 0 bis Freitag realistisch ist.
 
 </rules>
 
@@ -129,7 +140,11 @@ HEUTIGES DATUM: {report_date}
 WOCHENTAG HEUTE: {datetime.datetime.now(ZoneInfo('Europe/Berlin')).strftime('%A')}
 MEIN USERNAME: {own_username}
 MEIN AKTUELLES BUDGET: {own_budget_text} Euro
-MEIN GESCHAETZTES VERFUEGBARES BUDGET OHNE REGELVERSTOSS: {available_budget_text} Euro
+ECHT SOFORT VERFUEGBARES CASH OHNE INS MINUS ZU GEHEN: {spendable_without_debt_text} Euro
+THEORETISCHES MAXIMALES AUSGABENLIMIT BIS ZUR NEGATIVGRENZE: {theoretical_max_spend_text} Euro
+ZUSAETZLICHER TEMPORAERER NEGATIVPUFFER UEBER DEM CASH-BUDGET: {temporary_negative_buffer_text} Euro
+MAXIMAL ERLAUBTER KONTOSTAND IM MINUS: {max_negative_text} Euro
+RUECKHOLBEDARF BIS FREITAG, WENN DIE NEGATIVGRENZE AUSGEREIZT WIRD: {friday_recovery_need_text} Euro
 AKTUELLE KADERGROESSE: {len(squad_recommendations_df)} von 17
 NAECHSTER SPIELTAG: {matchday_context['next_matchday']}
 NAECHSTER SPIELTAG STARTET: {matchday_context['next_matchday_date']}
@@ -165,7 +180,13 @@ HINWEIS ZU DEN SCORES:
 - football_signal_score ist ein interner Struktur-Score aus Startelfwahrscheinlichkeit, Punkten, Minuten, Punkte-pro-Minute und Naehe zum naechsten Spiel.
 - predicted_mv_change ist die erwartete Marktwertveraenderung bis morgen. predicted_mv_target ist der daraus abgeleitete absolute Marktwert fuer morgen.
 - recommended_bid_min und recommended_bid_max sind bereits berechnete Fallback-Gebote aus Score, Ablaufzeit und erwarteter Marktwertchance.
+- estimated_market_winning_bid ist eine datenbasierte Schaetzung, zu welchem Preis die Liga in letzter Zeit aehnliche Spieler typischerweise weggeschnappt hat.
+- competitive_bid_max ist dein wettbewerbsfaehiges Maximalgebot, solange der Preis historisch noch profitabel bzw. vertretbar erscheint. Wenn bid_strategy_note auf avoid_price_war oder stay_disciplined steht, sollst du gerade NICHT stumpf auf den geschaetzten Marktpreis hochgehen.
+- recent_bid_competition beschreibt den zuletzt beobachteten Konkurrenzdruck in aehnlichen Deals als low, medium oder high.
 - next_opponent, home_or_away und fixture_difficulty kommen, falls verfuegbar, aus einem externen Spielplan-Feed ohne zusaetzlichen KI-Aufruf.
+- ECHT SOFORT VERFUEGBARES CASH OHNE INS MINUS ZU GEHEN ist das aktuell wirklich freie Budget in der App.
+- THEORETISCHES MAXIMALES AUSGABENLIMIT BIS ZUR NEGATIVGRENZE ist nur eine absolute Obergrenze bis zur erlaubten Minusgrenze und kein normales frei verfuegbares Budget.
+- ZUSAETZLICHER TEMPORAERER NEGATIVPUFFER UEBER DEM CASH-BUDGET bedeutet: Jeder Euro daraus muss bis Freitag durch Verkaeufe oder Gewinne wieder aufgeholt werden.
 
 </current_data_context>
 
@@ -180,7 +201,11 @@ Erstelle eine konkrete Abendstrategie fuer mein Kickbase-Team.
 - Wenn TRADING_WINDOW_MODE = extended_break, nutze die zusaetzliche Zeit aktiv. In solchen Phasen darfst du Spieler staerker nach mehrtaegigem Trading-Potenzial statt nur nach naechstem Update bewerten.
 - Wenn FRIDAY_SAFETY_MODE = active, priorisiere Spieltags-Readiness: bis Freitag muss ein funktionierendes Team stehen und das Budget spaetestens dann >= 0 sein, ausser es liegt wirklich ein verlaengertes Tradingfenster ohne direkten Spieltag vor.
 - Nutze die vorhandenen priority_score-, asset_role- und recommended_bid-Werte aktiv als Grundlage. Du darfst sie begruendet leicht anpassen, sollst sie aber nicht ignorieren.
-- Gib fuer jeden Kaufkandidaten ein maximales Gebot in Euro an. Das Gebot soll sich an Wichtigkeit, Budget, Trading-Chance, Startelf-Wahrscheinlichkeit und Ablaufzeit orientieren.
+- Nutze competitive_bid_max, recent_bid_competition und bid_strategy_note aktiv, um zwischen sinnvollem Mitgehen und unprofitablen Bieterkriegen zu unterscheiden.
+- Gib fuer jeden Kaufkandidaten ein maximales Gebot in Euro an. Das Gebot soll sich an Wichtigkeit, Cash-Budget, Trading-Chance, Startelf-Wahrscheinlichkeit und Ablaufzeit orientieren.
+- Nutze das theoretische Ausgabenlimit nur als Notfallobergrenze. Normale Empfehlungen sollen sich primaer am echten Cash-Budget orientieren.
+- Wenn ein Gebot nur mit Negativpuffer moeglich ist, schreibe das explizit dazu und nenne die wahrscheinlichsten Verkaeufe oder Rueckholhebel bis Freitag.
+- Wenn historical bid pressure hoch ist, entscheide explizit zwischen "mitgehen" und "Preiskrieg vermeiden". Ein hohes estimated_market_winning_bid ist kein Kaufzwang.
 - Unterscheide klar zwischen:
   A) Sofort kaufen vor dem naechsten Marktwertupdate
   B) Beobachten und spaeter angreifen

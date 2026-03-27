@@ -42,3 +42,12 @@ def get_manager_performance(token, league_id, manager_id, manager_name):
         "name": manager_name,
         "tp": tp_value
     }
+
+
+def get_manager_transfer_feed(token, league_id, manager_id):
+    """Get transfer-related manager data, including own offer state when exposed by the API."""
+
+    url = f"{BASE_URL}/leagues/{league_id}/managers/{manager_id}/transfer"
+    data = get_json_with_token(url, token)
+
+    return data

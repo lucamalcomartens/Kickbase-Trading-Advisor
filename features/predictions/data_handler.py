@@ -10,10 +10,16 @@ import concurrent.futures
 import pandas as pd
 import sqlite3
 
-def create_player_data_table():
+from project_settings import DATABASE_PATH
+
+
+def _resolve_db_path(db_path=None):
+    return db_path or DATABASE_PATH
+
+def create_player_data_table(db_path=None):
     """Create the player_data_1d table in the SQLite database if it doesn't exist"""
 
-    conn = sqlite3.connect("player_data_total.db")
+    conn = sqlite3.connect(_resolve_db_path(db_path))
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -41,7 +47,7 @@ def create_player_data_table():
 
     conn.commit()
 
-def check_if_data_reload_needed():
+def check_if_data_reload_needed(db_path=None):
     """Check if data reload is needed based on the last entry with null market value"""
 
     print("\nData reload needed, this takes a few minutes...")
@@ -51,7 +57,7 @@ def check_if_data_reload_needed():
     today_date = now.date()
 
     # Get nearest entry to today where mv is null
-    with sqlite3.connect("player_data_total.db") as conn:
+    with sqlite3.connect(_resolve_db_path(db_path)) as conn:
         cursor = conn.cursor()
 
         # Get the most recent date where mv is NULL
@@ -100,7 +106,7 @@ def check_if_data_reload_needed():
             return True
 
 
-def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_values, reload_data):
+def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_values, reload_data, db_path=None):
     """Fetch player data and save to SQLite database if reload_data is needed"""
 
     if reload_data:
@@ -176,13 +182,13 @@ def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_valu
         )
 
         # Save to SQLite
-        with sqlite3.connect("player_data_total.db") as conn:
+        with sqlite3.connect(_resolve_db_path(db_path)) as conn:
             final_df.to_sql("player_data_1d", conn, if_exists="replace", index=False)
 
-def load_player_data_from_db():
+def load_player_data_from_db(db_path=None):
     """Load player data from SQLite database into a dataframe"""
     
-    conn = sqlite3.connect("player_data_total.db")
+    conn = sqlite3.connect(_resolve_db_path(db_path))
     df = pd.read_sql("SELECT * FROM player_data_1d", conn)
     conn.close()
 

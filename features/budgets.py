@@ -113,11 +113,18 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
     except Exception as e:
         print(f"Warning: Could not sync own budget: {e}")
 
-    # TODO check if this also applies if the user has positiv budget, currently only tested with negative budget
-    budget_df["Max Negative"] = (budget_df["Team Value"].fillna(0) + budget_df["Budget"]) * -0.33
-
-    # Calculate available budget
-    budget_df["Available Budget"] = (budget_df["Max Negative"].fillna(0) - budget_df["Budget"]) * -1
+    # Budget semantics for downstream recommendation logic:
+    # - Budget: actual current cash in the app
+    # - Max Negative: lowest cash value the manager may hit
+    # - Available Budget: theoretical max spend until the negative floor is reached
+    budget_df["Current Cash"] = budget_df["Budget"]
+    budget_df["Max Negative"] = (budget_df["Team Value"].fillna(0) + budget_df["Current Cash"]) * -0.33
+    budget_df["Available Budget"] = (budget_df["Max Negative"].fillna(0) - budget_df["Current Cash"]) * -1
+    budget_df["Spendable Without Debt"] = budget_df["Current Cash"].clip(lower=0)
+    budget_df["Temporary Negative Buffer"] = (
+        budget_df["Available Budget"] - budget_df["Spendable Without Debt"]
+    ).clip(lower=0)
+    budget_df["Friday Recovery Need At Floor"] = budget_df["Max Negative"].clip(upper=0).abs()
 
     # Sort by available budget ascending
     budget_df.sort_values("Available Budget", ascending=False, inplace=True, ignore_index=True)
