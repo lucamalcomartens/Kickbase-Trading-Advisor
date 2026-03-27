@@ -54,8 +54,15 @@ def build_transfer_history_df(
     if history_df.empty:
         return history_df
 
+    history_df["player_id"] = pd.to_numeric(history_df["player_id"], errors="coerce")
+    history_df = history_df.dropna(subset=["player_id"])
+    history_df["player_id"] = history_df["player_id"].astype(int)
+
     reference_columns = [column for column in ["player_id", "mv", "position", "team_name"] if column in player_reference_df.columns]
     reference_df = player_reference_df[reference_columns].drop_duplicates(subset=["player_id"])
+    reference_df["player_id"] = pd.to_numeric(reference_df["player_id"], errors="coerce")
+    reference_df = reference_df.dropna(subset=["player_id"])
+    reference_df["player_id"] = reference_df["player_id"].astype(int)
     history_df = history_df.merge(reference_df, on="player_id", how="left")
 
     history_df["reference_mv"] = history_df["mv"].where(history_df["mv"].fillna(0) > 0, history_df["transfer_price"])
@@ -94,6 +101,9 @@ def enrich_market_with_bid_history(market_df, transfer_history_df):
 
     history_df = transfer_history_df.copy()
     history_df = history_df.dropna(subset=["player_id", "transfer_price"])
+    history_df["player_id"] = pd.to_numeric(history_df["player_id"], errors="coerce")
+    history_df = history_df.dropna(subset=["player_id"])
+    history_df["player_id"] = history_df["player_id"].astype(int)
     if "timestamp" in history_df.columns:
         history_df["timestamp"] = pd.to_datetime(history_df["timestamp"], errors="coerce", utc=True)
     history_df["transfer_premium_pct"] = pd.to_numeric(history_df["transfer_premium_pct"], errors="coerce")
@@ -127,6 +137,7 @@ def enrich_market_with_bid_history(market_df, transfer_history_df):
 
     enriched_df = enriched_df.merge(segment_summary, on=["position", "price_bucket"], how="left")
     if "player_id" in enriched_df.columns:
+        enriched_df["player_id"] = pd.to_numeric(enriched_df["player_id"], errors="coerce")
         enriched_df = enriched_df.merge(same_player_history, on="player_id", how="left")
 
     global_median_premium = history_df["transfer_premium_pct"].median()
