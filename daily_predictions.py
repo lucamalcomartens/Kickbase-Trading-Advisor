@@ -25,7 +25,7 @@ from features.analysis_support import (
 from features.bid_history import build_transfer_history_df, enrich_market_with_bid_history
 from features.budgets import calc_manager_budgets
 from features.notifier import send_mail
-from features.offer_tracking import extract_current_market_offers
+from features.offer_tracking import extract_current_market_offers, summarize_offer_feed_debug
 from features.predictions.data_handler import (
     check_if_data_reload_needed,
     create_player_data_table,
@@ -126,7 +126,7 @@ def main() -> None:
         system_settings.database_path,
     )
 
-    offer_tracking_summary = {"counts": {}, "recent_outbid": []}
+    offer_tracking_summary = {"counts": {}, "recent_outbid": [], "recent_active": [], "debug": {}}
     if own_manager_id is not None:
         try:
             raw_transfer_feed = get_manager_transfer_feed(token, league_id, own_manager_id)
@@ -144,6 +144,8 @@ def main() -> None:
                 league_id,
                 own_username,
             )
+            if offer_tracking_summary["counts"].get("active_offers", 0) == 0:
+                offer_tracking_summary["debug"] = summarize_offer_feed_debug(raw_transfer_feed)
             print(
                 f"\nOffer-Tracking: {offer_tracking_summary['counts'].get('active_offers', 0)} aktiv, "
                 f"{offer_tracking_summary['counts'].get('outbid_offers', 0)} ueberboten, "

@@ -268,6 +268,11 @@ def _render_markdown(payload):
         f"- {item.get('player_name')} | Dein Gebot: {item.get('offer_amount')} | Gewinnerpreis: {item.get('winning_price')} | Gewinner: {item.get('lost_to')} | Aufgeloest: {item.get('resolved_at')}"
         for item in payload["offer_tracking_summary"].get("recent_outbid", [])
     ) or "- Keine ueberbotenen Gebote gespeichert"
+    offer_debug = payload["offer_tracking_summary"].get("debug", {})
+    offer_debug_lines = "\n".join(
+        f"- Pfad: {item.get('path')} | Spieler: {item.get('player_name')} | Spieler-ID: {item.get('player_id')} | Betrag: {item.get('offer_amount')} | Marktwert: {item.get('market_value')} | Ablauf: {item.get('expires_at')} | Offer-ID: {item.get('offer_id')} | Path-Hint: {item.get('path_hint')} | Keys: {', '.join(item.get('keys', []))}"
+        for item in offer_debug.get("examples", [])
+    )
 
     squad_lines = "\n".join(
         f"- {item['player']} | Team: {item['team_name']} | Sell Score: {item['sell_priority_score']} | Rolle: {item['squad_role']} | Delta: {item['predicted_mv_change']} | Gegner: {item['next_opponent']} | Fixture: {item['fixture_difficulty']}"
@@ -347,6 +352,11 @@ def _render_markdown(payload):
 ## Recent Outbid Offers
 
 {outbid_lines}
+
+## Offer Tracking Debug
+
+- Candidate Count: {offer_debug.get('candidate_count', 0)}
+{offer_debug_lines or '- Keine Debug-Kandidaten gespeichert'}
 
 ## AI Full Output
 

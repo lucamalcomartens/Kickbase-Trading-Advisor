@@ -7,9 +7,10 @@ from datetime import datetime, timezone
 import pandas as pd
 
 
-OFFER_AMOUNT_KEYS = ["offer", "amount", "value", "bid", "prc", "mvb"]
-OFFER_EXPIRY_KEYS = ["expiresAt", "exp", "exs", "until"]
-OFFER_ID_KEYS = ["offerId", "oid"]
+OFFER_AMOUNT_KEYS = ["offer", "amount", "value", "bid", "prc", "mvb", "v", "amt", "am"]
+OFFER_EXPIRY_KEYS = ["expiresAt", "exp", "exs", "until", "expiry", "expires"]
+OFFER_ID_KEYS = ["offerId", "oid", "offer_id"]
+OFFER_PATH_HINTS = ["offer", "bid", "bids", "mybid", "myoffer", "offers"]
 
 
 def extract_current_market_offers(raw_transfer_feed, league_id, own_username):
@@ -22,8 +23,8 @@ def extract_current_market_offers(raw_transfer_feed, league_id, own_username):
     offers = []
     seen_offer_keys = set()
 
-    for candidate in _iter_offer_candidates(raw_transfer_feed):
-        normalized_offer = _normalize_offer_candidate(candidate, league_id, own_username, observed_at)
+    for path, candidate in _iter_offer_candidates(raw_transfer_feed):
+        normalized_offer = _normalize_offer_candidate(candidate, path, league_id, own_username, observed_at)
         if not normalized_offer:
             continue
         if normalized_offer["offer_key"] in seen_offer_keys:
@@ -40,6 +41,34 @@ def extract_current_market_offers(raw_transfer_feed, league_id, own_username):
     offers_df = offers_df.dropna(subset=["player_id", "offer_amount"])
 
     return offers_df[_offer_columns()].reset_index(drop=True)
+
+
+def summarize_offer_feed_debug(raw_transfer_feed, limit=10):
+    """Return a sanitized summary of offer-like objects to calibrate parsing with live data."""
+
+    if not raw_transfer_feed:
+        return {"candidate_count": 0, "examples": []}
+
+    examples = []
+    for path, candidate in _iter_offer_candidates(raw_transfer_feed):
+        examples.append(
+            {
+                "path": path,
+                "keys": sorted(candidate.keys()),
+                "player_id": _extract_player_id(candidate),
+                "player_name": _extract_player_name(candidate),
+                "offer_amount": _extract_numeric(candidate, OFFER_AMOUNT_KEYS),
+                "market_value": _extract_market_value(candidate),
+                "expires_at": _extract_datetime(candidate, OFFER_EXPIRY_KEYS),
+                "offer_id": _extract_scalar(candidate, OFFER_ID_KEYS + ["id", "i"]),
+                "path_hint": _path_looks_like_offer(path),
+                "sample": _sanitize_candidate(candidate),
+            }
+        )
+        if len(examples) >= limit:
+            break
+
+    return {"candidate_count": len(examples), "examples": examples}
 
 
 def _offer_columns():
@@ -60,31 +89,40 @@ def _offer_columns():
     ]
 
 
-def _iter_offer_candidates(payload):
+def _iter_offer_candidates(payload, path="root"):
     if isinstance(payload, list):
-        for item in payload:
-            yield from _iter_offer_candidates(item)
+        for index, item in enumerate(payload):
+            yield from _iter_offer_candidates(item, f"{path}[{index}]")
         return
 
     if not isinstance(payload, dict):
         return
 
-    if _looks_like_offer_candidate(payload):
-        yield payload
+    if _looks_like_offer_candidate(payload, path):
+        yield path, payload
 
-    for value in payload.values():
+    for key, value in payload.items():
         if isinstance(value, (dict, list)):
-            yield from _iter_offer_candidates(value)
+            yield from _iter_offer_candidates(value, f"{path}.{key}")
 
 
-def _looks_like_offer_candidate(candidate):
+def _looks_like_offer_candidate(candidate, path=""):
     player_id = _extract_player_id(candidate)
     offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
-    has_offer_marker = _extract_scalar(candidate, OFFER_ID_KEYS) is not None or _extract_datetime(candidate, OFFER_EXPIRY_KEYS) is not None
-    return player_id is not None and offer_amount is not None and has_offer_marker
+    has_offer_marker = (
+        _extract_scalar(candidate, OFFER_ID_KEYS + ["id", "i"]) is not None
+        or _extract_datetime(candidate, OFFER_EXPIRY_KEYS) is not None
+        or _path_looks_like_offer(path)
+    )
+    return (
+        player_id is not None
+        and offer_amount is not None
+        and has_offer_marker
+        and not _looks_like_completed_transfer(candidate, path)
+    )
 
 
-def _normalize_offer_candidate(candidate, league_id, own_username, observed_at):
+def _normalize_offer_candidate(candidate, path, league_id, own_username, observed_at):
     player_id = _extract_player_id(candidate)
     offer_amount = _extract_numeric(candidate, OFFER_AMOUNT_KEYS)
     if player_id is None or offer_amount is None:
@@ -92,11 +130,8 @@ def _normalize_offer_candidate(candidate, league_id, own_username, observed_at):
 
     market_value = _extract_market_value(candidate)
     expires_at = _extract_datetime(candidate, OFFER_EXPIRY_KEYS)
-    offer_id = _extract_scalar(candidate, OFFER_ID_KEYS)
+    offer_id = _extract_scalar(candidate, OFFER_ID_KEYS + ["id", "i"])
     player_name = _extract_player_name(candidate)
-
-    if expires_at is None:
-        return None
 
     expires_at_dt = pd.to_datetime(expires_at, utc=True, errors="coerce")
     observed_at_dt = pd.to_datetime(observed_at, utc=True, errors="coerce")
@@ -115,7 +150,7 @@ def _normalize_offer_candidate(candidate, league_id, own_username, observed_at):
         "expires_at": expires_at,
         "status": "active",
         "observed_at": observed_at,
-        "source": "manager_transfer_feed",
+        "source": f"manager_transfer_feed:{path}",
         "raw_json": json.dumps(candidate, ensure_ascii=False, sort_keys=True),
     }
 
@@ -174,6 +209,29 @@ def _extract_market_value(candidate):
             return nested_market_value
 
     return None
+
+
+def _path_looks_like_offer(path):
+    path_lower = str(path or "").lower()
+    return any(hint in path_lower for hint in OFFER_PATH_HINTS)
+
+
+def _looks_like_completed_transfer(candidate, path):
+    keys = {str(key).lower() for key in candidate.keys()}
+    transfer_markers = {"byr", "slr", "trp", "tid"}
+    return transfer_markers.issubset(keys) and not _path_looks_like_offer(path)
+
+
+def _sanitize_candidate(candidate):
+    sample = {}
+    for key, value in candidate.items():
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            sample[key] = value
+        elif isinstance(value, dict):
+            sample[key] = {nested_key: "<nested>" for nested_key in list(value.keys())[:8]}
+        elif isinstance(value, list):
+            sample[key] = f"<list:{len(value)}>"
+    return sample
 
 
 def _extract_numeric(candidate, keys):
