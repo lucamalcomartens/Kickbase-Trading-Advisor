@@ -97,15 +97,23 @@ def get_league_transfers(token, league_id, min_date=None, max_entries=5000):
 
     return transfers
 
-def get_league_players_on_market(token, league_id):
-    """Get all players currently available on the market in the league."""
+
+def get_league_market_raw(token, league_id):
+    """Get raw market payload items for debugging and richer market parsing."""
 
     url = f"{BASE_URL}/leagues/{league_id}/market"
     data = get_json_with_token(url, token)
 
+    return data.get("it", [])
+
+def get_league_players_on_market(token, league_id):
+    """Get all players currently available on the market in the league."""
+
+    data = get_league_market_raw(token, league_id)
+
     result = []
 
-    for player in data.get('it', []):
+    for player in data:
         result.append({
             'id': player.get('i'),
             'prob': player.get('prob'),

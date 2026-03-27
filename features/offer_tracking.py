@@ -82,6 +82,62 @@ def summarize_offer_feed_debug(raw_transfer_feed, limit=10):
     }
 
 
+def summarize_market_feed_debug(raw_market_feed, target_player_names=None, limit=10):
+    """Return a sanitized summary of raw market items, optionally focused on target players."""
+
+    if not raw_market_feed:
+        return {"item_count": 0, "examples": [], "root_type": None}
+
+    normalized_targets = {
+        str(name).strip().lower()
+        for name in (target_player_names or [])
+        if str(name).strip()
+    }
+
+    examples = []
+    for index, item in enumerate(raw_market_feed):
+        if not isinstance(item, dict):
+            continue
+        player_name = _extract_player_name(item)
+        if normalized_targets and str(player_name or "").strip().lower() not in normalized_targets:
+            continue
+        examples.append(
+            {
+                "path": f"market[{index}]",
+                "keys": sorted(item.keys()),
+                "player_id": _extract_player_id(item),
+                "player_name": player_name,
+                "market_value": _extract_market_value(item),
+                "expires_at": _extract_datetime(item, OFFER_EXPIRY_KEYS + ["dt"]),
+                "sample": _sanitize_candidate(item),
+            }
+        )
+        if len(examples) >= limit:
+            break
+
+    if not examples:
+        for index, item in enumerate(raw_market_feed[:limit]):
+            if not isinstance(item, dict):
+                continue
+            examples.append(
+                {
+                    "path": f"market[{index}]",
+                    "keys": sorted(item.keys()),
+                    "player_id": _extract_player_id(item),
+                    "player_name": _extract_player_name(item),
+                    "market_value": _extract_market_value(item),
+                    "expires_at": _extract_datetime(item, OFFER_EXPIRY_KEYS + ["dt"]),
+                    "sample": _sanitize_candidate(item),
+                }
+            )
+
+    return {
+        "item_count": len(raw_market_feed),
+        "examples": examples,
+        "root_type": type(raw_market_feed).__name__,
+    }
+
+
 def _offer_columns():
     return [
         "offer_key",

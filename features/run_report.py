@@ -269,6 +269,7 @@ def _render_markdown(payload):
         for item in payload["offer_tracking_summary"].get("recent_outbid", [])
     ) or "- Keine ueberbotenen Gebote gespeichert"
     offer_debug = payload["offer_tracking_summary"].get("debug", {})
+    market_debug = payload["offer_tracking_summary"].get("market_debug", {})
     offer_debug_lines = "\n".join(
         f"- Pfad: {item.get('path')} | Spieler: {item.get('player_name')} | Spieler-ID: {item.get('player_id')} | Betrag: {item.get('offer_amount')} | Marktwert: {item.get('market_value')} | Ablauf: {item.get('expires_at')} | Offer-ID: {item.get('offer_id')} | Path-Hint: {item.get('path_hint')} | Keys: {', '.join(item.get('keys', []))}"
         for item in offer_debug.get("examples", [])
@@ -276,6 +277,10 @@ def _render_markdown(payload):
     structure_debug_lines = "\n".join(
         f"- Pfad: {item.get('path')} | Typ: {item.get('node_type')} | Laenge: {item.get('length')} | Keys: {', '.join(item.get('keys', []))}"
         for item in offer_debug.get("structure_examples", [])
+    )
+    market_debug_lines = "\n".join(
+        f"- Pfad: {item.get('path')} | Spieler: {item.get('player_name')} | Spieler-ID: {item.get('player_id')} | Marktwert: {item.get('market_value')} | Ablauf: {item.get('expires_at')} | Keys: {', '.join(item.get('keys', []))} | Sample: {json.dumps(item.get('sample', {}), ensure_ascii=False)}"
+        for item in market_debug.get("examples", [])
     )
 
     squad_lines = "\n".join(
@@ -366,6 +371,12 @@ def _render_markdown(payload):
 ### Feed Structure Debug
 
 {structure_debug_lines or '- Keine Struktur-Daten gespeichert'}
+
+### Market Feed Debug
+
+- Root Type: {market_debug.get('root_type')}
+- Item Count: {market_debug.get('item_count', 0)}
+{market_debug_lines or '- Keine Market-Debug-Daten gespeichert'}
 
 ## AI Full Output
 

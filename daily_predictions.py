@@ -25,7 +25,7 @@ from features.analysis_support import (
 from features.bid_history import build_transfer_history_df, enrich_market_with_bid_history
 from features.budgets import calc_manager_budgets
 from features.notifier import send_mail
-from features.offer_tracking import extract_current_market_offers, summarize_offer_feed_debug
+from features.offer_tracking import extract_current_market_offers, summarize_market_feed_debug, summarize_offer_feed_debug
 from features.predictions.data_handler import (
     check_if_data_reload_needed,
     create_player_data_table,
@@ -40,7 +40,7 @@ from features.predictions.predictions import (
 )
 from features.predictions.preprocessing import preprocess_player_data, split_data
 from features.run_report import write_run_report
-from kickbase_api.league import get_league_id
+from kickbase_api.league import get_league_id, get_league_market_raw
 from kickbase_api.manager import get_manager_transfer_feed, get_managers
 from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
 from kickbase_api.user import get_budget, get_username, login
@@ -126,7 +126,9 @@ def main() -> None:
         system_settings.database_path,
     )
 
-    offer_tracking_summary = {"counts": {}, "recent_outbid": [], "recent_active": [], "debug": {}}
+    raw_market_feed = get_league_market_raw(token, league_id)
+
+    offer_tracking_summary = {"counts": {}, "recent_outbid": [], "recent_active": [], "debug": {}, "market_debug": {}}
     if own_manager_id is not None:
         try:
             raw_transfer_feed = get_manager_transfer_feed(token, league_id, own_manager_id)
@@ -146,6 +148,10 @@ def main() -> None:
             )
             if offer_tracking_summary["counts"].get("active_offers", 0) == 0:
                 offer_tracking_summary["debug"] = summarize_offer_feed_debug(raw_transfer_feed)
+                offer_tracking_summary["market_debug"] = summarize_market_feed_debug(
+                    raw_market_feed,
+                    target_player_names=["Péter Gulácsi", "Peter Gulacsi", "Gulácsi", "Gulacsi"],
+                )
             print(
                 f"\nOffer-Tracking: {offer_tracking_summary['counts'].get('active_offers', 0)} aktiv, "
                 f"{offer_tracking_summary['counts'].get('outbid_offers', 0)} ueberboten, "
