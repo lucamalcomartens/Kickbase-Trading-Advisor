@@ -273,6 +273,10 @@ def _render_markdown(payload):
         f"- Pfad: {item.get('path')} | Spieler: {item.get('player_name')} | Spieler-ID: {item.get('player_id')} | Betrag: {item.get('offer_amount')} | Marktwert: {item.get('market_value')} | Ablauf: {item.get('expires_at')} | Offer-ID: {item.get('offer_id')} | Path-Hint: {item.get('path_hint')} | Keys: {', '.join(item.get('keys', []))}"
         for item in offer_debug.get("examples", [])
     )
+    structure_debug_lines = "\n".join(
+        f"- Pfad: {item.get('path')} | Typ: {item.get('node_type')} | Laenge: {item.get('length')} | Keys: {', '.join(item.get('keys', []))}"
+        for item in offer_debug.get("structure_examples", [])
+    )
 
     squad_lines = "\n".join(
         f"- {item['player']} | Team: {item['team_name']} | Sell Score: {item['sell_priority_score']} | Rolle: {item['squad_role']} | Delta: {item['predicted_mv_change']} | Gegner: {item['next_opponent']} | Fixture: {item['fixture_difficulty']}"
@@ -355,8 +359,13 @@ def _render_markdown(payload):
 
 ## Offer Tracking Debug
 
+- Root Type: {offer_debug.get('root_type')}
 - Candidate Count: {offer_debug.get('candidate_count', 0)}
 {offer_debug_lines or '- Keine Debug-Kandidaten gespeichert'}
+
+### Feed Structure Debug
+
+{structure_debug_lines or '- Keine Struktur-Daten gespeichert'}
 
 ## AI Full Output
 

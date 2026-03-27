@@ -47,7 +47,7 @@ def summarize_offer_feed_debug(raw_transfer_feed, limit=10):
     """Return a sanitized summary of offer-like objects to calibrate parsing with live data."""
 
     if not raw_transfer_feed:
-        return {"candidate_count": 0, "examples": []}
+        return {"candidate_count": 0, "examples": [], "structure_examples": [], "root_type": None}
 
     examples = []
     for path, candidate in _iter_offer_candidates(raw_transfer_feed):
@@ -68,7 +68,18 @@ def summarize_offer_feed_debug(raw_transfer_feed, limit=10):
         if len(examples) >= limit:
             break
 
-    return {"candidate_count": len(examples), "examples": examples}
+    structure_examples = []
+    for node_info in _iter_structure_nodes(raw_transfer_feed):
+        structure_examples.append(node_info)
+        if len(structure_examples) >= limit:
+            break
+
+    return {
+        "candidate_count": len(examples),
+        "examples": examples,
+        "structure_examples": structure_examples,
+        "root_type": type(raw_transfer_feed).__name__,
+    }
 
 
 def _offer_columns():
@@ -104,6 +115,28 @@ def _iter_offer_candidates(payload, path="root"):
     for key, value in payload.items():
         if isinstance(value, (dict, list)):
             yield from _iter_offer_candidates(value, f"{path}.{key}")
+
+
+def _iter_structure_nodes(payload, path="root"):
+    if isinstance(payload, dict):
+        yield {
+            "path": path,
+            "node_type": "dict",
+            "keys": sorted(payload.keys()),
+            "sample": _sanitize_candidate(payload),
+        }
+        for key, value in payload.items():
+            if isinstance(value, (dict, list)):
+                yield from _iter_structure_nodes(value, f"{path}.{key}")
+    elif isinstance(payload, list):
+        yield {
+            "path": path,
+            "node_type": "list",
+            "length": len(payload),
+        }
+        for index, item in enumerate(payload[:10]):
+            if isinstance(item, (dict, list)):
+                yield from _iter_structure_nodes(item, f"{path}[{index}]")
 
 
 def _looks_like_offer_candidate(candidate, path=""):
