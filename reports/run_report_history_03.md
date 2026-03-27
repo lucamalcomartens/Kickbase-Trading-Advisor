@@ -1,7 +1,7 @@
 # Last Run Summary
 
 - Report Date: 27. March 2026
-- Generated At: 2026-03-27T10:33:14.526499Z
+- Generated At: 2026-03-27T12:16:29.464300Z
 - User: Luca Malco
 - Own Budget: 5181860.0
 - Market Players: 23
@@ -9,16 +9,16 @@
 - Fixture Context Active: True
 - AI Status: success
 - Mail Status: success
-- Offer Tracking Active: 0
+- Offer Tracking Active: 23
 - Offer Tracking Outbid: 0
 - Offer Tracking Won: 0
 
 ## Model Metrics
 
-- Signs Correct: 67.3
-- RMSE: 42860.77
-- MAE: 21562.15
-- R2: 0.9155
+- Signs Correct: 67.26
+- RMSE: 42840.79
+- MAE: 21543.88
+- R2: 0.9156
 
 ## Matchday Context
 
@@ -42,10 +42,10 @@
 
 ```text
       User     Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor
+     David 83.049.024 235.172.073    83.049.024  -105.012.962       188.061.986              83.049.024                105.012.962                    105.012.962
       joel 85.201.082 226.235.987    85.201.082  -102.774.233       187.975.315              85.201.082                102.774.233                    102.774.233
-     David 82.499.024 235.172.073    82.499.024  -104.831.462       187.330.486              82.499.024                104.831.462                    104.831.462
+ FlippiXxp 54.301.322 333.318.849    54.301.322  -127.914.656       182.215.978              54.301.322                127.914.656                    127.914.656
       Till 73.398.423 255.256.068    73.398.423  -108.455.982       181.854.405              73.398.423                108.455.982                    108.455.982
- FlippiXxp 52.334.913 333.318.849    52.334.913  -127.265.741       179.600.654              52.334.913                127.265.741                    127.265.741
        Jan 90.925.473 174.660.025    90.925.473   -87.643.214       178.568.687              90.925.473                 87.643.214                     87.643.214
        Rob 82.325.240 189.595.857    82.325.240   -89.733.962       172.059.202              82.325.240                 89.733.962                     89.733.962
      Jonas 70.956.552 162.720.673    70.956.552   -77.113.484       148.070.036              70.956.552                 77.113.484                     77.113.484
@@ -54,63 +54,67 @@ Luca Malco  5.181.860 153.864.289     5.181.860   -52.485.229        57.667.089 
 
 ## Top Market Candidates
 
-- Péter Gulácsi | Team: Leipzig | Score: 71.3 | Rolle: short_term_trade | Delta: 221043.63 | Max: 6198048.0 | Competitive Max: 6198048.0 | Wettbewerb: high | Gegner: None | Fixture: None
-- Chrislain Matsima | Team: Augsburg | Score: 67.3 | Rolle: short_term_trade | Delta: 196793.89 | Max: 874590.0 | Competitive Max: 874590.0 | Wettbewerb: high | Gegner: Hamburger SV | Fixture: good
-- Frederik Rönnow | Team: Union Berlin | Score: 63.0 | Rolle: short_term_trade | Delta: 79114.63 | Max: 7150029.0 | Competitive Max: 7150029.0 | Wettbewerb: high | Gegner: FC St. Pauli 1910 | Fixture: good
-- Max Moerstedt | Team: Hoffenheim | Score: 61.4 | Rolle: short_term_trade | Delta: 268.53 | Max: 500129.0 | Competitive Max: 500129.0 | Wettbewerb: high | Gegner: 1. FSV Mainz 05 | Fixture: good
-- Loïc Badé | Team: Leverkusen | Score: 59.6 | Rolle: short_term_trade | Delta: 277900.66 | Max: 5390910.0 | Competitive Max: 5390910.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Péter Gulácsi | Team: Leipzig | Score: 75.5 | Rolle: short_term_trade | Delta: 221056.57 | Max: 6198054.0 | Competitive Max: 6198054.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Chrislain Matsima | Team: Augsburg | Score: 68.0 | Rolle: short_term_trade | Delta: 194304.15 | Max: 875082.0 | Competitive Max: 875082.0 | Wettbewerb: high | Gegner: Hamburger SV | Fixture: good
+- Frederik Rönnow | Team: Union Berlin | Score: 67.2 | Rolle: short_term_trade | Delta: 78853.18 | Max: 7149904.0 | Competitive Max: 7149904.0 | Wettbewerb: high | Gegner: FC St. Pauli 1910 | Fixture: good
+- Manuel Neuer | Team: Bayern | Score: 62.7 | Rolle: short_term_trade | Delta: 276345.46 | Max: 6402513.0 | Competitive Max: 6402513.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Loïc Badé | Team: Leverkusen | Score: 60.4 | Rolle: short_term_trade | Delta: 281268.01 | Max: 5392527.0 | Competitive Max: 5392527.0 | Wettbewerb: high | Gegner: None | Fixture: None
 
 ## Market Snapshot
 
 ```text
 first_name     last_name    team_name         mv  predicted_mv_change priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note  hours_to_exp
-     Péter       Gulácsi      Leipzig  6.091.947              221.044             71           6.198.048            6.198.048                   high               avoid_price_war             2
- Chrislain       Matsima     Augsburg    813.968              196.794             67             874.590              874.590                   high               avoid_price_war            14
-  Frederik        Rönnow Union Berlin  7.112.054               79.115             63           7.150.029            7.150.029                   high               avoid_price_war             4
-       Max     Moerstedt   Hoffenheim    500.000                  269             61             500.129              500.129                   high               avoid_price_war             1
-      Loïc          Badé   Leverkusen  5.257.518              277.901             60           5.390.910            5.390.910                   high aggressive_only_if_priority_a            23
-    Manuel         Neuer       Bayern  6.269.867              277.368             59           6.403.004            6.403.004                   high               avoid_price_war             8
-   Danilho        Doekhi Union Berlin 18.265.637              138.666             54          18.332.197           18.332.197                   high               avoid_price_war            10
-      Rani       Khedira Union Berlin  6.442.631             -133.730             52           6.442.631            6.442.631                   high               avoid_price_war             2
-     Bilal  El Khannouss    Stuttgart 25.605.094               34.283             50          25.617.436           25.617.436                   high               avoid_price_war            11
-  Ransford Königsdörffer      Hamburg  4.865.162              -70.958             50           4.865.162            4.865.162                   high               avoid_price_war             3
-Maximilian     Eggestein     Freiburg 15.835.943               52.230             50          15.854.746           15.854.746                   high aggressive_only_if_priority_a            28
- Alexander         Nübel    Stuttgart 20.010.110               13.459             50          20.016.570           20.016.570                   high               avoid_price_war            10
-    Robert       Glatzel      Hamburg    500.000                  255             49             500.122              500.122                   high               avoid_price_war             6
-  Valentin       Gendrey   Hoffenheim    500.000                  182             49             500.087              500.087                   high               avoid_price_war             6
- Christian        Conteh   Heidenheim    500.000                1.420             48             500.511              500.511                   high               avoid_price_war            21
+     Péter       Gulácsi      Leipzig  6.091.947              221.057             76           6.198.054            6.198.054                   high               avoid_price_war             1
+ Chrislain       Matsima     Augsburg    813.968              194.304             68             875.082              875.082                   high               avoid_price_war            13
+  Frederik        Rönnow Union Berlin  7.112.054               78.853             67           7.149.904            7.149.904                   high               avoid_price_war             2
+    Manuel         Neuer       Bayern  6.269.867              276.345             63           6.402.513            6.402.513                   high               avoid_price_war             6
+      Loïc          Badé   Leverkusen  5.257.518              281.268             60           5.392.527            5.392.527                   high aggressive_only_if_priority_a            21
+      Rani       Khedira Union Berlin  6.442.631             -134.792             56           6.442.631            6.442.631                   high               avoid_price_war             0
+   Danilho        Doekhi Union Berlin 18.265.637              137.986             54          18.331.870           18.331.870                   high               avoid_price_war             8
+  Ransford Königsdörffer      Hamburg  4.865.162              -70.407             54           4.865.162            4.865.162                   high               avoid_price_war             1
+    Robert       Glatzel      Hamburg    500.000                  272             53             500.131              500.131                   high               avoid_price_war             5
+  Valentin       Gendrey   Hoffenheim    500.000                  180             53             500.086              500.086                   high               avoid_price_war             5
+     Assan     Ouédraogo      Leipzig  8.838.484              324.067             51           8.955.148            8.955.148                   high aggressive_only_if_priority_a            40
+     Bilal  El Khannouss    Stuttgart 25.605.094               34.522             50          25.617.522           25.617.522                   high               avoid_price_war            10
+Maximilian     Eggestein     Freiburg 15.835.943               51.177             50          15.854.367           15.854.367                   high aggressive_only_if_priority_a            26
+ Alexander         Nübel    Stuttgart 20.010.110               18.072             50          20.018.785           20.018.785                   high               avoid_price_war             9
+ Christian        Conteh   Heidenheim    500.000                1.192             49             500.429              500.429                   high               avoid_price_war            19
 ```
 
 ## Top Sell Candidates
 
-- Marius Wolf | Team: Augsburg | Sell Score: 21.6 | Rolle: rotation_hold | Delta: 177.92 | Gegner: Hamburger SV | Fixture: good
-- Lucas Höler | Team: Freiburg | Sell Score: 19.0 | Rolle: rotation_hold | Delta: 3056.17 | Gegner: None | Fixture: None
-- Josha Vagnoman | Team: Stuttgart | Sell Score: 18.9 | Rolle: rotation_hold | Delta: 230108.71 | Gegner: None | Fixture: None
-- Ermedin Demirović | Team: Stuttgart | Sell Score: 17.9 | Rolle: rotation_hold | Delta: 10995.7 | Gegner: None | Fixture: None
-- Dimitris Giannoulis | Team: Augsburg | Sell Score: 17.1 | Rolle: rotation_hold | Delta: 87408.6 | Gegner: Hamburger SV | Fixture: good
+- Marius Wolf | Team: Augsburg | Sell Score: 21.6 | Rolle: rotation_hold | Delta: 159.23 | Gegner: Hamburger SV | Fixture: good
+- Lucas Höler | Team: Freiburg | Sell Score: 19.0 | Rolle: rotation_hold | Delta: 2838.61 | Gegner: None | Fixture: None
+- Josha Vagnoman | Team: Stuttgart | Sell Score: 18.9 | Rolle: rotation_hold | Delta: 230600.37 | Gegner: None | Fixture: None
+- Ermedin Demirović | Team: Stuttgart | Sell Score: 17.9 | Rolle: rotation_hold | Delta: 15121.04 | Gegner: None | Fixture: None
+- Dimitris Giannoulis | Team: Augsburg | Sell Score: 17.1 | Rolle: rotation_hold | Delta: 85920.7 | Gegner: Hamburger SV | Fixture: good
 
 ## Squad Snapshot
 
 ```text
 first_name  last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role s_11_prob            next_opponent
-    Marius       Wolf   Augsburg    500.000                  178                   22 rotation_hold         -             Hamburger SV
-     Lucas      Höler   Freiburg    500.000                3.056                   19 rotation_hold         -                        -
-     Josha   Vagnoman  Stuttgart  5.163.488              230.109                   19 rotation_hold         -                        -
-   Ermedin  Demirović  Stuttgart 20.586.494               10.996                   18 rotation_hold         -                        -
-  Dimitris Giannoulis   Augsburg  6.253.230               87.409                   17 rotation_hold         -             Hamburger SV
-    Marvin  Pieringer Heidenheim  1.745.376              184.196                   17 rotation_hold         - Borussia Mönchengladbach
-    Robert    Andrich Leverkusen 18.885.795                9.044                   16 rotation_hold         -                        -
- Christian    Eriksen  Wolfsburg 10.543.667              101.618                   16 rotation_hold         -                        -
-    Kaishu       Sano      Mainz 11.565.345              110.517                   16 rotation_hold         -      TSG 1899 Hoffenheim
-      Finn    Jeltsch  Stuttgart 10.617.512               80.141                   16 rotation_hold         -                        -
-     Jakub   Kaminski       Köln 19.655.090              103.187                   16 rotation_hold         -      Eintracht Frankfurt
-     Marco     Friedl     Bremen 17.429.222               27.039                   15 rotation_hold         -                        -
-     Serge     Gnabry     Bayern 29.919.070               93.238                   15 rotation_hold         -                        -
+    Marius       Wolf   Augsburg    500.000                  159                   22 rotation_hold         -             Hamburger SV
+     Lucas      Höler   Freiburg    500.000                2.839                   19 rotation_hold         -                        -
+     Josha   Vagnoman  Stuttgart  5.163.488              230.600                   19 rotation_hold         -                        -
+   Ermedin  Demirović  Stuttgart 20.586.494               15.121                   18 rotation_hold         -                        -
+  Dimitris Giannoulis   Augsburg  6.253.230               85.921                   17 rotation_hold         -             Hamburger SV
+    Marvin  Pieringer Heidenheim  1.745.376              190.113                   17 rotation_hold         - Borussia Mönchengladbach
+    Robert    Andrich Leverkusen 18.885.795                7.753                   16 rotation_hold         -                        -
+ Christian    Eriksen  Wolfsburg 10.543.667               99.119                   16 rotation_hold         -                        -
+    Kaishu       Sano      Mainz 11.565.345              110.469                   16 rotation_hold         -      TSG 1899 Hoffenheim
+      Finn    Jeltsch  Stuttgart 10.617.512               79.873                   16 rotation_hold         -                        -
+     Jakub   Kaminski       Köln 19.655.090              102.440                   16 rotation_hold         -      Eintracht Frankfurt
+     Marco     Friedl     Bremen 17.429.222               26.284                   15 rotation_hold         -                        -
+     Serge     Gnabry     Bayern 29.919.070               92.949                   15 rotation_hold         -                        -
 ```
 
 ## Active Offers
 
-- Keine aktiven Gebote gespeichert
+- Rani Khedira | Gebot: 6442631.0 | Marktwert: 6442631.0 | Ablauf: 2026-03-27T12:17:16Z
+- Manuel Neuer | Gebot: 6269867.0 | Marktwert: 6269867.0 | Ablauf: 2026-03-27T18:39:39Z
+- Michael Gregoritsch | Gebot: 3635363.0 | Marktwert: 3635363.0 | Ablauf: 2026-03-28T09:21:11Z
+- Lukas Klostermann | Gebot: 500000.0 | Marktwert: 500000.0 | Ablauf: 2026-03-28T19:27:36Z
+- Alexander Nübel | Gebot: 20010110.0 | Marktwert: 20010110.0 | Ablauf: 2026-03-27T20:48:00Z
 
 ## Recent Outbid Offers
 
@@ -118,77 +122,67 @@ first_name  last_name  team_name         mv  predicted_mv_change  sell_priority_
 
 ## Offer Tracking Debug
 
-- Root Type: dict
+- Root Type: None
 - Candidate Count: 0
 - Keine Debug-Kandidaten gespeichert
 
 ### Feed Structure Debug
 
-- Pfad: root | Typ: dict | Laenge: None | Keys: it, u, unm
-- Pfad: root.it | Typ: list | Laenge: 25 | Keys: 
-- Pfad: root.it[0] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[1] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[2] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[3] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[4] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[5] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[6] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
-- Pfad: root.it[7] | Typ: dict | Laenge: None | Keys: dt, pi, pim, pn, tid, trp, tty
+- Keine Struktur-Daten gespeichert
 
 ### Market Feed Debug
 
 - Root Type: list
 - Item Count: 23
-- Pfad: market[0] | Spieler: None | Spieler-ID: None | Marktwert: 6442631.0 | Ablauf: 1970-01-01T01:44:36Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "51", "fn": "Rani", "n": "Khedira", "tid": "40", "pos": 3, "st": 0, "mvt": 2, "mv": 6442631, "p": 1733, "ap": 67, "ofc": 0, "exs": 6276, "prc": 6442631, "isn": false, "iposl": false, "dt": "2026-03-26T04:12:15Z", "pim": "content/file/98159e30baca4a1080128a7a4c32914e.png"}
-- Pfad: market[1] | Spieler: None | Spieler-ID: None | Marktwert: 6269867.0 | Ablauf: 1970-01-01T08:06:59Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "237", "fn": "Manuel", "n": "Neuer", "tid": "2", "pos": 1, "st": 0, "mvt": 1, "mv": 6269867, "p": 1838, "ap": 97, "ofc": 0, "exs": 29219, "prc": 6269867, "isn": false, "iposl": false, "dt": "2026-03-26T05:20:38Z", "pim": "content/file/48622993193e45f09d696908d75ed523.png"}
-- Pfad: market[2] | Spieler: None | Spieler-ID: None | Marktwert: 3635363.0 | Ablauf: 1970-01-01T22:48:31Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "493", "fn": "Michael", "n": "Gregoritsch", "tid": "13", "pos": 4, "st": 0, "mvt": 2, "mv": 3635363, "p": 604, "ap": 55, "ofc": 0, "exs": 82111, "prc": 3635363, "isn": true, "iposl": false, "dt": "2026-03-27T00:03:10Z", "pim": "content/file/b93977fb3dee4e75af09d67896a1666b.png"}
-- Pfad: market[3] | Spieler: None | Spieler-ID: None | Marktwert: 500000.0 | Ablauf: 1970-01-02T08:54:56Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1333", "fn": "Lukas", "n": "Klostermann", "tid": "43", "pos": 2, "st": 0, "mvt": 0, "mv": 500000, "p": 53, "ap": 13, "ofc": 0, "exs": 118496, "prc": 500000, "isn": true, "iposl": false, "dt": "2026-03-27T06:27:35Z", "pim": "content/file/fe5ccc7927254a46ab71aeed829805e4.png"}
-- Pfad: market[4] | Spieler: None | Spieler-ID: None | Marktwert: 20010110.0 | Ablauf: 1970-01-01T10:15:20Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1581", "fn": "Alexander", "n": "Nübel", "tid": "9", "pos": 1, "st": 0, "mvt": 1, "mv": 20010110, "p": 3169, "ap": 117, "ofc": 0, "exs": 36920, "prc": 20010110, "isn": false, "iposl": false, "dt": "2026-03-26T09:42:59Z", "pim": "content/file/2dea6714f704489fa0fb302accce4e8a.png"}
-- Pfad: market[5] | Spieler: None | Spieler-ID: None | Marktwert: 15835943.0 | Ablauf: 1970-01-02T03:34:05Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1645", "fn": "Maximilian", "n": "Eggestein", "tid": "5", "pos": 3, "st": 0, "mvt": 1, "mv": 15835943, "p": 2361, "ap": 87, "ofc": 0, "exs": 99245, "prc": 15835943, "isn": true, "iposl": false, "dt": "2026-03-27T03:13:44Z", "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"}
-- Pfad: market[6] | Spieler: None | Spieler-ID: None | Marktwert: 6091947.0 | Ablauf: 1970-01-01T02:19:04Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, ofs, p, pim, pos, prc, st, tid, uoid, uop | Sample: {"i": "1896", "fn": "Péter", "n": "Gulácsi", "tid": "43", "pos": 1, "st": 4, "mvt": 1, "mv": 6091947, "p": 2335, "ap": 106, "ofc": 1, "exs": 8344, "prc": 6091947, "uop": 6250000, "uoid": "2622703", "isn": false, "ofs": "<list:1>", "iposl": false, "dt": "2026-03-25T22:57:43Z", "pim": "content/file/fe5ccc7927254a46ab71aeed829805e4.png"}
-- Pfad: market[7] | Spieler: None | Spieler-ID: None | Marktwert: 7112054.0 | Ablauf: 1970-01-01T03:51:56Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2279", "fn": "Frederik", "n": "Rönnow", "tid": "40", "pos": 1, "st": 0, "mvt": 1, "mv": 7112054, "p": 2109, "ap": 81, "ofc": 0, "exs": 13916, "prc": 7112054, "isn": false, "iposl": false, "dt": "2026-03-26T01:03:35Z", "pim": "content/file/98159e30baca4a1080128a7a4c32914e.png"}
-- Pfad: market[8] | Spieler: None | Spieler-ID: None | Marktwert: 500000.0 | Ablauf: 1970-01-01T06:13:27Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2444", "fn": "Robert", "n": "Glatzel", "tid": "6", "pos": 4, "st": 2, "mvt": 0, "mv": 500000, "p": 335, "ap": 24, "ofc": 0, "exs": 22407, "prc": 500000, "isn": false, "iposl": false, "dt": "2026-03-25T23:59:06Z", "pim": "content/file/6bd6cf911d5b497e977b3e6a4526aef9.png"}
-- Pfad: market[9] | Spieler: None | Spieler-ID: None | Marktwert: 500000.0 | Ablauf: 1970-01-01T21:01:49Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2598", "fn": "Christian", "n": "Conteh", "tid": "50", "pos": 4, "st": 0, "mvt": 0, "mv": 500000, "p": 137, "ap": 27, "ofc": 0, "exs": 75709, "prc": 500000, "isn": false, "iposl": false, "dt": "2026-03-26T14:01:28Z", "pim": "content/file/ef0f480acb2e4002811381446d78ae87.png"}
+- Pfad: market[6] | Spieler: Péter Gulácsi | Spieler-ID: 1896 | Marktwert: 6091947.0 | Ablauf: 1970-01-01T00:36:04Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, ofs, p, pim, pos, prc, st, tid, uoid, uop | Sample: {"i": "1896", "fn": "Péter", "n": "Gulácsi", "tid": "43", "pos": 1, "st": 4, "mvt": 1, "mv": 6091947, "p": 2335, "ap": 106, "ofc": 1, "exs": 2164, "prc": 6091947, "uop": 6250000, "uoid": "2622703", "isn": false, "ofs": "<list:1>", "iposl": false, "dt": "2026-03-25T22:57:43Z", "pim": "content/file/fe5ccc7927254a46ab71aeed829805e4.png"}
 
 ## AI Full Output
 
-Hallo Luca Malco, hier ist deine Kickbase-Abendstrategie. Wir nutzen die Länderspielpause für kluge Trades, um den Kaderwert zu steigern und uns optimal auf den nächsten Spieltag vorzubereiten.
+Hallo Luca Malco, hier ist deine Kickbase-Abendstrategie für Freitag, den 27. März 2026.
 
-### 1. TEAMSTATUS
-Dein Kader ist mit 13 von 17 Plätzen noch nicht voll und verfügt über ein solides Budget von 5.181.860 Euro. Die Länderspielpause verschafft uns im "extended_break" Modus wertvolle Zeit für Trades mit mehrtägigem Hebel, ohne den Druck eines anstehenden Spieltags. Unser Fokus liegt heute darauf, auslaufende Marktchancen zu nutzen und das Kapital intelligent zu investieren, um bis zum nächsten Marktwert-Update maximale Gewinne zu erzielen.
+Ich werde jetzt die neuesten Informationen zu den wichtigsten Kauf- und Verkaufsentscheidungen einholen, um meine Empfehlungen auf die aktuellsten Fakten zu stützen.### 1. TEAMSTATUS
+
+Guten Abend, Luca. Die Lage ist ausgezeichnet. Wir befinden uns in einer Länderspielpause (`extended_break`), was uns 9 Tage Zeit bis zum nächsten Spieltag verschafft. Dein Budget ist mit 5.181.860 € positiv und wir haben vier freie Kaderplätze (13/17). Das ist die perfekte Ausgangslage, um die lange Trading-Phase zu nutzen, gezielt Marktwertgewinne zu realisieren und den Kaderwert signifikant zu steigern, ohne den Druck des bevorstehenden Spieltags. Unser Fokus liegt heute klar auf profitablem Trading.
 
 ### 2. VERKAUFS-BEFEHLE
-Aktuell gibt es keinen akuten Verkaufsdruck, da kein Spieler im Kader ein negatives Marktwertpotenzial aufweist. Alle Spieler sind als "rotation_hold" eingestuft und sollten gehalten werden, um von den erwarteten Marktwertsteigerungen zu profitieren. Wir setzen auf Kaderstabilität und internes Wachstum.
+
+Auch wenn das Modell alle Spieler auf "hold" setzt, müssen wir für maximales Wachstum Kapital umschichten. Spieler mit hohen Marktwerten, aber geringen prognostizierten Zuwächsen, binden unnötig Kapital, das an anderer Stelle profitabler arbeiten kann.
+
+*   **Verkaufe Ermedin Demirović (Stuttgart, 20.586.494 €):** Seine prognostizierte Marktwertsteigerung ist mit 15k minimal. Viel wichtiger ist jedoch, dass er einen von maximal drei Stuttgart-Plätzen blockiert. Ein Verkauf macht uns flexibler, falls ein Stuttgarter Spieler mit hohem Potenzial auf den Markt kommt. Es gibt ältere Berichte über eine Fußverletzung, aber keine aktuellen Informationen, die einen Verkauf erzwingen würden; die Entscheidung ist rein strategischer Natur, um Kapital und einen Club-Slot freizumachen.
+*   **Verkaufe Robert Andrich (Leverkusen, 18.885.795 €):** Ähnlich wie bei Demirović ist die prognostizierte Steigerung praktisch null. Aktuelle Berichte deuten auf einen möglichen Umbruch in Leverkusen hin, bei dem Andrichs Zukunft nicht mehr zu 100 % sicher sein könnte, da er die Erwartungen als Abwehrchef nicht vollends erfüllt habe. Auch wenn er in der Nationalmannschaft eine Rolle spielt, ist das Risiko im Verhältnis zum gebundenen Kapital zu hoch. Verkaufen und das Kapital in Spieler mit 5-10% Wachstumspotenzial investieren.
+
+Durch diese beiden Verkäufe würden wir ca. **39,47 Mio. €** an Kapital freisetzen und hätten ein Gesamtbudget von ca. **44,65 Mio. €** zur Verfügung, um den Kader aggressiv zu verstärken.
 
 ### 3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE
-Heute konzentrieren wir uns auf Spieler mit hohem kurzfristigen Potenzial, die bald auslaufen.
 
-*   **Kauf Péter Gulácsi (RB Leipzig)** | Priorität A | Max Gebot 6.300.000 € | Rolle: Trader | **Warum jetzt:** Gulácsi hat mit +221k die höchste prognostizierte Marktwertsteigerung im Segment A und läuft in nur 2 Stunden aus. Aktuellen Berichten zufolge hat er sich Mitte Februar eine Innenbandverletzung zugezogen und sollte bis Ende März ausfallen. Es ist entscheidend, seinen aktuellen Fitnesszustand genau zu prüfen. Wenn er wieder fit ist, ist er ein exzellenter "Overnight-Flip". Aufgrund des hohen Konkurrenzdrucks und des geschätzten Siegergebots von 6.5 Mio. € ist ein Gebot bis 6.3 Mio. € vertretbar, um nicht in einen Preiskrieg zu geraten.
+Wir konzentrieren uns auf Spieler aus Marktsegment A mit der besten Kombination aus Dringlichkeit und Potenzial.
 
-*   **Kauf Chrislain Matsima (FC Augsburg)** | Priorität B | Max Gebot 875.000 € | Rolle: Trader/Hold | **Warum jetzt:** Obwohl er erst in 14 Stunden ausläuft, verspricht Matsima mit +24% die prozentual höchste Marktwertsteigerung. Das macht ihn zu einem sehr attraktiven "2-4-Tage-Hold". Dein Budget erlaubt diesen Kauf bequem. Gehe bis zum empfohlenen `competitive_bid_max` mit, um dir dieses Potenzial zu sichern.
+*   **Kauf Péter Gulácsi (Leipzig) | Priorität A | Max Gebot 6.313.000 € | Rolle: Trader | Warum jetzt:** Gulácsi hat mit +221k die höchste prognostizierte Steigerung unter den kurzfristig verfügbaren Torhütern und eine hohe Priorität von 76. Ältere Berichte von Mitte Februar 2026 erwähnen eine Knieverletzung mit einer Ausfallzeit bis Ende März. Da heute der 27. März ist, steht seine Rückkehr kurz bevor, was den Markt antizipieren und seinen Wert steigern wird. Die Konkurrenz ist hoch, daher bieten wir diszipliniert bis zum prognostizierten Zielwert (`predicted_mv_target`) und vermeiden einen Preiskrieg, wie vom Modell empfohlen.
+*   **Kauf Frederik Rönnow (Union Berlin) | Priorität B | Max Gebot 7.190.000 € | Rolle: Trader/Hold | Warum jetzt:** Rönnow hat ebenfalls eine solide Prognose. Mitte März 2026 wurde von Fußproblemen berichtet, weshalb er ein Spiel verpasste. Diese scheinen aber nicht langfristig zu sein. Sein `football_signal_score` ist mit 67 sehr stark. Auch hier gilt: Der Markt ist umkämpft. Wir bieten bis zum prognostizierten Zielwert, gehen aber nicht in einen Bieterkrieg. Sollten wir ihn bekommen, ist er ein Kandidat für einen 2-4-Tage-Hold.
 
 ### 4. SPÄTERE CHANCEN UND HOLDS
-Wir behalten den Markt für mittel- bis langfristige Chancen im Auge.
 
-*   **Beobachte Loïc Badé (Bayer Leverkusen)** | Zielstrategie: 2-4 Tage | Späteres Max Gebot: 5.390.000 € | **Warum relevant:** Badé zeigt eine solide prognostizierte Steigerung von +277k. Da er erst in 23 Stunden ausläuft, können wir zunächst die Entwicklung bei Gulácsi abwarten und unser Budget gezielt einsetzen. Er bleibt aber ein sehr interessanter Kandidat für die nächsten Tage.
+Dank der Länderspielpause sind mehrtägige Holds die eigentliche Goldgrube.
+
+*   **Beobachte Chrislain Matsima (Augsburg) | Zielstrategie: 2-4 Tage | Späteres Max Gebot: 950.000 € | Warum relevant:** Matsima ist die **Top-Chance** auf dem gesamten Markt. Mit einer prognostizierten Steigerung von +194k auf einen Marktwert von nur 813k entspricht das einem **Wachstum von 24%**. Berichte aus dem letzten Jahr bestätigen seinen Status als aufstrebendes Talent, für das Augsburg bereits eine Kaufoption gezogen hat und das als Leistungsträger für die Zukunft gilt. Da wir bereits 2 Augsburger haben, ist der Kauf möglich. Wir setzen ihn auf die Watchlist und bieten aggressiv, aber nicht blind. Aufgrund der hohen Konkurrenz ist ein Gebot bis leicht unter die 1-Mio-Marke gerechtfertigt, um ihn für einen mehrtägigen Hold zu sichern. Das ist der wichtigste Trade der nächsten Tage.
 
 ### 5. NEWS-CHECK
-Die Recherche hat wichtige Erkenntnisse zu unseren Transferzielen und einigen Kaderspielern geliefert:
 
-*   **Péter Gulácsi:** Litt an einem Innenbandanriss im Knie, die Ausfallzeit wurde bis Ende März prognostiziert. Es gibt keine neuere Meldung, die seine vollständige Genesung bestätigt. Das macht den Kauf riskanter.
-*   **Frederik Rönnow:** Hatte Mitte März mit einer Fußverletzung zu kämpfen, weshalb sein Einsatz fraglich war. Ältere Meldungen bestätigen eine vorherige Trainingsverletzung. Der Kauf wird daher nicht empfohlen.
-*   **Manuel Neuer:** Feiert heute seinen 40. Geburtstag und erholt sich von einem Muskelfaserriss. Eine ältere Meldung vom 20. März 2024 (Achtung, veraltetes Datum!) sprach ebenfalls von einer Verletzung.
-*   **Danilho Doekhi:** Keine aktuellen, besorgniserregenden Nachrichten. Ältere Meldungen deuten darauf hin, dass er nach einer früheren Verletzung wieder im Training ist.
-*   **Robert Andrich:** Wurde zuletzt nicht für die Nationalmannschaft nominiert, wird aber im Verein als Kapitän und Führungsspieler sehr geschätzt.
-*   **Ermedin Demirović & Finn Jeltsch:** Sind mit ihren Nationalmannschaften unterwegs.
-*   **Lucas Höler:** Meldete sich Ende Januar krank ab, was aber für die aktuelle Situation nicht mehr relevant sein dürfte.
-*   Für **Marius Wolf**, **Marco Friedl** und **Max Moerstedt** wurden keine spielentscheidenden, aktuellen Informationen gefunden.
+*   **Manuel Neuer:** Ältere Nachrichten deuten auf wiederkehrende Verletzungsprobleme und Pausen im Training hin. Die Datenlage ist nicht eindeutig genug, um einen Kauf zu rechtfertigen, weshalb wir wie vom Modell empfohlen passen.
+*   **Serge Gnabry:** Seine Verletzungshistorie ist bekannt, es gibt aber keine aktuellen, alarmierenden Meldungen, die einen Notverkauf erzwingen würden. Dennoch bleibt er aufgrund des hohen Marktwertes bei geringem Wachstum ein Verkaufskandidat, wenn wir besseres Potenzial sehen.
+*   **Jakub Kaminski:** Er scheint sich in Köln gut eingelebt zu haben und blüht wieder auf. Es gibt keine negativen Nachrichten, daher halten wir ihn aktuell.
+*   Für die restlichen Spieler (Demirović, Andrich, Rönnow, Gulácsi) konnten keine brandaktuellen, spielentscheidenden News gefunden werden, die die strategischen Empfehlungen (Verkauf wegen Kapitalbindung, Kauf wegen Marktwertpotenzial) grundlegend ändern würden.
 
 ### 6. TRADING-PLAN
-Die Strategie für die Länderspielpause ist klar: Wir nutzen die Zeit für Marktwert-Trades.
-1.  **Priorität 1 (Heute):** Gib ein Gebot für **Péter Gulácsi** bis maximal 6.300.000 € ab. Das Verletzungsrisiko ist vorhanden, aber die Marktwert-Chance ist bei rechtzeitiger Genesung hoch. Parallel dazu bietest du auf **Chrislain Matsima** bis 875.000 €.
-2.  **Plan B (Morgen):** Sollte der Gulácsi-Deal scheitern, wird das frei gewordene Kapital neu bewertet. **Loïc Badé** rückt dann in den Fokus.
-3.  **Halten und Entwickeln:** Der bestehende Kader wird gehalten. Die positiven Marktwertprognosen für Spieler wie Vagnoman, Pieringer und Kaminski sollten über die nächsten Tage realisiert werden.
+
+Unsere Strategie für die nächsten 2-4 Tage ist klar: **Kapitalmaximierung durch Umschichtung.**
+1.  **Phase 1 (Heute Abend):** Verkäufe von Demirović und Andrich einleiten, um über 44 Mio. € liquides Kapital zu schaffen. Gleichzeitig disziplinierte Gebote auf Gulácsi und Rönnow abgeben, um kurzfristige Gewinne zu sichern.
+2.  **Phase 2 (Nächste 1-2 Tage):** Den Hauptfokus auf den Erwerb von Chrislain Matsima legen. Sein prozentuales Wachstum ist der größte Hebel für unseren Kaderwert.
+3.  **Phase 3 (Laufend):** Mit dem freigewordenen Kapital und den 4 offenen Kaderplätzen gezielt weitere Spieler im Bereich von 1-10 Mio. € suchen, die ein hohes prozentuales Wachstum versprechen. Ziel ist es, bis Mitte nächster Woche alle 17 Kaderplätze mit steigenden Assets zu füllen.
 
 ### 7. FRIDAY-CHECK
-Da wir uns in einer Länderspielpause befinden und der `FRIDAY_SAFETY_MODE` inaktiv ist, müssen wir nicht zwingend bis heute Abend einen positiven Kontostand aufweisen. Die Priorität liegt auf dem Abschluss profitabler Trades. Wir werden sicherstellen, dass dein Kontostand bis zum Freitag vor dem nächsten Spieltag (03. April 2026) wieder im Plus ist und ein schlagkräftiges Team für den 28. Spieltag bereitsteht.
+
+Da wir uns in einer `extended_break` befinden, entfällt der übliche Freitagsstress. Der `FRIDAY_SAFETY_MODE` ist `inactive`. Das bedeutet:
+*   Wir müssen **nicht** bis heute Abend um jeden Preis bei Null sein.
+*   Unser Ziel ist es, bis zum **nächsten Freitag (03. April 2026)** ein schlagkräftiges Team aufgestellt zu haben und dann einen positiven Kontostand aufzuweisen.
+*   Jeder Einsatz des Negativpuffers in dieser Woche muss durch die realisierten Gewinne aus den Trades (vor allem Matsima) und den getätigten Verkäufen bis dahin wieder ausgeglichen werden. Die heute empfohlenen Verkäufe schaffen dafür bereits ein massives Polster.
