@@ -12,6 +12,7 @@ REPORT_HISTORY_LIMIT = 3
 
 def write_run_report(
     output_dir,
+    repo_output_dir,
     report_date,
     own_username,
     own_budget,
@@ -29,6 +30,7 @@ def write_run_report(
     """Write a sanitized summary of the latest run for later inspection."""
 
     os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(repo_output_dir, exist_ok=True)
 
     payload = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
@@ -75,10 +77,16 @@ def write_run_report(
         "ai_full_text": str(ai_advice or ""),
     }
 
-    json_path = os.path.join(output_dir, "last_run_summary.json")
-    markdown_path = os.path.join(output_dir, "last_run_summary.md")
-    consolidated_markdown_path = os.path.join(output_dir, "latest_run_report.md")
     rendered_markdown = _render_markdown(payload)
+
+    _write_report_bundle(output_dir, payload, rendered_markdown)
+    _write_report_bundle(repo_output_dir, payload, rendered_markdown)
+
+
+def _write_report_bundle(target_dir, payload, rendered_markdown):
+    json_path = os.path.join(target_dir, "last_run_summary.json")
+    markdown_path = os.path.join(target_dir, "last_run_summary.md")
+    consolidated_markdown_path = os.path.join(target_dir, "latest_run_report.md")
 
     with open(json_path, "w", encoding="utf-8") as json_file:
         json.dump(payload, json_file, ensure_ascii=False, indent=2)
@@ -89,7 +97,7 @@ def write_run_report(
     with open(consolidated_markdown_path, "w", encoding="utf-8") as markdown_file:
         markdown_file.write(rendered_markdown)
 
-    _rotate_markdown_report_history(output_dir, rendered_markdown)
+    _rotate_markdown_report_history(target_dir, rendered_markdown)
 
 
 def _rotate_markdown_report_history(output_dir, rendered_markdown):

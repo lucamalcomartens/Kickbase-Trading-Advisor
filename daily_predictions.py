@@ -284,6 +284,7 @@ def main() -> None:
 
     write_run_report(
         output_dir=system_settings.run_output_dir,
+        repo_output_dir=system_settings.repo_reports_dir,
         report_date=report_date,
         own_username=own_username,
         own_budget=own_budget,

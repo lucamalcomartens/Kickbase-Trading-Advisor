@@ -25,6 +25,9 @@
       <strong>SQLite Persistence Layer:</strong> Core advisor data is stored in a local SQLite database. Besides player history, the app now also persists completed league transfers as well as full market, squad, and budget snapshots per run for later analysis.
     </li>
     <li>
+      <strong>Versioned Repo Reports:</strong> Each run writes a full markdown report into <code>reports/</code>. The latest three runs are kept there and the GitHub Action pushes updates back into the repository automatically.
+    </li>
+    <li>
       <strong>More Features in the Future:</strong> ...
     </li>
   </ol>
@@ -60,7 +63,7 @@
       </ul>
     </li>
     <li>
-      <strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow." It should take at most about 2 minutes. If everything works, the workflow will show a green check mark. You can then click on the workflow, select "run-daily-predictions," and click "Run daily_predictions.py." There, you should see the results and, if email is set up, you may also receive an email with the results. If the workflow shows a red cross, something went wrong. To check this, follow the same steps to view the results; you should find an error message indicating what went wrong. Most of the time, this is caused by wrong or missing variables and/or secrets. Each run now also writes a sanitized summary and console log as a workflow artifact named <code>kickadvisor-last-run</code>, which helps with debugging without exposing secrets. Once everything works, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file.
+      <strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow." It should take at most about 2 minutes. If everything works, the workflow will show a green check mark. You can then click on the workflow, select "run-daily-predictions," and click "Run daily_predictions.py." There, you should see the results and, if email is set up, you may also receive an email with the results. If the workflow shows a red cross, something went wrong. To check this, follow the same steps to view the results; you should find an error message indicating what went wrong. Most of the time, this is caused by wrong or missing variables and/or secrets. Each run now also writes a sanitized summary and console log as a workflow artifact named <code>kickadvisor-last-run</code>. In addition, the workflow updates the tracked <code>reports/</code> folder in the repository itself and keeps the latest three run reports there. Once everything works, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file.
     </li>
   </ol>
 </div>

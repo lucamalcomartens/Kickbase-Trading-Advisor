@@ -9,6 +9,7 @@ import pandas as pd
 ANALYSIS_HISTORY_PATH = "analysis_history.json"
 RUN_OUTPUT_DIR = "run_outputs"
 DATABASE_PATH = "player_data_total.db"
+REPO_REPORTS_DIR = "reports"
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,7 @@ class SystemSettings:
     analysis_history_path: str = ANALYSIS_HISTORY_PATH
     run_output_dir: str = RUN_OUTPUT_DIR
     database_path: str = DATABASE_PATH
+    repo_reports_dir: str = REPO_REPORTS_DIR
 
 
 @dataclass(frozen=True)
