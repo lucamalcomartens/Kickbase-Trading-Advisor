@@ -9,11 +9,13 @@ SRC_ROOT = Path(__file__).resolve().parent.parent
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
+from config.secrets import load_runtime_secrets
 from config.settings import ensure_runtime_directories
 from features.external import get_api_football_context
 
 
 def main() -> None:
+    load_runtime_secrets()
     parser = argparse.ArgumentParser(description="Validate API-Football integration for a configured competition.")
     parser.add_argument("--competition-id", type=int, default=1, help="Kickbase competition id, e.g. 1 for Bundesliga")
     parser.add_argument("--force-refresh", action="store_true", help="Bypass local cache and hit the API directly")

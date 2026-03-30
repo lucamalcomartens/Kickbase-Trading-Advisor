@@ -4,9 +4,9 @@ import datetime
 import os
 
 import google.genai as genai
-from dotenv import load_dotenv
 from IPython.display import display
 
+from config.secrets import get_secret, load_runtime_secrets, validate_required_secrets
 from config.settings import SystemSettings, configure_display, ensure_runtime_directories, load_user_settings
 from features.ai import generate_ai_advice
 from features.analysis import (
@@ -80,7 +80,7 @@ def _ensure_buy_gate_fallback_columns(market_df):
 
 
 def main() -> None:
-    load_dotenv()
+    load_runtime_secrets()
     configure_display()
     ensure_runtime_directories()
 
@@ -92,13 +92,21 @@ def main() -> None:
 
     create_advisor_tables(system_settings.database_path)
 
-    username = os.getenv("KICK_USER")
-    password = os.getenv("KICK_PASS")
-
-    if not username or not password:
+    missing_core_secrets = validate_required_secrets(["KICK_USER", "KICK_PASS", "GEMINI_API_KEY"])
+    if missing_core_secrets:
         raise RuntimeError(
-            "Kickbase credentials are not configured. Set KICK_USER and KICK_PASS in the environment or GitHub Actions secrets."
+            "Missing required secrets: "
+            + ", ".join(missing_core_secrets)
+            + ". Configure them in the environment, .env.local, or the local credential manager."
         )
+
+    if get_secret("EMAIL_USER") and not get_secret("EMAIL_PASS"):
+        raise RuntimeError(
+            "EMAIL_USER is configured but EMAIL_PASS is missing. Configure EMAIL_PASS as well or remove EMAIL_USER to disable local email sending."
+        )
+
+    username = get_secret("KICK_USER")
+    password = get_secret("KICK_PASS")
 
     token = login(username, password)
     print("\nLogged in to Kickbase.")

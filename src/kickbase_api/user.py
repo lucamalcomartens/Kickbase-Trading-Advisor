@@ -22,7 +22,7 @@ def login(username, password):
     except requests.HTTPError as error:
         if resp.status_code == 401:
             raise RuntimeError(
-                "Kickbase login failed with 401 Unauthorized. Verify KICK_USER and KICK_PASS in your local .env or GitHub Actions secrets."
+                "Kickbase login failed with 401 Unauthorized. Verify KICK_USER and KICK_PASS in your local secret store, .env.local, or environment."
             ) from error
         raise
     data = resp.json()

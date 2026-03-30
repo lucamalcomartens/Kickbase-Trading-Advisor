@@ -6,6 +6,8 @@ import os
 
 import pandas as pd
 
+from config.secrets import get_secret, load_runtime_secrets
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
@@ -77,12 +79,14 @@ def ensure_runtime_directories() -> None:
 def load_user_settings() -> UserSettings:
     """Load the user-managed project settings from the current environment and defaults."""
 
+    load_runtime_secrets()
+
     return UserSettings(
         competition_ids=[1],
         league_name="Spitz",
         start_budget=50_000_000,
         league_start_date="2025-12-22",
-        email=os.getenv("EMAIL_USER"),
+        email=get_secret("EMAIL_USER"),
     )
 
 

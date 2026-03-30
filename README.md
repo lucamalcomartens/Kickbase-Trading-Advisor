@@ -48,14 +48,52 @@ Wichtige Werte:
 
 ### 3. Secrets bereitstellen
 
-Für lokale Runs in einer `.env` Datei oder in GitHub Actions als Secrets:
+Für lokale Runs gibt es jetzt drei unterstützte Wege:
+
+1. Prozess-Umgebung
+2. Windows Credential Manager über `keyring`
+3. `.env.local` im Projektroot
+
+Die Lade-Reihenfolge für fehlende Werte ist:
+
+1. bestehende Environment-Variablen
+2. lokaler Credential Manager
+3. `.env.local`
+4. `.env`
+
+Benötigte oder optionale Schlüssel:
 
 - `KICK_USER`: Kickbase-Login.
 - `KICK_PASS`: Kickbase-Passwort.
+- `GEMINI_API_KEY`: Schlüssel für die KI-Auswertung.
 - `EMAIL_USER`: Absenderadresse für Mailversand.
 - `EMAIL_PASS`: App-Passwort für Gmail.
 - `FOOTBALL_DATA_API_KEY` optional: einfacher Fixture-Kontext.
 - `API_FOOTBALL_KEY` optional: erweiterter Team- und Availability-Kontext.
+
+Empfohlen für den lokalen Dauerbetrieb ist der Credential Manager. Die Anwendung liest die Werte, ohne dass sie im Repository gespeichert oder im Log ausgegeben werden.
+
+Status prüfen:
+
+```bash
+python src/scripts/manage_local_secrets.py status
+```
+
+Secret lokal im Credential Manager hinterlegen:
+
+```bash
+python src/scripts/manage_local_secrets.py set KICK_USER
+python src/scripts/manage_local_secrets.py set KICK_PASS
+python src/scripts/manage_local_secrets.py set GEMINI_API_KEY
+```
+
+Optionales Secret löschen:
+
+```bash
+python src/scripts/manage_local_secrets.py delete API_FOOTBALL_KEY
+```
+
+Falls du lieber mit Dateien arbeitest, nutze `.env.local` auf Basis von `.env.example`. Diese Datei ist bereits durch `.gitignore` geschützt.
 
 ### 4. Lokal ausführen
 
@@ -81,10 +119,12 @@ Das Projekt ist bewusst in Schichten organisiert.
 - `src/scripts/run_daily_predictions.py`: orchestriert den kompletten Tageslauf.
 - `src/scripts/export_buy_training_data.py`: exportiert Trainingsdaten für spätere Entscheidungsmodelle.
 - `src/scripts/validate_api_football.py`: prüft die externe API-Football-Integration.
+- `src/scripts/manage_local_secrets.py`: verwaltet lokale Secrets, ohne Werte im Repo oder Log zu speichern.
 
 ### 2. Konfiguration
 
 - `src/config/settings.py`: zentrale Pfade, Laufzeitverzeichnisse und User-Einstellungen.
+- `src/config/secrets.py`: zentrale Secret-Ladeschicht für Environment, Credential Manager und `.env.local`.
 - `src/project_settings.py`: kompakter Re-Export zentraler Settings für schnelle Nutzung.
 
 ### 3. Kickbase API Layer
