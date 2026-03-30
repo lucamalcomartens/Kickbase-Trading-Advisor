@@ -95,6 +95,8 @@ def write_run_report(
         "ai_full_text": str(ai_advice or ""),
     }
 
+    payload = _make_json_safe(payload)
+
     rendered_markdown = _render_markdown(payload)
 
     _write_report_bundle(output_dir, payload, rendered_markdown)
@@ -241,6 +243,27 @@ def _safe_number(value):
         return None
     if isinstance(value, (int, float)):
         return float(value)
+    return value
+
+
+def _make_json_safe(value):
+    if isinstance(value, dict):
+        return {str(key): _make_json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_make_json_safe(item) for item in value]
+    if isinstance(value, tuple):
+        return [_make_json_safe(item) for item in value]
+    if value is None:
+        return None
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    if hasattr(value, "item"):
+        try:
+            return _make_json_safe(value.item())
+        except Exception:
+            pass
+    if pd.isna(value):
+        return None
     return value
 
 

@@ -201,21 +201,61 @@ def main() -> None:
     strategy_context["squad_management"] = squad_management_summary
     market_all_df, roster_need_summary = apply_roster_need_context(squad_recommendations_df, market_all_df)
     strategy_context["roster_needs"] = roster_need_summary
-    market_all_df, buy_gate_summary = apply_deterministic_buy_gates(
-        market_all_df,
-        squad_recommendations_df,
-        manager_budgets_df,
-        own_username,
-        strategy_context=strategy_context,
-    )
-    strategy_context["buy_gates"] = buy_gate_summary
-    strategy_context["purchase_review"] = build_purchase_evaluation_summary(
-        db_path=system_settings.database_path,
-        league_id=league_id,
-        own_username=own_username,
-        transfer_history_df=transfer_history_df,
-        squad_df=squad_recommendations_df,
-    )
+    try:
+        market_all_df, buy_gate_summary = apply_deterministic_buy_gates(
+            market_all_df,
+            squad_recommendations_df,
+            manager_budgets_df,
+            own_username,
+            strategy_context=strategy_context,
+        )
+        strategy_context["buy_gates"] = buy_gate_summary
+    except Exception as error:
+        strategy_context["buy_gates"] = {
+            "blocked_count": 0,
+            "managed_existing_offer_count": 0,
+            "club_limit_blocks": 0,
+            "budget_blocks": 0,
+            "sell_first_flags": 0,
+            "available_cash": 0.0,
+            "available_budget": 0.0,
+            "squad_size": int(len(squad_recommendations_df)),
+            "squad_limit": 17,
+            "feature_status": "failed",
+            "error": str(error),
+        }
+        strategy_context.setdefault("validation_notes", []).append(
+            f"Buy-Gate-Modul deaktiviert wegen Fehler: {error}"
+        )
+        print(f"Warnung: Buy-Gate-Modul deaktiviert: {error}")
+
+    try:
+        strategy_context["purchase_review"] = build_purchase_evaluation_summary(
+            db_path=system_settings.database_path,
+            league_id=league_id,
+            own_username=own_username,
+            transfer_history_df=transfer_history_df,
+            squad_df=squad_recommendations_df,
+        )
+    except Exception as error:
+        strategy_context["purchase_review"] = {
+            "recent_purchase_count": 0,
+            "good_count": 0,
+            "neutral_count": 0,
+            "poor_count": 0,
+            "model_misaligned_count": 0,
+            "realized_count": 0,
+            "open_count": 0,
+            "training_eligible_count": 0,
+            "learning_note": "Purchase-Review voruebergehend deaktiviert.",
+            "recent_evaluations": [],
+            "feature_status": "failed",
+            "error": str(error),
+        }
+        strategy_context.setdefault("validation_notes", []).append(
+            f"Purchase-Review deaktiviert wegen Fehler: {error}"
+        )
+        print(f"Warnung: Purchase-Review deaktiviert: {error}")
     market_email_df = market_all_df[
         [
             "last_name",
@@ -354,24 +394,27 @@ def main() -> None:
         squad_df=squad_recommendations_df,
     )
 
-    write_run_report(
-        output_dir=system_settings.run_output_dir,
-        repo_output_dir=system_settings.repo_reports_dir,
-        report_date=report_date,
-        own_username=own_username,
-        own_budget=own_budget,
-        manager_budgets_df=manager_budgets_df,
-        matchday_context=matchday_context,
-        model_metrics=model_metrics,
-        market_df=market_all_df,
-        squad_df=squad_recommendations_df,
-        ai_status=ai_status,
-        ai_advice=ai_advice,
-        mail_status=mail_status,
-        fixture_context_active=bool(fixture_context) or bool(api_football_context.get("summary", {}).get("available")),
-        offer_tracking_summary=offer_tracking_summary,
-        strategy_context=strategy_context,
-    )
+    try:
+        write_run_report(
+            output_dir=system_settings.run_output_dir,
+            repo_output_dir=system_settings.repo_reports_dir,
+            report_date=report_date,
+            own_username=own_username,
+            own_budget=own_budget,
+            manager_budgets_df=manager_budgets_df,
+            matchday_context=matchday_context,
+            model_metrics=model_metrics,
+            market_df=market_all_df,
+            squad_df=squad_recommendations_df,
+            ai_status=ai_status,
+            ai_advice=ai_advice,
+            mail_status=mail_status,
+            fixture_context_active=bool(fixture_context) or bool(api_football_context.get("summary", {}).get("available")),
+            offer_tracking_summary=offer_tracking_summary,
+            strategy_context=strategy_context,
+        )
+    except Exception as error:
+        print(f"Warnung: Run-Report konnte nicht geschrieben werden: {error}")
 
 
 if __name__ == "__main__":
