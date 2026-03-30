@@ -38,14 +38,25 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
     """Load optional API-Football team context for fixtures and availability."""
 
     api_key = (os.getenv("API_FOOTBALL_KEY") or "").strip()
-    requested_season = _resolve_current_season(current_dt)
+    requested_season = _resolve_requested_season(current_dt)
+    live_reference_season = _resolve_live_reference_season(current_dt)
     season_candidates = _build_season_candidates(requested_season, competition_id)
     descriptor = COMPETITION_LOOKUP.get(competition_id)
 
     if not api_key:
-        return _empty_context("missing_api_key", season=requested_season, requested_season=requested_season)
+        return _empty_context(
+            "missing_api_key",
+            season=requested_season,
+            requested_season=requested_season,
+            live_reference_season=live_reference_season,
+        )
     if descriptor is None:
-        return _empty_context("unsupported_competition", season=requested_season, requested_season=requested_season)
+        return _empty_context(
+            "unsupported_competition",
+            season=requested_season,
+            requested_season=requested_season,
+            live_reference_season=live_reference_season,
+        )
 
     last_error = None
     for season in season_candidates:
@@ -56,6 +67,7 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
                 descriptor,
                 season,
                 requested_season=requested_season,
+                live_reference_season=live_reference_season,
                 force_refresh=force_refresh,
             )
         except Exception as error:
@@ -66,7 +78,13 @@ def get_api_football_context(competition_id, current_dt=None, force_refresh=Fals
 
     print(f"Hinweis: API-Football Kontext konnte nicht geladen werden: {last_error}")
     failed_season = season_candidates[-1] if season_candidates else requested_season
-    return _empty_context("request_failed", season=failed_season, requested_season=requested_season, error=str(last_error))
+    return _empty_context(
+        "request_failed",
+        season=failed_season,
+        requested_season=requested_season,
+        live_reference_season=live_reference_season,
+        error=str(last_error),
+    )
 
 
 def _load_api_football_context_for_season(
@@ -75,13 +93,49 @@ def _load_api_football_context_for_season(
     descriptor,
     season,
     requested_season,
+    live_reference_season,
     force_refresh=False,
 ):
     league = _resolve_league(api_key, competition_id, descriptor, season)
     if not league:
-        return _empty_context("league_not_found", season=season, requested_season=requested_season)
+        return _empty_context(
+            "league_not_found",
+            season=season,
+            requested_season=requested_season,
+            live_reference_season=live_reference_season,
+        )
 
     league_id = int(league["league"]["id"])
+    historical_season_mode = int(season) != int(live_reference_season)
+    if historical_season_mode:
+        return {
+            "summary": {
+                "available": False,
+                "source": "api_football",
+                "reason": "historical_season_only",
+                "season": season,
+                "requested_season": requested_season,
+                "live_reference_season": live_reference_season,
+                "season_fallback_applied": int(season) != int(requested_season),
+                "historical_season_mode": True,
+                "league_id": league_id,
+                "league_name": league["league"].get("name"),
+                "team_count": 0,
+                "teams_loaded": 0,
+                "standings_loaded": 0,
+                "fixtures_loaded": 0,
+                "injury_entries_loaded": 0,
+                "injured_player_count": 0,
+                "questionable_player_count": 0,
+                "top_affected_teams": [],
+                "error": (
+                    f"API-Football liefert in deinem Plan keine Live-Daten fuer Season {live_reference_season}. "
+                    f"Die verfuegbare Saison {season} ist historisch und wird deshalb nicht auf die Live-Strategie angewendet."
+                ),
+            },
+            "team_context": {},
+        }
+
     standings = _request_api_football(
         api_key,
         "/standings",
@@ -163,7 +217,9 @@ def _load_api_football_context_for_season(
             "source": "api_football",
             "season": season,
             "requested_season": requested_season,
+            "live_reference_season": live_reference_season,
             "season_fallback_applied": int(season) != int(requested_season),
+            "historical_season_mode": False,
             "league_id": league_id,
             "league_name": league["league"].get("name"),
             "team_count": len(team_context),
@@ -244,11 +300,15 @@ def _is_empty(value):
         return False
 
 
-def _resolve_current_season(current_dt=None):
+def _resolve_requested_season(current_dt=None):
     configured_season = (os.getenv("API_FOOTBALL_SEASON") or "").strip()
     if configured_season.isdigit():
         return int(configured_season)
 
+    return _resolve_live_reference_season(current_dt)
+
+
+def _resolve_live_reference_season(current_dt=None):
     reference_dt = current_dt or datetime.now(timezone.utc)
     return reference_dt.year if reference_dt.month >= 7 else reference_dt.year - 1
 
@@ -697,14 +757,16 @@ def _normalize_kickoff(value):
     return datetime.fromisoformat(str(value).replace("Z", "+00:00")).isoformat()
 
 
-def _empty_context(reason, season=None, requested_season=None, error=None):
+def _empty_context(reason, season=None, requested_season=None, live_reference_season=None, error=None):
     summary = {
         "available": False,
         "source": "api_football",
         "reason": reason,
         "season": season,
         "requested_season": requested_season,
+        "live_reference_season": live_reference_season,
         "season_fallback_applied": bool(requested_season is not None and season is not None and int(requested_season) != int(season)),
+        "historical_season_mode": bool(live_reference_season is not None and season is not None and int(live_reference_season) != int(season)),
         "league_id": None,
         "league_name": None,
         "team_count": 0,

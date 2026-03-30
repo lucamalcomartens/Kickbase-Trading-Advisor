@@ -397,7 +397,9 @@ def _render_markdown(payload):
 - Liga: {api_football_summary.get('league_name')}
 - Season: {api_football_summary.get('season')}
 - Angefragte Season: {api_football_summary.get('requested_season')}
+- Live-Season Referenz: {api_football_summary.get('live_reference_season')}
 - Season-Fallback aktiv: {api_football_summary.get('season_fallback_applied')}
+- Historische Season aktiv: {api_football_summary.get('historical_season_mode')}
 - Teams mit Kontext: {api_football_summary.get('team_count')}
 - Teams geladen: {api_football_summary.get('teams_loaded')}
 - Standings geladen: {api_football_summary.get('standings_loaded')}
