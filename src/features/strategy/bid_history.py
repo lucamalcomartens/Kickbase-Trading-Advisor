@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from features.advisor_db import load_transfer_history_from_db, save_transfer_history_to_db
+from features.persistence import load_transfer_history_from_db, save_transfer_history_to_db
 from kickbase_api.league import get_league_transfers
 
 

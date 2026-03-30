@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from kickbase_api.others import get_matchdays
+from kickbase_api.market_context import get_matchdays
 
 
 MAX_ANALYSIS_HISTORY_ENTRIES = 20

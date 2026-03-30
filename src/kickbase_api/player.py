@@ -1,5 +1,5 @@
 from kickbase_api.config import BASE_URL, get_json_with_token
-from kickbase_api.others import get_all_teams
+from kickbase_api.market_context import get_all_teams
 from datetime import datetime, timedelta
 
 # All functions related to player data

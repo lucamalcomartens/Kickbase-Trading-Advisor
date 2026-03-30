@@ -8,8 +8,18 @@ from dotenv import load_dotenv
 from IPython.display import display
 
 from config.settings import SystemSettings, configure_display, ensure_runtime_directories, load_user_settings
-from features.ai_advisor import generate_ai_advice
-from features.advisor_db import (
+from features.ai import generate_ai_advice
+from features.analysis import (
+    build_history_entry,
+    get_next_matchday_context,
+    load_analysis_history,
+    prepare_top_actions,
+    save_analysis_history,
+)
+from features.budgeting import calc_manager_budgets
+from features.communication import send_mail
+from features.external import enrich_with_api_football_context, get_api_football_context
+from features.persistence import (
     build_purchase_evaluation_summary,
     create_advisor_tables,
     load_offer_tracking_summary,
@@ -17,32 +27,32 @@ from features.advisor_db import (
     save_run_snapshot,
     upsert_current_market_offers,
 )
-from features.analysis_support import (
-    build_history_entry,
-    get_next_matchday_context,
-    load_analysis_history,
-    prepare_top_actions,
-    save_analysis_history,
-)
-from features.bid_history import apply_personal_bid_tuning, build_transfer_history_df, enrich_market_with_bid_history
-from features.budgets import calc_manager_budgets
-from features.external import enrich_with_api_football_context, get_api_football_context
-from features.notifier import send_mail
-from features.offer_tracking import extract_current_market_offers, summarize_market_feed_debug, summarize_offer_feed_debug
-from features.predictions.data_handler import (
+from features.predictions.feature_preprocessing import preprocess_player_data, split_data
+from features.predictions.live_prediction_pipeline import join_current_market, join_current_squad, live_data_predictions
+from features.predictions.market_value_model import evaluate_model, train_model
+from features.predictions.player_data_store import (
     check_if_data_reload_needed,
     create_player_data_table,
     load_player_data_from_db,
     save_player_data_to_db,
 )
-from features.predictions.modeling import evaluate_model, train_model
-from features.predictions.predictions import join_current_market, join_current_squad, live_data_predictions
-from features.predictions.preprocessing import preprocess_player_data, split_data
-from features.run_report import write_run_report
-from features.strategy_engine import apply_deterministic_buy_gates, apply_roster_need_context, apply_squad_retention_context, apply_team_availability_context, build_strategy_context
+from features.reporting import write_run_report
+from features.strategy import (
+    apply_deterministic_buy_gates,
+    apply_personal_bid_tuning,
+    apply_roster_need_context,
+    apply_squad_retention_context,
+    apply_team_availability_context,
+    build_strategy_context,
+    build_transfer_history_df,
+    enrich_market_with_bid_history,
+    extract_current_market_offers,
+    summarize_market_feed_debug,
+    summarize_offer_feed_debug,
+)
 from kickbase_api.league import get_league_id, get_league_market_raw
 from kickbase_api.manager import get_manager_transfer_feed, get_managers
-from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
+from kickbase_api.market_context import enrich_with_fixture_context, get_fixture_context
 from kickbase_api.user import get_budget, get_username, login
 
 

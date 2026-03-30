@@ -7,7 +7,7 @@ import os
 import pandas as pd
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 RUN_OUTPUTS_DIR = DATA_DIR / "run_outputs"

@@ -1,119 +1,357 @@
-<h1 align="center">KickAdvisor</h1>
+# KickAdvisor
 
-<div align="justify">
-  <p>
-    <strong>Kickbase Trading Advisor:</strong> A helper for the fantasy football game <a href="https://www.kickbase.com" target="_blank" rel="noopener">Kickbase</a>, designed to assist you in making the best trading decisions. The tool estimates other managers' budgets, predicts future player market values, and sends this information to you daily via email. More features and improvements are planned. This project uses the community <a href="https://kevinskyba.github.io/kickbase-api-doc/index.html" target="_blank" rel="noopener">Kickbase API</a> by <a href="https://github.com/kevinskyba" target="_blank" rel="noopener">kevinskyba</a>, big shoutout!
-  </p>
-</div>
+KickAdvisor ist ein täglicher Kickbase-Entscheidungshelfer für Markt, Kader und Trading. Das Projekt kombiniert drei Ebenen:
 
-<h2 align="center">Features</h2>
-<div align="justify">
-  <ol>
-    <li>
-      <strong>Manager Budget Calculation:</strong> Based on the activity log in each Kickbase league and the points-to-money reward for each matchday, the tool estimates each manager's current budget. Since there is no access to other players' login bonuses or achievements, your own are used for the estimation. While not perfect, this approach still provides a practical and reasonably accurate estimate.
-    </li>
-    <li>
-      <strong>Market Value Prediction:</strong> Using selected features such as points, minutes played, current market value, recent value changes, and more, a machine learning model predicts market value changes for the following day. This is done for all players currently on the market as well as those in your squad.
-    </li>
-    <li>
-      <strong>Historical Bid Pressure:</strong> Completed league transfers are evaluated to estimate how aggressively your league tends to overpay for similar players. The tool then distinguishes between bids that are worth matching and pure price wars that should be avoided.
-    </li>
-    <li>
-      <strong>Email Notifier:</strong> The results from the previous features are sent to you via email daily around 23:00 (+-45 minutes), always after the market value updates around 22:00. You can also run this manually at any time without waiting for the scheduled execution.
-    </li>
-    <li>
-      <strong>SQLite Persistence Layer:</strong> Core advisor data is stored in a local SQLite database. Besides player history, the app now also persists completed league transfers as well as full market, squad, and budget snapshots per run for later analysis.
-    </li>
-    <li>
-      <strong>Buy Learning Dataset Builder:</strong> The stored transfers and per-run snapshots can now be exported into a labeled training dataset for future decision models. This turns the remaining season into a clean learning phase instead of just a sequence of daily predictions.
-    </li>
-    <li>
-      <strong>Versioned Repo Reports:</strong> Each run writes a full markdown report into <code>reports/</code>. The latest three runs are kept there and the GitHub Action pushes updates back into the repository automatically.
-    </li>
-    <li>
-      <strong>More Features in the Future:</strong> ...
-    </li>
-  </ol>
-</div>
+1. Datenaufnahme aus Kickbase und optionalen externen Football-Feeds.
+2. Ein ML-Modell für kurzfristige Marktwertbewegungen.
+3. Eine deterministische Entscheidungslogik für Bieten, Halten, Verkaufen und Risikobegrenzung.
 
-<h2 align="center">How Can You Use It?</h2>
+Zusätzlich speichert das System seine Runs, Marktsnapshots und Transfers in SQLite, damit aus den echten Entscheidungen schrittweise ein belastbares Lernsystem für die nächste Saison entstehen kann.
 
-<div align="justify">
-  <ol>
-    <li><strong>Fork the Repository:</strong> Click the "Fork" button to create a copy of this repository in your account.</li>
-    <li>
-      <strong>Set Your Variables:</strong> In the file <code>config/settings.py</code>, set the following variables:
-      <ul>
-<li><code>competition_ids</code>: The league you are playing in (default: 1 = Bundesliga).</li>
-<li><code>league_name</code>: The exact name of your league (case-sensitive, include spaces, use UTF encoding for special symbols like emojis). If the name doesn't match any league in your account, the tool will default to your first league. If you belong to only one league, you can leave this empty.</li>
-       <li><code>start_budget</code>: Your league's starting budget (default: 50,000,000), used to calculate managers' budgets.</li>
-        <li><code>league_start_date</code>: Your league's starting date (default: 2025-08-08), used to calculate managers' budgets.</li>
-      </ul>
-    </li>
-    <li>
-      <strong>Add Your Secrets:</strong> In your fork, add the following secrets:
-      <ul>
-        <li><code>KICK_USER</code>: Your Kickbase Username (usually your email)</li>
-        <li><code>KICK_PASS</code>: Your Kickbase Password (handled securely)</li>
-        <li><code>FOOTBALL_DATA_API_KEY</code> (optional): Enables next opponent, home/away, and a simple fixture difficulty without any extra AI call</li>
-        <li><code>API_FOOTBALL_KEY</code> (optional): Enables richer external team context via API-Football, including upcoming fixtures and team-wide injury / questionable signals</li>
-        <li><code>EMAIL_USER</code>: Your Gmail Address (for sending and receiving emails)</li>
-        <li><code>EMAIL_PASS</code>: Password for your Gmail account (usually an app password)
-          <ul>
-            <li>The email notifier currently only works with Gmail. If you use another email provider, you can leave <code>EMAIL_USER</code> and <code>EMAIL_PASS</code> empty; the results will still be displayed in the Actions log. See the section "Test Your Setup" below for more details.</li>
-            <li>An app password is a special password generated by your email provider for third-party apps. You usually need it if your email uses two-factor authentication. Check your email account settings under "Security" or "App Passwords" to see if you need one. <a href="https://support.google.com/mail/answer/185833?hl=en" rel="noopener">Here</a> is how Google handles this.</li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li>
-      <strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow." It should take at most about 2 minutes. If everything works, the workflow will show a green check mark. You can then click on the workflow, select "run-daily-predictions," and click "Run daily_predictions.py." There, you should see the results and, if email is set up, you may also receive an email with the results. If the workflow shows a red cross, something went wrong. To check this, follow the same steps to view the results; you should find an error message indicating what went wrong. Most of the time, this is caused by wrong or missing variables and/or secrets. Each run now also writes a sanitized summary and console log as a workflow artifact named <code>kickadvisor-last-run</code>. In addition, the workflow updates the tracked <code>reports/</code> folder in the repository itself and keeps the latest three run reports there. Once everything works, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file.
-    </li>
-  </ol>
-</div>
+## Ziel des Projekts
 
-<div align="justify">
-  <strong>Other Use Case Options:</strong> The tool can be used without the email notifier. Just leave out the secrets, and the results will still be displayed in the GitHub Action execution log. As described in the fourth step "Test Your Setup," you can also always execute the workflow manually and are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed along with the packages listed in <code>requirements.txt</code>. Create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If <code>FOOTBALL_DATA_API_KEY</code> is set, the prompt and email also receive opponent and simple fixture context without consuming additional AI resources. If you have any further questions or encounter issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
-</div>
+Das Projekt soll nicht nur Marktwerte vorhersagen, sondern mittelfristig bessere Transferentscheidungen lernen.
 
-<div align="justify">
-  <strong>External Data Strategy:</strong> The project supports optional external football feeds. The existing <code>FOOTBALL_DATA_API_KEY</code> path provides a lightweight fixture view. If <code>API_FOOTBALL_KEY</code> is set, the advisor additionally enriches market and squad rows with API-Football team context such as next fixtures, team-wide missing/questionable counts, and a compact availability signal. The run stays fully functional without either key; missing external data only removes those optional context columns.
-</div>
+Stand heute:
 
-<div align="justify">
-  <strong>API-Football Caching:</strong> API-Football responses are cached locally under <code>data/external_cache/api_football/</code>. This keeps request usage low enough for practical daily runs and avoids wasting quota on unchanged league metadata.
-</div>
+- Das Modell prognostiziert tägliche Marktwertänderungen.
+- Die Strategie-Engine setzt harte Regeln für Budget, Kaderlogik und Gebotsdisziplin.
+- Reports, Snapshots und Transferhistorie schaffen die Datengrundlage für ein späteres Buy-Quality-Modell.
 
-<div align="justify">
-  <strong>Live Validation:</strong> Once <code>API_FOOTBALL_KEY</code> is available, you can validate the integration locally with <code>python scripts/validate_api_football.py --competition-id 1</code>. Add <code>--force-refresh</code> to bypass the local cache for a fresh API check.
-</div>
+Strategische Richtung:
 
-<div align="justify">
-  <strong>Buy Learning Workflow:</strong> To export the current supervised learning base for future buy-decision models, run <code>python scripts/export_buy_training_data.py</code>. By default, the script uses the latest stored advisor run to resolve your league and username and writes the dataset to <code>data/training/buy_training_dataset.csv</code>. The exported rows combine the original transfer, the latest pre-buy market snapshot, and the observed outcome (sold later or still held). This is the intended bridge between the current rule-based advisor and a stronger decision model for next season.
-</div>
+- Rest der aktuellen Saison: saubere Datensammlung und belastbare Entscheidungslogik.
+- Nächste Saison: Buy-Decision-Scoring und stärkere operative Trading-Entscheidungen.
 
-<div align="justify">
-  <strong>Training Dataset Semantics:</strong> The export is intentionally conservative. A row becomes training-eligible only when a sufficiently recent pre-buy snapshot exists and the later outcome is at least partially observable. Realized exits are preferred; still-open squad positions are included separately and only become eligible after a minimum hold period. The dataset therefore supports careful offline model development instead of noisy pseudo-labeling.
-</div>
+## Schnellstart
 
-<h2 align="center">Project Structure</h2>
-<div align="justify">
-  <ul>
-    <li><code>config/</code>: Central project settings and path management.</li>
-    <li><code>scripts/</code>: Executable workflow entrypoints. The actual daily run lives in <code>scripts/run_daily_predictions.py</code>.</li>
-    <li><code>features/</code>: Domain logic such as bidding strategy, reports, AI prompt preparation, offer tracking, and prediction helpers.</li>
-    <li><code>features/buy_learning.py</code>: Builds supervised learning datasets and compact evaluation summaries from advisor snapshots plus real transfer outcomes.</li>
-    <li><code>features/external/</code>: Optional external enrichment providers such as API-Football.</li>
-    <li><code>kickbase_api/</code>: Encapsulated Kickbase API access layer.</li>
-    <li><code>data/</code>: Generated runtime data such as the SQLite database, analysis history, and local run outputs.</li>
-    <li><code>reports/</code>: Versioned markdown reports that stay inside the repository.</li>
-    <li><code>daily_predictions.py</code>: Thin compatibility entrypoint that forwards to the real runner in <code>scripts/</code>.</li>
-  </ul>
-</div>
+### 1. Repository verwenden
 
-<h2 align="center">Future Work & Ideas</h2>
-<ul>
-  <li>Three-day and one-week market predictions</li>
-  <li>Overpay calculator, based on budget and more</li>
-  <li>Improve the notifier; using email is not optimal</li>
-</ul>
+- Repository forken oder lokal klonen.
+- Python-Umgebung anlegen.
+- Abhängigkeiten installieren:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Konfiguration setzen
+
+Die fachliche Konfiguration liegt in `src/config/settings.py`.
+
+Wichtige Werte:
+
+- `competition_ids`: Wettbewerb, standardmäßig Bundesliga.
+- `league_name`: Exakter Name deiner Liga.
+- `start_budget`: Startbudget deiner Liga.
+- `league_start_date`: Startdatum deiner Liga.
+
+### 3. Secrets bereitstellen
+
+Für lokale Runs in einer `.env` Datei oder in GitHub Actions als Secrets:
+
+- `KICK_USER`: Kickbase-Login.
+- `KICK_PASS`: Kickbase-Passwort.
+- `EMAIL_USER`: Absenderadresse für Mailversand.
+- `EMAIL_PASS`: App-Passwort für Gmail.
+- `FOOTBALL_DATA_API_KEY` optional: einfacher Fixture-Kontext.
+- `API_FOOTBALL_KEY` optional: erweiterter Team- und Availability-Kontext.
+
+### 4. Lokal ausführen
+
+```bash
+python src/daily_predictions.py
+```
+
+Der Thin Entry Point `src/daily_predictions.py` delegiert direkt an `src/scripts/run_daily_predictions.py`.
+
+### 5. In GitHub Actions ausführen
+
+- Workflow öffnen: `Run Daily Predictions`
+- Manuell starten oder den täglichen Scheduler nutzen.
+- Jeder Run schreibt Artefakte und aktualisiert die Report-Dateien im Repository.
+
+## Architekturüberblick
+
+Das Projekt ist bewusst in Schichten organisiert.
+
+### 1. Entry Points
+
+- `src/daily_predictions.py`: sehr dünner Startpunkt für lokale Aufrufe.
+- `src/scripts/run_daily_predictions.py`: orchestriert den kompletten Tageslauf.
+- `src/scripts/export_buy_training_data.py`: exportiert Trainingsdaten für spätere Entscheidungsmodelle.
+- `src/scripts/validate_api_football.py`: prüft die externe API-Football-Integration.
+
+### 2. Konfiguration
+
+- `src/config/settings.py`: zentrale Pfade, Laufzeitverzeichnisse und User-Einstellungen.
+- `src/project_settings.py`: kompakter Re-Export zentraler Settings für schnelle Nutzung.
+
+### 3. Kickbase API Layer
+
+Der Ordner `src/kickbase_api/` kapselt alle direkten API-Zugriffe.
+
+- `src/kickbase_api/user.py`: Login, Username, eigenes Budget.
+- `src/kickbase_api/league.py`: Ligaauflösung und Marktfeed.
+- `src/kickbase_api/manager.py`: Managerdaten und Transferfeed.
+- `src/kickbase_api/player.py`: Spielerbezogene Hilfen.
+- `src/kickbase_api/market_context.py`: Matchdays, Teams, Fixture-Kontext und gemeinsame Hilfsfunktionen.
+
+### 4. Feature Layer
+
+Der Ordner `src/features/` enthält die Geschäftslogik.
+
+#### Strategische Entscheidungslogik
+
+- `src/features/strategy/decision_engine.py`: harte Regeln für Kaderbedarf, Squad-Retention, Buy-Gates und Team-Availability.
+- `src/features/strategy/bid_history.py`: historische Gebots- und Transferdrucksignale.
+- `src/features/strategy/offer_tracking.py`: laufende Gebote, Outbid-Erkennung und Angebotsstatus.
+
+#### Persistenz und Historisierung
+
+- `src/features/persistence/advisor_repository.py`: SQLite-Persistenz für Snapshots, Transfers und Offer-Tracking.
+- `src/features/analysis/history.py`: Historie, Prompt-Tabellen und Run-Zusammenfassungen.
+
+#### Kommunikation und Reporting
+
+- `src/features/ai/advice_generator.py`: baut den LLM-Prompt und erzeugt die textliche Handlungsempfehlung.
+- `src/features/reporting/run_reporting.py`: Markdown- und JSON-Reporting.
+- `src/features/communication/email_notifier.py`: E-Mail-Versand.
+
+#### Budget- und Lernlogik
+
+- `src/features/budgeting/manager_budgeting.py`: Budgetschätzung der Manager.
+- `src/features/learning/buy_learning.py`: Trainingsdatensatz und Kaufbewertung aus realen Transfers und Snapshots.
+
+#### Externe Daten
+
+- `src/features/external/api_football.py`: optionale Team-Availability- und Fixture-Anreicherung.
+
+### 5. Prediction Layer
+
+Der Unterordner `src/features/predictions/` ist für den ML-Teil zuständig.
+
+- `src/features/predictions/player_data_store.py`: bevorzugter Importpfad für das Laden und Speichern historischer Spieldaten.
+- `src/features/predictions/feature_preprocessing.py`: bevorzugter Importpfad für Feature-Aufbereitung und Datensplitting.
+- `src/features/predictions/market_value_model.py`: bevorzugter Importpfad für Modelltraining und Evaluierung.
+- `src/features/predictions/live_prediction_pipeline.py`: bevorzugter Importpfad für Live-Prognosen, Markt-Join und Squad-Join.
+
+Die Dateien in `features/predictions/` tragen jetzt direkt die sprechenden Namen der jeweiligen Verantwortung.
+
+## Empfohlene Importpfade
+
+Wenn du neue Logik hinzufügst, importiere direkt aus den neuen Subpaketen:
+
+- `features.analysis`
+- `features.persistence`
+- `features.budgeting`
+- `features.communication`
+- `features.reporting`
+- `features.strategy`
+- `features.learning`
+- `features.ai`
+- `features.predictions.player_data_store`
+- `features.predictions.feature_preprocessing`
+- `features.predictions.market_value_model`
+- `features.predictions.live_prediction_pipeline`
+- `kickbase_api.market_context`
+
+## End-to-End Ablauf des täglichen Runs
+
+Der Tageslauf in `src/scripts/run_daily_predictions.py` folgt grob diesem Ablauf:
+
+1. Einstellungen laden und Laufzeitverzeichnisse anlegen.
+2. Mit Kickbase einloggen.
+3. Liga und Basisdaten auflösen.
+4. Historische Spieldaten laden oder aktualisieren.
+5. Features vorbereiten und Marktwertmodell trainieren.
+6. Prognosen auf aktuelle Markt- und Kaderspieler anwenden.
+7. Transferhistorie, Gebotsdruck und Offer Tracking einbeziehen.
+8. Optionalen Fixture- und API-Football-Kontext anreichern.
+9. Deterministische Strategie anwenden:
+   - Squad-Retention
+   - Roster Needs
+   - Buy Gates
+10. Purchase Review aus gespeicherten Käufen und Snapshots bilden.
+11. AI-Text generieren.
+12. E-Mail versenden.
+13. JSON- und Markdown-Report schreiben.
+14. Run-Snapshot und Verlauf speichern.
+
+## Daten und Persistenz
+
+### SQLite
+
+Die zentrale Datenbank liegt unter `data/player_data_total.db`.
+
+Wichtige Inhalte:
+
+- Historische Player-Daten für das Marktwertmodell.
+- Vollständige Snapshots pro Run.
+- League-Transferhistorie.
+- Offer-Tracking-Daten.
+- Advisor-Run-Metadaten.
+
+### Reports
+
+Der Ordner `reports/` enthält versionierte Run-Ergebnisse:
+
+- `last_run_summary.json`: maschinenlesbare Zusammenfassung.
+- `last_run_summary.md`: gut lesbare Zusammenfassung.
+- `latest_run_report.md`: vollständiger letzter Report.
+- `run_report_history_01.md` bis `run_report_history_03.md`: letzte historische Reports.
+
+### Trainingsdaten
+
+Trainingsdaten für die künftige Buy-Decision-Lernlogik liegen standardmäßig unter:
+
+- `data/training/buy_training_dataset.csv`
+
+Export:
+
+```bash
+python src/scripts/export_buy_training_data.py
+```
+
+## Buy Learning und Kaufbewertung
+
+Dieses Projekt trennt bewusst zwischen Marktwertprognose und Kaufentscheidung.
+
+Heute vorhanden:
+
+- Marktwertmodell für kurzfristige MV-Änderungen.
+- Purchase Review für jüngste eigene Käufe.
+- Datengrundlage aus Transfers und historischen Marktsnapshots.
+
+Noch nicht final produktiv:
+
+- ein separates Buy-Quality-Modell, das Käufe direkt scorend bewertet.
+
+Die Datei `src/features/learning/buy_learning.py` stellt dafür bereits die Grundlage bereit:
+
+- Build von Trainingsdaten aus echten Käufen.
+- Labeling in `good`, `neutral`, `poor`.
+- Learning Notes für Reports und Prompt-Disziplin.
+
+## Externe Datenquellen
+
+### Football-Data.org
+
+Wenn `FOOTBALL_DATA_API_KEY` gesetzt ist, bekommt der Advisor einfachen Fixture-Kontext.
+
+### API-Football
+
+Wenn `API_FOOTBALL_KEY` gesetzt ist, ergänzt das System:
+
+- nächste Gegner
+- Team-Verfügbarkeitskontext
+- Missing- und Questionable-Counts
+- vorsichtige Markt- und Verkaufsanpassungen
+
+Wichtig:
+
+- Der Run bleibt auch ohne externe APIs funktionsfähig.
+- API-Football wird nur als Zusatzkontext genutzt, nicht als harte Pflichtabhängigkeit.
+- Responses werden lokal unter `data/external_cache/api_football/` gecacht.
+
+Validierung:
+
+```bash
+python src/scripts/validate_api_football.py --competition-id 1
+```
+
+Mit `--force-refresh` kann der Cache bewusst umgangen werden.
+
+## Bekannte fachliche Grenzen
+
+- Budgetschätzung fremder Manager ist eine Näherung, weil nicht alle internen Kickbase-Effekte sichtbar sind.
+- Externe Football-Feeds können unvollständig, historisch oder vorübergehend gesperrt sein.
+- Das Projekt lernt aktuell noch nicht vollautomatisch aus allen Entscheidungen, sondern baut die saubere Datengrundlage dafür erst auf.
+
+## Entwicklungsrichtlinien für dieses Repository
+
+Wenn du neue Logik einbaust, halte dich an diese Regeln:
+
+1. Neue Funktionalität soll klare, sprechende Modulnamen verwenden.
+2. Orchestrierung bleibt in `scripts/run_daily_predictions.py`, Fachlogik gehört in `features/`.
+3. Kickbase-API-Aufrufe bleiben in `kickbase_api/`.
+4. Persistenzlogik bleibt in Repository-Modulen, nicht direkt im Runner.
+5. Experimentelle Features dürfen den täglichen Produktivlauf nicht hart abbrechen, wenn ein sicherer Fallback möglich ist.
+6. Reports sollen sowohl für Menschen als auch für spätere Offline-Analyse brauchbar bleiben.
+
+## Projektstruktur
+
+```text
+.
+|-- src/
+|   |-- config/
+|   |   |-- settings.py
+|   |-- daily_predictions.py
+|   |-- features/
+|   |   |-- ai/
+|   |   |   |-- advice_generator.py
+|   |   |-- analysis/
+|   |   |   |-- history.py
+|   |   |-- budgeting/
+|   |   |   |-- manager_budgeting.py
+|   |   |-- communication/
+|   |   |   |-- email_notifier.py
+|   |   |-- external/
+|   |   |   |-- api_football.py
+|   |   |-- learning/
+|   |   |   |-- buy_learning.py
+|   |   |-- persistence/
+|   |   |   |-- advisor_repository.py
+|   |   |-- predictions/
+|   |   |   |-- feature_preprocessing.py
+|   |   |   |-- live_prediction_pipeline.py
+|   |   |   |-- market_value_model.py
+|   |   |   |-- player_data_store.py
+|   |   |-- reporting/
+|   |   |   |-- run_reporting.py
+|   |   |-- strategy/
+|   |   |   |-- bid_history.py
+|   |   |   |-- decision_engine.py
+|   |   |   |-- offer_tracking.py
+|   |-- kickbase_api/
+|   |   |-- league.py
+|   |   |-- manager.py
+|   |   |-- market_context.py
+|   |   |-- player.py
+|   |   |-- user.py
+|   |-- project_settings.py
+|   |-- scripts/
+|   |   |-- export_buy_training_data.py
+|   |   |-- run_daily_predictions.py
+|   |   |-- validate_api_football.py
+|-- data/
+|   |-- player_data_total.db
+|   |-- training/
+|   |-- external_cache/
+|-- reports/
+|-- README.md
+```
+
+## Roadmap
+
+Kurzfristig:
+
+- bestehende Entscheidungslogik weiter stabilisieren
+- Kaufdisziplin und Buy-Gates weiter schärfen
+- Reports und Trainingsdatenbasis verbessern
+
+Mittelfristig:
+
+- echtes Buy-Quality-Modell trainieren
+- dieses Modell in die Strategie-Engine integrieren
+- Portfolio-Optimierung für Kader und Liquidität ergänzen
+
+## Credits
+
+Das Projekt nutzt die Community-Dokumentation zur Kickbase-API von kevinskyba:
+
+- https://kevinskyba.github.io/kickbase-api-doc/index.html
+
+## Lizenz / Nutzung
+
+Wenn du das Projekt in deinem eigenen Fork nutzt, passe Konfiguration, Secrets und Scheduler an deine Liga und deine Betriebsweise an.

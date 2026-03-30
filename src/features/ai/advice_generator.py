@@ -9,7 +9,7 @@ import pandas as pd
 from google import genai
 from google.genai import types
 
-from features.analysis_support import format_currency, format_history_for_prompt, format_prompt_table
+from features.analysis import format_currency, format_history_for_prompt, format_prompt_table
 
 
 RETRYABLE_AI_ERROR_MARKERS = [

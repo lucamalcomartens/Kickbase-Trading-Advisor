@@ -8,7 +8,7 @@ from kickbase_api.manager import (
     get_manager_performance,
     get_manager_info,
 )
-from kickbase_api.others import get_achievement_reward
+from kickbase_api.market_context import get_achievement_reward
 import pandas as pd
 
 def calc_manager_budgets(token, league_id, league_start_date, start_budget):

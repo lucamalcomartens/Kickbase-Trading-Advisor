@@ -5,12 +5,12 @@ import sqlite3
 from pathlib import Path
 import sys
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+SRC_ROOT = Path(__file__).resolve().parent.parent
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
 from config.settings import SystemSettings, ensure_runtime_directories
-from features.buy_learning import build_buy_training_dataset, summarize_buy_training_dataset
+from features.learning import build_buy_training_dataset, summarize_buy_training_dataset
 
 
 def main() -> None:

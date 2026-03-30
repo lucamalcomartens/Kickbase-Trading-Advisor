@@ -44,7 +44,7 @@ jobs:
           mkdir -p run_outputs
           mkdir -p reports
           set -o pipefail
-          python daily_predictions.py 2>&1 | tee run_outputs/console.log
+          python src/daily_predictions.py 2>&1 | tee run_outputs/console.log
 
       - name: Commit report updates
         if: always()

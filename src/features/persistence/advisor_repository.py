@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
-from features.buy_learning import build_purchase_evaluation_summary
+from features.learning.buy_learning import build_purchase_evaluation_summary
 
 
 def create_advisor_tables(db_path):

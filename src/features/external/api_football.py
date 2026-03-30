@@ -13,7 +13,7 @@ import pandas as pd
 import requests
 
 from config.settings import API_FOOTBALL_CACHE_DIR
-from kickbase_api.others import normalize_team_name, rank_to_fixture_difficulty
+from kickbase_api.market_context import normalize_team_name, rank_to_fixture_difficulty
 
 
 API_FOOTBALL_BASE_URL = "https://v3.football.api-sports.io"
