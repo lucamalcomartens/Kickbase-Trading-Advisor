@@ -350,12 +350,16 @@ def apply_deterministic_buy_gates(market_df, squad_df, manager_budgets_df, own_u
     gate_reason.loc[no_budget_anyway_mask] = "above_total_budget_limit"
 
     sell_first_mask = actionable_buy_mask & gate_status.eq("clear") & ((minimum_entry_price > available_cash) | squad_full)
-    gate_status.loc[sell_first_mask] = "sell_first"
-    gate_reason.loc[sell_first_mask] = np.where(
-        squad_full & (minimum_entry_price > available_cash),
-        "sell_first_cash_and_slot_required",
-        np.where(squad_full, "sell_first_squad_full", "sell_first_insufficient_cash"),
+    sell_first_reason = pd.Series(
+        np.where(
+            squad_full & (minimum_entry_price > available_cash),
+            "sell_first_cash_and_slot_required",
+            np.where(squad_full, "sell_first_squad_full", "sell_first_insufficient_cash"),
+        ),
+        index=working_market_df.index,
     )
+    gate_status.loc[sell_first_mask] = "sell_first"
+    gate_reason.loc[sell_first_mask] = sell_first_reason.loc[sell_first_mask]
 
     gated_buy_action = current_buy_action.copy()
     gated_buy_action.loc[gate_status.isin(["blocked", "managed_existing_offer"])] = "pass"
