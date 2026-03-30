@@ -25,6 +25,9 @@
       <strong>SQLite Persistence Layer:</strong> Core advisor data is stored in a local SQLite database. Besides player history, the app now also persists completed league transfers as well as full market, squad, and budget snapshots per run for later analysis.
     </li>
     <li>
+      <strong>Buy Learning Dataset Builder:</strong> The stored transfers and per-run snapshots can now be exported into a labeled training dataset for future decision models. This turns the remaining season into a clean learning phase instead of just a sequence of daily predictions.
+    </li>
+    <li>
       <strong>Versioned Repo Reports:</strong> Each run writes a full markdown report into <code>reports/</code>. The latest three runs are kept there and the GitHub Action pushes updates back into the repository automatically.
     </li>
     <li>
@@ -85,12 +88,21 @@
   <strong>Live Validation:</strong> Once <code>API_FOOTBALL_KEY</code> is available, you can validate the integration locally with <code>python scripts/validate_api_football.py --competition-id 1</code>. Add <code>--force-refresh</code> to bypass the local cache for a fresh API check.
 </div>
 
+<div align="justify">
+  <strong>Buy Learning Workflow:</strong> To export the current supervised learning base for future buy-decision models, run <code>python scripts/export_buy_training_data.py</code>. By default, the script uses the latest stored advisor run to resolve your league and username and writes the dataset to <code>data/training/buy_training_dataset.csv</code>. The exported rows combine the original transfer, the latest pre-buy market snapshot, and the observed outcome (sold later or still held). This is the intended bridge between the current rule-based advisor and a stronger decision model for next season.
+</div>
+
+<div align="justify">
+  <strong>Training Dataset Semantics:</strong> The export is intentionally conservative. A row becomes training-eligible only when a sufficiently recent pre-buy snapshot exists and the later outcome is at least partially observable. Realized exits are preferred; still-open squad positions are included separately and only become eligible after a minimum hold period. The dataset therefore supports careful offline model development instead of noisy pseudo-labeling.
+</div>
+
 <h2 align="center">Project Structure</h2>
 <div align="justify">
   <ul>
     <li><code>config/</code>: Central project settings and path management.</li>
     <li><code>scripts/</code>: Executable workflow entrypoints. The actual daily run lives in <code>scripts/run_daily_predictions.py</code>.</li>
     <li><code>features/</code>: Domain logic such as bidding strategy, reports, AI prompt preparation, offer tracking, and prediction helpers.</li>
+    <li><code>features/buy_learning.py</code>: Builds supervised learning datasets and compact evaluation summaries from advisor snapshots plus real transfer outcomes.</li>
     <li><code>features/external/</code>: Optional external enrichment providers such as API-Football.</li>
     <li><code>kickbase_api/</code>: Encapsulated Kickbase API access layer.</li>
     <li><code>data/</code>: Generated runtime data such as the SQLite database, analysis history, and local run outputs.</li>
