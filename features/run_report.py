@@ -387,6 +387,8 @@ def _render_markdown(payload):
 - Primaerer Positionsbedarf: {roster_needs.get('primary_need_position')}
 - Dringlichkeit: {roster_needs.get('primary_need_level')}
 - Positionen mit Bedarf: {roster_needs.get('urgent_need_count')}
+- Echte strukturelle Luecken: {roster_needs.get('structural_gap_count')}
+- Primaerer Bedarf ist echte Luecke: {roster_needs.get('primary_need_is_structural_gap')}
 
 {roster_need_lines}
 

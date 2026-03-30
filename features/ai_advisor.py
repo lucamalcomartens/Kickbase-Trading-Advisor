@@ -66,6 +66,8 @@ def generate_ai_advice(
     primary_need_position = roster_needs.get("primary_need_position", "none")
     primary_need_level = roster_needs.get("primary_need_level", "none")
     urgent_need_count = int(roster_needs.get("urgent_need_count", 0) or 0)
+    structural_gap_count = int(roster_needs.get("structural_gap_count", 0) or 0)
+    primary_need_is_structural_gap = bool(roster_needs.get("primary_need_is_structural_gap", False))
     position_need_rows = roster_needs.get("position_needs", [])
     api_football_available = bool(api_football_summary.get("available"))
     api_football_league_name = api_football_summary.get("league_name", "n/a")
@@ -423,6 +425,8 @@ SYSTEMISCH GESCHUETZTE KADERSPIELER WEGEN DUENNEM MARKT: {protected_player_count
 PRIMAERER KADERBEDARF NACH POSITION: {primary_need_position}
 DRINGLICHKEIT DIESES POSITIONSBEDARFS: {primary_need_level}
 ANZAHL POSITIONEN MIT AKUTEM ODER ERHOEHTEM BEDARF: {urgent_need_count}
+ANZAHL ECHTER STRUKTURELLER KADERLUECKEN: {structural_gap_count}
+PRIMAERER KADERBEDARF IST EINE ECHTE LUECKE: {'ja' if primary_need_is_structural_gap else 'nein'}
 
 MEHRFACHBELEGUNG PRO VEREIN IM KADER:
 {squad_team_counts_text}
@@ -470,7 +474,7 @@ HINWEIS ZU DEN SCORES:
 - personal_bid_feedback zeigt, ob competitive_bid_max wegen deiner juengsten Overbid-Historie bereits leicht angehoben wurde.
 - active_offer_decision und active_offer_recommended_new_bid sind vorgelagerte Systementscheidungen fuer bereits laufende Gebote.
 - squad_strategy_note zeigt, ob ein Kaderspieler wegen Marktknappheit bewusst eher gehalten werden sollte.
-- roster_need_level und roster_need_note zeigen, ob ein Marktspieler wegen einer echten Kaderluecke strukturell wichtiger ist als sein reiner Trading-Wert.
+- roster_need_level und roster_need_note zeigen, ob ein Marktspieler wegen einer echten Kaderluecke oder wegen duennem Positions-Backup strukturell wichtiger ist als sein reiner Trading-Wert.
 - team_missing_count, team_questionable_count, team_availability_level und team_availability_note kommen aus API-Football und zeigen teamweite Ausfall- bzw. Verfuegbarkeitsrisiken.
 - team_availability_priority_adjustment und team_availability_sell_adjustment zeigen, wie diese Teamrisiken bereits deterministisch in Kauf- bzw. Sell-Scores eingepreist wurden.
 - recent_bid_competition beschreibt den zuletzt beobachteten Konkurrenzdruck in aehnlichen Deals als low, medium oder high.
@@ -501,7 +505,8 @@ Erstelle eine konkrete Abendstrategie fuer mein Kickbase-Team.
 - Wenn ein Spieler bereits ein aktives Gebot hat, gib keine redundante Neuempfehlung ohne explizite Aussage "Gebot halten", "leicht erhoehen" oder "abbrechen".
 - Wenn MARKTKNAPPHEIT FUER GUTE ERSATZ-/UPGRADE-SPIELER = high oder medium, priorisiere das Halten guter, schwer ersetzbarer Kaderspieler. Verkaufe solche Spieler nicht nur, weil sie kurzfristig nicht den maximalen Trading-Gewinn bringen.
 - Wenn squad_strategy_note = keep_due_to_thin_market oder lean_keep_due_to_market_scarcity, dann ist Halten der Default. Eine Verkaufsempfehlung braucht dann eine klare, konkrete Begruendung.
-- Wenn PRIMAERER KADERBEDARF NACH POSITION nicht "none" ist, behandle diese Luecke als echte Management-Prioritaet. Das gilt besonders fuer GK/Torwart: selbst in der Laenderspielpause darf ein fehlender Torwart nicht nur wegen besserer Trading-Chancen auf spaeter verschoben werden.
+- Wenn PRIMAERER KADERBEDARF IST EINE ECHTE LUECKE = ja, behandle diese Luecke als echte Management-Prioritaet. Das gilt besonders fuer GK/Torwart: ein fehlender Torwart darf nicht nur wegen besserer Trading-Chancen auf spaeter verschoben werden.
+- Wenn PRIMAERER KADERBEDARF IST EINE ECHTE LUECKE = nein, formuliere das NICHT als fehlenden Spieler oder als Kaderluecke. Beschreibe es stattdessen als Absicherung, Backup-Bedarf oder qualitative Kaderverbesserung.
 - Wenn roster_need_level = high oder medium, darf ein Spieler dieser Position gegenueber rein besseren Trading-Kandidaten vorgezogen werden, sofern das Budget realistisch bleibt.
 - Wenn PERSOENLICHER OVERBID-DRUCK = medium oder high, pruefe aktiv, ob competitive_bid_max bei Prioritaet-A-Kandidaten leicht angehoben werden sollte, statt immer nur dieselbe disziplinierte Grenze zu wiederholen.
 - Wenn historical bid pressure hoch ist, entscheide explizit zwischen "mitgehen" und "Preiskrieg vermeiden". Ein hohes estimated_market_winning_bid ist kein Kaufzwang.

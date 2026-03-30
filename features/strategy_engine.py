@@ -650,6 +650,7 @@ def _build_position_needs(squad_counts, market_depth):
                 "current_count": current_count,
                 "minimum_count": minimum_count,
                 "missing_count": missing_count,
+                "is_structural_gap": missing_count > 0,
                 "market_option_count": market_option_count,
                 "need_level": need_level,
                 "priority_boost": priority_boost,
@@ -670,10 +671,13 @@ def _build_position_needs(squad_counts, market_depth):
 
 
 def _build_roster_need_summary(position_needs, primary_need_position, primary_need_level, urgent_need_count):
+    primary_need = position_needs[0] if position_needs else {}
     return {
         "primary_need_position": primary_need_position,
         "primary_need_level": primary_need_level,
         "urgent_need_count": int(urgent_need_count),
+        "structural_gap_count": int(sum(1 for item in position_needs if item.get("is_structural_gap"))),
+        "primary_need_is_structural_gap": bool(primary_need.get("is_structural_gap", False)),
         "position_needs": position_needs,
     }
 
@@ -682,7 +686,7 @@ def _build_position_need_note(position_label, current_count, market_option_count
     if position_label == "GK" and current_count == 0:
         return "Torwart fehlt im Kader, verfuegbare Optionen frueh priorisieren."
     if position_label == "GK" and current_count == 1:
-        return "Nur ein Torwart im Kader, Ersatzoptionen nicht zu spaet angehen."
+        return "Torwartposition ist besetzt, aber aktuell ohne Ersatzoption im Kader. Backup nicht zu spaet angehen."
     if need_level == "high":
         return f"Position {position_label} ist duenn besetzt und der Markt bietet wenig Alternativen."
     return f"Position {position_label} sollte zeitnah verstaerkt werden, bevor der Markt noch duenner wird."
