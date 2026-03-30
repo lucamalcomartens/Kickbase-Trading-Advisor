@@ -10,6 +10,7 @@ from IPython.display import display
 from config.settings import SystemSettings, configure_display, ensure_runtime_directories, load_user_settings
 from features.ai_advisor import generate_ai_advice
 from features.advisor_db import (
+    build_purchase_evaluation_summary,
     create_advisor_tables,
     load_offer_tracking_summary,
     reconcile_tracked_market_offers,
@@ -38,7 +39,7 @@ from features.predictions.modeling import evaluate_model, train_model
 from features.predictions.predictions import join_current_market, join_current_squad, live_data_predictions
 from features.predictions.preprocessing import preprocess_player_data, split_data
 from features.run_report import write_run_report
-from features.strategy_engine import apply_roster_need_context, apply_squad_retention_context, apply_team_availability_context, build_strategy_context
+from features.strategy_engine import apply_deterministic_buy_gates, apply_roster_need_context, apply_squad_retention_context, apply_team_availability_context, build_strategy_context
 from kickbase_api.league import get_league_id, get_league_market_raw
 from kickbase_api.manager import get_manager_transfer_feed, get_managers
 from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
@@ -195,6 +196,21 @@ def main() -> None:
     strategy_context["squad_management"] = squad_management_summary
     market_all_df, roster_need_summary = apply_roster_need_context(squad_recommendations_df, market_all_df)
     strategy_context["roster_needs"] = roster_need_summary
+    market_all_df, buy_gate_summary = apply_deterministic_buy_gates(
+        market_all_df,
+        squad_recommendations_df,
+        manager_budgets_df,
+        own_username,
+        strategy_context=strategy_context,
+    )
+    strategy_context["buy_gates"] = buy_gate_summary
+    strategy_context["purchase_review"] = build_purchase_evaluation_summary(
+        db_path=system_settings.database_path,
+        league_id=league_id,
+        own_username=own_username,
+        transfer_history_df=transfer_history_df,
+        squad_df=squad_recommendations_df,
+    )
     market_email_df = market_all_df[
         [
             "last_name",
@@ -218,6 +234,9 @@ def main() -> None:
             "team_availability_priority_adjustment",
             "active_offer_decision",
             "active_offer_recommended_new_bid",
+            "buy_gate_status",
+            "buy_gate_reason",
+            "effective_bid_cap",
             "hours_to_exp",
             "expiring_today",
             "next_opponent",

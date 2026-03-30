@@ -47,7 +47,7 @@ def write_run_report(
         "ai_status": ai_status,
         "mail_status": mail_status,
         "offer_tracking_summary": offer_tracking_summary or {"counts": {}, "recent_outbid": []},
-        "strategy_context": strategy_context or {"management_summary": {}, "squad_management": {}, "roster_needs": {}, "active_offer_actions": [], "validation_notes": []},
+        "strategy_context": strategy_context or {"management_summary": {}, "squad_management": {}, "roster_needs": {}, "buy_gates": {}, "purchase_review": {}, "active_offer_actions": [], "validation_notes": []},
         "top_market_candidates": _summarize_market(market_df),
         "top_sell_candidates": _summarize_squad(squad_df),
         "budget_table": _frame_to_text(manager_budgets_df, limit=10),
@@ -70,6 +70,9 @@ def write_run_report(
             "team_availability_priority_adjustment",
             "active_offer_decision",
             "active_offer_recommended_new_bid",
+            "buy_gate_status",
+            "buy_gate_reason",
+            "effective_bid_cap",
             "hours_to_exp",
         ], limit=15),
         "squad_table": _frame_to_text(squad_df, columns=[
@@ -277,6 +280,8 @@ def _render_markdown(payload):
     management_summary = strategy_context.get("management_summary", {})
     squad_management = strategy_context.get("squad_management", {})
     roster_needs = strategy_context.get("roster_needs", {})
+    buy_gates = strategy_context.get("buy_gates", {})
+    purchase_review = strategy_context.get("purchase_review", {})
     api_football_summary = strategy_context.get("external_data", {}).get("api_football", {})
     availability_adjustment_summary = api_football_summary.get("availability_adjustment_summary", {})
     validation_lines = "\n".join(
@@ -294,6 +299,10 @@ def _render_markdown(payload):
         f"- {item.get('team_name')} | Missing: {item.get('team_missing_count')} | Questionable: {item.get('team_questionable_count')} | Level: {item.get('team_availability_level')} | Score: {item.get('team_availability_score')} | Gegner: {item.get('next_opponent')} | Fixture: {item.get('fixture_difficulty')}"
         for item in api_football_summary.get("top_affected_teams", [])
     ) or "- Keine auffaelligen Team-Ausfaelle im API-Football Kontext"
+    purchase_review_lines = "\n".join(
+        f"- {item.get('player_name')} | Urteil: {item.get('verdict')} | Delta: {item.get('profit_delta')} | Status: {item.get('status_label')} | Signal: {item.get('signal_alignment')} | Hinweis: {item.get('signal_note')}"
+        for item in purchase_review.get("recent_evaluations", [])
+    ) or "- Keine eigenen Kaeufe im Auswertungsfenster"
 
     offer_counts = payload["offer_tracking_summary"].get("counts", {})
     budget_row = payload.get("own_budget_row", {})
@@ -391,6 +400,30 @@ def _render_markdown(payload):
 - Primaerer Bedarf ist echte Luecke: {roster_needs.get('primary_need_is_structural_gap')}
 
 {roster_need_lines}
+
+## Buy Gate Summary
+
+- Geblockte Kaufkandidaten: {buy_gates.get('blocked_count')}
+- Bereits ueber aktive Gebote gemanagte Kandidaten: {buy_gates.get('managed_existing_offer_count')}
+- Club-Limit Blocks: {buy_gates.get('club_limit_blocks')}
+- Budget-Hard-Blocks: {buy_gates.get('budget_blocks')}
+- Erst verkaufen / Cash freimachen: {buy_gates.get('sell_first_flags')}
+- Freies Cash fuer Sofortkaeufe: {buy_gates.get('available_cash')}
+- Absolute Budgetobergrenze: {buy_gates.get('available_budget')}
+- Kadergroesse: {buy_gates.get('squad_size')} / {buy_gates.get('squad_limit')}
+
+## Purchase Review Summary
+
+- Eigene Kaeufe im Fenster: {purchase_review.get('recent_purchase_count')}
+- Gut: {purchase_review.get('good_count')}
+- Neutral: {purchase_review.get('neutral_count')}
+- Schwach: {purchase_review.get('poor_count')}
+- Gegen Modellsignal: {purchase_review.get('model_misaligned_count')}
+- Realisiert: {purchase_review.get('realized_count')}
+- Noch offen: {purchase_review.get('open_count')}
+- Learning: {purchase_review.get('learning_note')}
+
+{purchase_review_lines}
 
 ## API-Football Summary
 

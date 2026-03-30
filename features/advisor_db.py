@@ -518,6 +518,77 @@ def save_run_snapshot(
     return run_id
 
 
+def build_purchase_evaluation_summary(db_path, league_id, own_username, transfer_history_df, squad_df, lookback_days=21):
+    """Evaluate recent own purchases against later outcomes and the pre-buy model snapshot."""
+
+    if transfer_history_df is None or transfer_history_df.empty:
+        return _empty_purchase_evaluation_summary()
+
+    working_history_df = transfer_history_df.copy()
+    working_history_df["timestamp"] = pd.to_datetime(working_history_df["timestamp"], errors="coerce", utc=True)
+    working_history_df["transfer_price"] = pd.to_numeric(working_history_df["transfer_price"], errors="coerce")
+    working_history_df["player_id"] = pd.to_numeric(working_history_df["player_id"], errors="coerce")
+    working_history_df = working_history_df.dropna(subset=["timestamp", "transfer_price", "player_id"])
+    if working_history_df.empty:
+        return _empty_purchase_evaluation_summary()
+
+    cutoff = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=lookback_days)
+    own_buys_df = working_history_df[
+        working_history_df["buyer"].fillna("").astype(str).eq(str(own_username))
+        & (working_history_df["timestamp"] >= cutoff)
+    ].copy()
+    if own_buys_df.empty:
+        return _empty_purchase_evaluation_summary()
+
+    own_buys_df["player_id"] = own_buys_df["player_id"].astype(int)
+    market_snapshot_index = _load_market_snapshot_index(db_path, league_id, cutoff)
+    current_squad_lookup = _build_current_squad_lookup(squad_df)
+
+    evaluations = []
+    for _, purchase_row in own_buys_df.sort_values("timestamp", ascending=False).iterrows():
+        player_id = int(purchase_row["player_id"])
+        player_history_df = working_history_df[working_history_df["player_id"] == player_id].sort_values("timestamp")
+        later_sales_df = player_history_df[
+            player_history_df["seller"].fillna("").astype(str).eq(str(own_username))
+            & (player_history_df["timestamp"] > purchase_row["timestamp"])
+        ]
+        first_sale_row = later_sales_df.iloc[0].to_dict() if not later_sales_df.empty else None
+        current_squad_row = current_squad_lookup.get(player_id)
+        snapshot_match = _find_latest_snapshot_before_purchase(
+            market_snapshot_index,
+            player_id,
+            purchase_row.get("player_name"),
+            purchase_row["timestamp"],
+        )
+        evaluations.append(
+            _evaluate_purchase_row(
+                purchase_row.to_dict(),
+                first_sale_row,
+                current_squad_row,
+                snapshot_match,
+            )
+        )
+
+    good_count = sum(1 for item in evaluations if item.get("verdict") == "good")
+    neutral_count = sum(1 for item in evaluations if item.get("verdict") == "neutral")
+    poor_count = sum(1 for item in evaluations if item.get("verdict") == "poor")
+    model_misaligned_count = sum(1 for item in evaluations if item.get("signal_alignment") == "misaligned")
+    realized_count = sum(1 for item in evaluations if item.get("outcome_type") == "realized")
+    open_count = sum(1 for item in evaluations if item.get("outcome_type") == "open")
+
+    return {
+        "recent_purchase_count": len(evaluations),
+        "good_count": good_count,
+        "neutral_count": neutral_count,
+        "poor_count": poor_count,
+        "model_misaligned_count": model_misaligned_count,
+        "realized_count": realized_count,
+        "open_count": open_count,
+        "learning_note": _build_purchase_learning_note(good_count, poor_count, model_misaligned_count),
+        "recent_evaluations": evaluations[:8],
+    }
+
+
 def _dataframe_to_records(dataframe):
     if dataframe is None or dataframe.empty:
         return []
@@ -529,6 +600,201 @@ def _dataframe_to_records(dataframe):
 
     safe_df = safe_df.where(pd.notna(safe_df), None)
     return safe_df.to_dict(orient="records")
+
+
+def _empty_purchase_evaluation_summary():
+    return {
+        "recent_purchase_count": 0,
+        "good_count": 0,
+        "neutral_count": 0,
+        "poor_count": 0,
+        "model_misaligned_count": 0,
+        "realized_count": 0,
+        "open_count": 0,
+        "learning_note": "Keine eigenen Kaeufe im Auswertungsfenster gefunden.",
+        "recent_evaluations": [],
+    }
+
+
+def _load_market_snapshot_index(db_path, league_id, cutoff):
+    with sqlite3.connect(db_path) as conn:
+        snapshot_rows = pd.read_sql_query(
+            """
+            SELECT r.created_at, s.payload_json
+            FROM advisor_snapshots s
+            INNER JOIN advisor_runs r ON r.run_id = s.run_id
+            WHERE r.league_id = ?
+                AND s.snapshot_name = 'market'
+                AND r.created_at >= ?
+            ORDER BY r.created_at DESC
+            """,
+            conn,
+            params=[league_id, cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")],
+        )
+
+    index_by_player_id = {}
+    index_by_name = {}
+    if snapshot_rows.empty:
+        return {"by_player_id": index_by_player_id, "by_name": index_by_name}
+
+    for _, snapshot_row in snapshot_rows.iterrows():
+        snapshot_time = pd.to_datetime(snapshot_row.get("created_at"), errors="coerce", utc=True)
+        if pd.isna(snapshot_time):
+            continue
+        try:
+            payload = json.loads(snapshot_row.get("payload_json") or "[]")
+        except json.JSONDecodeError:
+            continue
+
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            item = dict(item)
+            item["snapshot_created_at"] = snapshot_time
+            player_id = pd.to_numeric(item.get("player_id"), errors="coerce")
+            player_name = _normalize_player_name(item)
+            if pd.notna(player_id):
+                index_by_player_id.setdefault(int(player_id), []).append(item)
+            if player_name:
+                index_by_name.setdefault(player_name, []).append(item)
+
+    return {"by_player_id": index_by_player_id, "by_name": index_by_name}
+
+
+def _build_current_squad_lookup(squad_df):
+    if squad_df is None or squad_df.empty or "player_id" not in squad_df.columns:
+        return {}
+
+    working_squad_df = squad_df.copy()
+    working_squad_df["player_id"] = pd.to_numeric(working_squad_df["player_id"], errors="coerce")
+    working_squad_df = working_squad_df.dropna(subset=["player_id"]).drop_duplicates(subset=["player_id"])
+    return {
+        int(row["player_id"]): row.to_dict()
+        for _, row in working_squad_df.iterrows()
+    }
+
+
+def _find_latest_snapshot_before_purchase(snapshot_index, player_id, player_name, purchase_time, max_age_hours=72):
+    candidates = snapshot_index.get("by_player_id", {}).get(int(player_id), [])
+    if not candidates and player_name:
+        candidates = snapshot_index.get("by_name", {}).get(" ".join(str(player_name).strip().lower().split()), [])
+
+    best_match = None
+    for candidate in candidates:
+        snapshot_time = candidate.get("snapshot_created_at")
+        if snapshot_time is None or snapshot_time > purchase_time:
+            continue
+        age_hours = (purchase_time - snapshot_time).total_seconds() / 3600
+        if age_hours > max_age_hours:
+            continue
+        if best_match is None or snapshot_time > best_match.get("snapshot_created_at"):
+            best_match = candidate
+    return best_match
+
+
+def _evaluate_purchase_row(purchase_row, sale_row, current_squad_row, snapshot_match):
+    player_name = purchase_row.get("player_name") or "Unbekannt"
+    purchase_price = _json_safe_number(purchase_row.get("transfer_price")) or 0.0
+    purchase_time = pd.to_datetime(purchase_row.get("timestamp"), errors="coerce", utc=True)
+    sale_price = _json_safe_number(sale_row.get("transfer_price")) if sale_row else None
+    current_market_value = _json_safe_number(current_squad_row.get("mv")) if current_squad_row else None
+
+    if sale_price is not None:
+        outcome_value = float(sale_price) - float(purchase_price)
+        outcome_type = "realized"
+        benchmark_value = float(sale_price)
+        status_label = "bereits verkauft"
+    elif current_market_value is not None:
+        outcome_value = float(current_market_value) - float(purchase_price)
+        outcome_type = "open"
+        benchmark_value = float(current_market_value)
+        status_label = "noch im Kader"
+    else:
+        outcome_value = None
+        outcome_type = "unknown"
+        benchmark_value = None
+        status_label = "nicht mehr im Kader"
+
+    threshold = max(300_000.0, float(purchase_price) * 0.03)
+    squad_role = str(current_squad_row.get("squad_role") or "") if current_squad_row else ""
+    sell_priority_score = _json_safe_number(current_squad_row.get("sell_priority_score")) if current_squad_row else None
+
+    if outcome_value is not None and outcome_value >= threshold:
+        verdict = "good"
+    elif outcome_value is not None and outcome_value <= -threshold:
+        verdict = "poor"
+    elif current_squad_row and squad_role == "core_starter" and (sell_priority_score or 0) < 45:
+        verdict = "good"
+    elif outcome_value is None:
+        verdict = "neutral"
+    else:
+        verdict = "neutral"
+
+    signal_alignment, signal_note = _classify_snapshot_alignment(snapshot_match, purchase_price)
+    if verdict == "neutral" and signal_alignment == "misaligned" and outcome_value is not None and outcome_value < 0:
+        verdict = "poor"
+
+    held_days = None
+    if purchase_time is not None:
+        end_time = pd.to_datetime(sale_row.get("timestamp"), errors="coerce", utc=True) if sale_row else pd.Timestamp.now(tz="UTC")
+        if pd.notna(end_time):
+            held_days = round((end_time - purchase_time).total_seconds() / 86400, 1)
+
+    return {
+        "player_name": player_name,
+        "purchase_price": round(float(purchase_price), 0),
+        "benchmark_value": round(float(benchmark_value), 0) if benchmark_value is not None else None,
+        "profit_delta": round(float(outcome_value), 0) if outcome_value is not None else None,
+        "verdict": verdict,
+        "status_label": status_label,
+        "outcome_type": outcome_type,
+        "held_days": held_days,
+        "signal_alignment": signal_alignment,
+        "signal_note": signal_note,
+        "reference_buy_action": snapshot_match.get("buy_action") if snapshot_match else None,
+        "reference_priority_score": _json_safe_number(snapshot_match.get("priority_score")) if snapshot_match else None,
+        "reference_competitive_bid_max": _json_safe_number(snapshot_match.get("competitive_bid_max")) if snapshot_match else None,
+        "current_squad_role": squad_role or None,
+    }
+
+
+def _classify_snapshot_alignment(snapshot_match, purchase_price):
+    if not snapshot_match:
+        return "unknown", "Kein passender Marktsnapshot vor dem Kauf gefunden."
+
+    buy_action = str(snapshot_match.get("buy_action") or "pass")
+    competitive_bid_max = _json_safe_number(snapshot_match.get("competitive_bid_max"))
+    delta_prediction = _json_safe_number(snapshot_match.get("delta_prediction"))
+    priority_score = _json_safe_number(snapshot_match.get("priority_score"))
+
+    if buy_action == "pass" or (delta_prediction is not None and delta_prediction <= 0):
+        return "misaligned", "Das Modell hatte vor dem Kauf keinen sauberen Kauf-Edge signalisiert."
+    if competitive_bid_max is not None and float(purchase_price) > float(competitive_bid_max) * 1.03:
+        return "misaligned", "Der Kaufpreis lag oberhalb der disziplinierten Modellgrenze."
+    if buy_action == "buy_now":
+        return "aligned", "Der Kauf war auch aus Modellsicht ein Sofort-Kandidat."
+    if buy_action == "watchlist" or (priority_score is not None and priority_score >= 65):
+        return "aligned", "Der Kauf war aus Modellsicht mindestens vertretbar vorbereitet."
+    return "unknown", "Vor dem Kauf lag kein eindeutiges Modellsignal vor."
+
+
+def _build_purchase_learning_note(good_count, poor_count, model_misaligned_count):
+    if good_count == poor_count == 0:
+        return "Noch keine belastbaren Kaufresultate im Auswertungsfenster."
+    if poor_count > good_count and model_misaligned_count >= max(1, poor_count // 2):
+        return "Zu viele schwache Kaeufe liefen gegen Preis- oder Modellsignale. Preisdisziplin und harte Gates wichtiger setzen."
+    if good_count >= poor_count + 2:
+        return "Die juengsten Kaeufe wirken insgesamt sauber. Gute Trades weiter priorisieren, aber Preisdisziplin halten."
+    return "Die juengsten Kaeufe sind gemischt. Besonders Transfers ausserhalb der disziplinierten Modellgrenzen enger pruefen."
+
+
+def _normalize_player_name(row):
+    first_name = str(row.get("first_name", "") or "").strip()
+    last_name = str(row.get("last_name", "") or "").strip()
+    full_name = " ".join(part for part in [first_name, last_name] if part)
+    if not full_name:
+        full_name = str(row.get("player_name", "") or "").strip()
+    return " ".join(full_name.lower().split())
 
 
 def _json_safe_number(value):

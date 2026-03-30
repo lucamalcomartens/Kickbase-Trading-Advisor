@@ -8,6 +8,8 @@ import pandas as pd
 
 MIN_ACTIVE_OFFER_RAISE_EUR = 25_000
 MIN_ACTIVE_OFFER_RAISE_PCT = 0.005
+MAX_SQUAD_SIZE = 17
+MAX_PLAYERS_PER_TEAM = 3
 POSITION_LABELS = {
     1: "GK",
     2: "DEF",
@@ -256,6 +258,133 @@ def apply_roster_need_context(squad_df, market_df):
     return working_market_df.sort_values(["priority_score", "delta_prediction", "hours_to_exp"], ascending=[False, False, True]), roster_need_summary
 
 
+def apply_deterministic_buy_gates(market_df, squad_df, manager_budgets_df, own_username, strategy_context=None):
+    """Apply hard pre-AI buy constraints for cash, club limits, squad slots, and active offers."""
+
+    if market_df.empty:
+        return market_df.copy(), {
+            "blocked_count": 0,
+            "managed_existing_offer_count": 0,
+            "club_limit_blocks": 0,
+            "budget_blocks": 0,
+            "sell_first_flags": 0,
+            "available_cash": 0.0,
+            "available_budget": 0.0,
+            "squad_size": int(len(squad_df)),
+            "squad_limit": MAX_SQUAD_SIZE,
+        }
+
+    working_market_df = market_df.copy()
+    _ensure_buy_gate_columns(working_market_df)
+
+    strategy_context = strategy_context or {}
+    management_summary = strategy_context.get("management_summary", {})
+    own_budget_row = manager_budgets_df[manager_budgets_df["User"] == own_username] if manager_budgets_df is not None and "User" in manager_budgets_df.columns else pd.DataFrame()
+    spendable_without_debt = _to_float(own_budget_row["Spendable Without Debt"].iloc[0]) if not own_budget_row.empty and "Spendable Without Debt" in own_budget_row.columns else None
+    available_budget = _to_float(own_budget_row["Available Budget"].iloc[0]) if not own_budget_row.empty and "Available Budget" in own_budget_row.columns else None
+    effective_cash_after_active_offers = _to_float(management_summary.get("effective_cash_after_active_offers"))
+
+    available_cash = spendable_without_debt
+    if available_cash is None:
+        available_cash = effective_cash_after_active_offers
+    if available_cash is None:
+        available_cash = 0.0
+    if available_budget is None:
+        available_budget = available_cash
+
+    squad_size = int(len(squad_df))
+    squad_full = squad_size >= MAX_SQUAD_SIZE
+    squad_sell_candidates = int((squad_df.get("squad_action", pd.Series(index=squad_df.index, dtype=object)).fillna("hold") == "sell").sum()) if squad_df is not None else 0
+
+    team_counts = squad_df.get("team_name", pd.Series(index=squad_df.index, dtype=object)).fillna("unknown").astype(str).value_counts().to_dict() if squad_df is not None else {}
+    reserved_team_counts = {}
+    for item in strategy_context.get("active_offer_actions", []):
+        if item.get("recommended_action") not in {"hold", "raise_small"}:
+            continue
+        market_index = item.get("market_index")
+        if market_index is None or market_index not in working_market_df.index:
+            continue
+        team_name = str(working_market_df.at[market_index, "team_name"] or "unknown")
+        reserved_team_counts[team_name] = reserved_team_counts.get(team_name, 0) + 1
+
+    current_buy_action = working_market_df.get("buy_action", pd.Series("pass", index=working_market_df.index)).fillna("pass")
+    actionable_buy_mask = current_buy_action.isin(["buy_now", "watchlist"])
+    competitive_bid_max = pd.to_numeric(working_market_df.get("competitive_bid_max"), errors="coerce")
+    recommended_bid_max = pd.to_numeric(working_market_df.get("recommended_bid_max"), errors="coerce")
+    market_value = pd.to_numeric(working_market_df.get("mv"), errors="coerce")
+    effective_bid_cap = competitive_bid_max.fillna(recommended_bid_max).fillna(market_value)
+    minimum_entry_price = market_value.fillna(recommended_bid_max).fillna(effective_bid_cap)
+
+    gate_status = pd.Series("clear", index=working_market_df.index, dtype=object)
+    gate_reason = pd.Series("", index=working_market_df.index, dtype=object)
+
+    active_offer_decision = working_market_df.get("active_offer_decision", pd.Series(index=working_market_df.index, dtype=object)).fillna("")
+    active_offer_mask = active_offer_decision.ne("")
+    abort_offer_mask = active_offer_decision.eq("abort")
+    managed_offer_mask = active_offer_mask & ~abort_offer_mask
+
+    gate_status.loc[abort_offer_mask] = "blocked"
+    gate_reason.loc[abort_offer_mask] = "active_offer_abort"
+    gate_status.loc[managed_offer_mask] = "managed_existing_offer"
+    gate_reason.loc[managed_offer_mask] = "manage_existing_offer"
+
+    club_counts_after_buy = []
+    club_limit_mask = []
+    for row_index, row in working_market_df.iterrows():
+        team_name = str(row.get("team_name") or "unknown")
+        reserved_count = reserved_team_counts.get(team_name, 0)
+        own_count = int(team_counts.get(team_name, 0))
+        has_reserved_same_player = bool(row.get("has_active_offer")) and active_offer_decision.get(row_index, "") in {"hold", "raise_small"}
+        projected_count = own_count + reserved_count + (0 if has_reserved_same_player else 1)
+        club_counts_after_buy.append(projected_count)
+        club_limit_mask.append(projected_count > MAX_PLAYERS_PER_TEAM)
+
+    club_counts_after_buy = pd.Series(club_counts_after_buy, index=working_market_df.index)
+    club_limit_mask = pd.Series(club_limit_mask, index=working_market_df.index)
+    hard_club_limit_mask = actionable_buy_mask & club_limit_mask & gate_status.eq("clear")
+    gate_status.loc[hard_club_limit_mask] = "blocked"
+    gate_reason.loc[hard_club_limit_mask] = "club_limit_reached"
+
+    no_budget_anyway_mask = actionable_buy_mask & gate_status.eq("clear") & ((minimum_entry_price > available_budget) | minimum_entry_price.isna())
+    gate_status.loc[no_budget_anyway_mask] = "blocked"
+    gate_reason.loc[no_budget_anyway_mask] = "above_total_budget_limit"
+
+    sell_first_mask = actionable_buy_mask & gate_status.eq("clear") & ((minimum_entry_price > available_cash) | squad_full)
+    gate_status.loc[sell_first_mask] = "sell_first"
+    gate_reason.loc[sell_first_mask] = np.where(
+        squad_full & (minimum_entry_price > available_cash),
+        "sell_first_cash_and_slot_required",
+        np.where(squad_full, "sell_first_squad_full", "sell_first_insufficient_cash"),
+    )
+
+    gated_buy_action = current_buy_action.copy()
+    gated_buy_action.loc[gate_status.isin(["blocked", "managed_existing_offer"])] = "pass"
+    gated_buy_action.loc[sell_first_mask & current_buy_action.eq("buy_now")] = "watchlist"
+
+    working_market_df["buy_action"] = gated_buy_action
+    working_market_df["buy_gate_status"] = gate_status
+    working_market_df["buy_gate_reason"] = gate_reason
+    working_market_df["buy_gate_detail"] = gate_reason.map(_build_buy_gate_detail)
+    working_market_df["effective_bid_cap"] = np.round(np.minimum(effective_bid_cap.fillna(0), available_budget), 0)
+    working_market_df["minimum_entry_price"] = np.round(minimum_entry_price, 0)
+    working_market_df["club_count_after_buy"] = club_counts_after_buy
+    working_market_df["squad_size_after_buy"] = squad_size + 1
+
+    summary = {
+        "blocked_count": int(gate_status.eq("blocked").sum()),
+        "managed_existing_offer_count": int(gate_status.eq("managed_existing_offer").sum()),
+        "club_limit_blocks": int(hard_club_limit_mask.sum()),
+        "budget_blocks": int(no_budget_anyway_mask.sum()),
+        "sell_first_flags": int(sell_first_mask.sum()),
+        "available_cash": round(float(available_cash), 2),
+        "available_budget": round(float(available_budget), 2),
+        "squad_size": squad_size,
+        "squad_limit": MAX_SQUAD_SIZE,
+        "sell_candidates": squad_sell_candidates,
+    }
+    return working_market_df.sort_values(["priority_score", "delta_prediction", "hours_to_exp"], ascending=[False, False, True]), summary
+
+
 def build_strategy_context(market_df, offer_tracking_summary, own_budget):
     """Create deterministic strategy context before handing control to the AI layer."""
 
@@ -339,6 +468,21 @@ def _ensure_market_need_columns(market_df):
         "roster_need_level": "none",
         "roster_need_priority_boost": 0.0,
         "roster_need_note": "",
+    }
+    for column, default_value in defaults.items():
+        if column not in market_df.columns:
+            market_df[column] = default_value
+
+
+def _ensure_buy_gate_columns(market_df):
+    defaults = {
+        "buy_gate_status": "clear",
+        "buy_gate_reason": "",
+        "buy_gate_detail": "",
+        "effective_bid_cap": pd.NA,
+        "minimum_entry_price": pd.NA,
+        "club_count_after_buy": pd.NA,
+        "squad_size_after_buy": pd.NA,
     }
     for column, default_value in defaults.items():
         if column not in market_df.columns:
@@ -784,6 +928,19 @@ def _action_label(action):
         "abort": "abbrechen",
     }
     return mapping.get(action, action)
+
+
+def _build_buy_gate_detail(reason):
+    mapping = {
+        "active_offer_abort": "Bestehendes Gebot soll laut System aktiv beendet werden.",
+        "manage_existing_offer": "Fuer diesen Spieler existiert bereits ein aktives Gebot. Nur bestehendes Gebot managen.",
+        "club_limit_reached": "Der Kauf wuerde das harte 3-Spieler-Limit fuer diesen Verein reissen.",
+        "above_total_budget_limit": "Der Spieler liegt selbst mit Negativspielraum ausserhalb der harten Budgetgrenze.",
+        "sell_first_cash_and_slot_required": "Vor dem Kauf muessen sowohl Cash als auch ein Kaderplatz freigemacht werden.",
+        "sell_first_squad_full": "Vor dem Kauf muss zuerst ein Kaderplatz frei werden.",
+        "sell_first_insufficient_cash": "Vor dem Kauf muss zuerst reales Cash freigemacht werden.",
+    }
+    return mapping.get(reason, "")
 
 
 def _to_float(value):

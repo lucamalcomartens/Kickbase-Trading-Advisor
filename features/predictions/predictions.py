@@ -219,7 +219,7 @@ def join_current_squad(token, league_id, today_df_results):
     )
 
     # Keep only relevant columns
-    squad_df = squad_df[["first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob"]]
+    squad_df = squad_df[["player_id", "first_name", "last_name", "position", "team_name", "p", "mp", "ppm", "days_to_next", "mv", "mv_change_yesterday", "predicted_mv_change", "predicted_mv_target", "delta_prediction", "delta_percent", "s_11_prob"]]
 
     return enrich_squad_candidates(squad_df)
 
