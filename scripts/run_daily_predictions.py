@@ -46,6 +46,29 @@ from kickbase_api.others import enrich_with_fixture_context, get_fixture_context
 from kickbase_api.user import get_budget, get_username, login
 
 
+def _ensure_buy_gate_fallback_columns(market_df):
+    fallback_bid_cap = None
+    for candidate_column in ("competitive_bid_max", "recommended_bid_max", "mv"):
+        if candidate_column in market_df.columns:
+            fallback_bid_cap = market_df[candidate_column]
+            break
+
+    defaults = {
+        "buy_gate_status": "clear",
+        "buy_gate_reason": "",
+        "buy_gate_detail": "",
+        "effective_bid_cap": fallback_bid_cap if fallback_bid_cap is not None else None,
+        "minimum_entry_price": market_df["mv"] if "mv" in market_df.columns else fallback_bid_cap,
+        "club_count_after_buy": None,
+        "squad_size_after_buy": None,
+    }
+    for column, default_value in defaults.items():
+        if column not in market_df.columns:
+            market_df[column] = default_value
+
+    return market_df
+
+
 def main() -> None:
     load_dotenv()
     configure_display()
@@ -224,10 +247,13 @@ def main() -> None:
             "feature_status": "failed",
             "error": str(error),
         }
+        market_all_df = _ensure_buy_gate_fallback_columns(market_all_df)
         strategy_context.setdefault("validation_notes", []).append(
             f"Buy-Gate-Modul deaktiviert wegen Fehler: {error}"
         )
         print(f"Warnung: Buy-Gate-Modul deaktiviert: {error}")
+
+    market_all_df = _ensure_buy_gate_fallback_columns(market_all_df)
 
     try:
         strategy_context["purchase_review"] = build_purchase_evaluation_summary(
