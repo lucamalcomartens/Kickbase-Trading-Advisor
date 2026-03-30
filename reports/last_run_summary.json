@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-30T12:34:13.597340Z",
+  "generated_at": "2026-03-30T12:47:00.539111Z",
   "report_date": "30. March 2026",
   "own_username": "Luca Malco",
   "own_budget": 3746461.0,
@@ -21,12 +21,12 @@
     "friday_safety_mode": "inactive"
   },
   "model_metrics": {
-    "signs_percent": 66.81,
-    "rmse": 41868.77,
-    "mae": 20857.0,
-    "r2": 0.9192
+    "signs_percent": 66.82,
+    "rmse": 41889.73,
+    "mae": 20880.7,
+    "r2": 0.9191
   },
-  "market_player_count": 27,
+  "market_player_count": 28,
   "squad_player_count": 12,
   "fixture_context_active": true,
   "ai_status": "success",
@@ -252,7 +252,7 @@
       "root_type": "dict"
     },
     "market_debug": {
-      "item_count": 27,
+      "item_count": 28,
       "examples": [
         {
           "path": "market[0]",
@@ -276,7 +276,7 @@
           "player_id": 357,
           "player_name": "Jens Grahl",
           "market_value": 500000.0,
-          "expires_at": "2026-03-30T15:51:00Z",
+          "expires_at": "2026-03-30T15:51:01Z",
           "sample": {
             "i": "357",
             "fn": "Jens",
@@ -287,7 +287,7 @@
             "mvt": 0,
             "mv": 500000,
             "ofc": 0,
-            "exs": 11856,
+            "exs": 11067,
             "prc": 500000,
             "isn": false,
             "iposl": false,
@@ -319,7 +319,7 @@
           "player_id": 513,
           "player_name": "Mario Götze",
           "market_value": 1167613.0,
-          "expires_at": "2026-03-31T16:03:38Z",
+          "expires_at": "2026-03-31T16:03:39Z",
           "sample": {
             "i": "513",
             "fn": "Mario",
@@ -332,7 +332,7 @@
             "p": 634,
             "ap": 35,
             "ofc": 0,
-            "exs": 99014,
+            "exs": 98225,
             "prc": 1167613,
             "isn": false,
             "iposl": false,
@@ -364,7 +364,7 @@
           "player_id": 550,
           "player_name": "Stefan Bell",
           "market_value": 1633318.0,
-          "expires_at": "2026-04-01T00:40:02Z",
+          "expires_at": "2026-04-01T00:40:03Z",
           "sample": {
             "i": "550",
             "fn": "Stefan",
@@ -377,7 +377,7 @@
             "p": 1313,
             "ap": 73,
             "ofc": 0,
-            "exs": 129998,
+            "exs": 129209,
             "prc": 1633318,
             "isn": true,
             "iposl": false,
@@ -409,7 +409,7 @@
           "player_id": 1664,
           "player_name": "Maximilian Mittelstädt",
           "market_value": 32834792.0,
-          "expires_at": "2026-03-30T16:18:07Z",
+          "expires_at": "2026-03-30T16:18:08Z",
           "sample": {
             "i": "1664",
             "fn": "Maximilian",
@@ -422,7 +422,7 @@
             "p": 3062,
             "ap": 122,
             "ofc": 0,
-            "exs": 13483,
+            "exs": 12694,
             "prc": 32834792,
             "isn": false,
             "iposl": false,
@@ -454,7 +454,7 @@
           "player_id": 1686,
           "player_name": "Nico Elvedi",
           "market_value": 20695903.0,
-          "expires_at": "2026-04-01T02:31:27Z",
+          "expires_at": "2026-04-01T02:31:28Z",
           "sample": {
             "i": "1686",
             "fn": "Nico",
@@ -467,7 +467,7 @@
             "p": 2643,
             "ap": 98,
             "ofc": 0,
-            "exs": 136683,
+            "exs": 135894,
             "prc": 20695903,
             "isn": true,
             "iposl": false,
@@ -499,7 +499,7 @@
           "player_id": 1920,
           "player_name": "Serhou Guirassy",
           "market_value": 38389860.0,
-          "expires_at": "2026-03-31T02:09:47Z",
+          "expires_at": "2026-03-31T02:09:48Z",
           "sample": {
             "i": "1920",
             "fn": "Serhou",
@@ -512,7 +512,7 @@
             "p": 2676,
             "ap": 103,
             "ofc": 0,
-            "exs": 48983,
+            "exs": 48194,
             "prc": 38389860,
             "isn": false,
             "iposl": false,
@@ -544,7 +544,7 @@
           "player_id": 2141,
           "player_name": "Ridle Baku",
           "market_value": 21936083.0,
-          "expires_at": "2026-03-31T07:53:21Z",
+          "expires_at": "2026-03-31T07:53:22Z",
           "sample": {
             "i": "2141",
             "fn": "Ridle ",
@@ -557,7 +557,7 @@
             "p": 2577,
             "ap": 103,
             "ofc": 0,
-            "exs": 69597,
+            "exs": 68808,
             "prc": 21936083,
             "isn": true,
             "iposl": false,
@@ -590,7 +590,7 @@
           "player_id": 2279,
           "player_name": "Frederik Rönnow",
           "market_value": 7513549.0,
-          "expires_at": "2026-04-27T14:10:25Z",
+          "expires_at": "2026-04-27T14:10:26Z",
           "sample": {
             "i": "2279",
             "fn": "Frederik",
@@ -603,7 +603,7 @@
             "p": 2109,
             "ap": 81,
             "ofc": 0,
-            "exs": 2425021,
+            "exs": 2424232,
             "u": {
               "i": "<nested>",
               "n": "<nested>",
@@ -642,7 +642,7 @@
           "player_id": 2764,
           "player_name": "Yannik Keitel",
           "market_value": 500000.0,
-          "expires_at": "2026-03-31T19:01:35Z",
+          "expires_at": "2026-03-31T19:01:36Z",
           "sample": {
             "i": "2764",
             "fn": "Yannik",
@@ -655,9 +655,9 @@
             "p": 207,
             "ap": 52,
             "ofc": 0,
-            "exs": 109691,
+            "exs": 108902,
             "prc": 500000,
-            "isn": true,
+            "isn": false,
             "iposl": false,
             "dt": "2026-03-30T00:43:35Z",
             "pim": "content/file/b93977fb3dee4e75af09d67896a1666b.png"
@@ -687,7 +687,7 @@
           "player_id": 2939,
           "player_name": "Eren Sami Dinkçi",
           "market_value": 1729640.0,
-          "expires_at": "2026-03-31T19:36:02Z",
+          "expires_at": "2026-03-31T19:36:03Z",
           "sample": {
             "i": "2939",
             "fn": "Eren Sami",
@@ -700,7 +700,7 @@
             "p": 327,
             "ap": 20,
             "ofc": 0,
-            "exs": 111758,
+            "exs": 110969,
             "prc": 1729640,
             "isn": true,
             "iposl": false,
@@ -730,15 +730,13 @@
         "abort": 0
       },
       "validation_notes": [
-        "Keine offensichtlichen Strategie-Konflikte erkannt.",
-        "Buy-Gate-Modul deaktiviert wegen Fehler: cannot set using a list-like indexer with a different length than the value"
+        "Keine offensichtlichen Strategie-Konflikte erkannt."
       ]
     },
     "active_offer_actions": [],
     "recent_outbid": [],
     "validation_notes": [
-      "Keine offensichtlichen Strategie-Konflikte erkannt.",
-      "Buy-Gate-Modul deaktiviert wegen Fehler: cannot set using a list-like indexer with a different length than the value"
+      "Keine offensichtlichen Strategie-Konflikte erkannt."
     ],
     "external_data": {
       "api_football": {
@@ -802,13 +800,12 @@
       "managed_existing_offer_count": 0,
       "club_limit_blocks": 0,
       "budget_blocks": 0,
-      "sell_first_flags": 0,
-      "available_cash": 0.0,
-      "available_budget": 0.0,
+      "sell_first_flags": 2,
+      "available_cash": 3746461.0,
+      "available_budget": 56449374.67,
       "squad_size": 12,
       "squad_limit": 17,
-      "feature_status": "failed",
-      "error": "cannot set using a list-like indexer with a different length than the value"
+      "sell_candidates": 0
     },
     "purchase_review": {
       "recent_purchase_count": 9,
@@ -830,7 +827,7 @@
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
           "status_label": "noch im Kader",
-          "held_days": 2.7
+          "held_days": 2.8
         },
         {
           "player_name": "Giannoulis",
@@ -916,65 +913,65 @@
     {
       "player": "Jens Grahl",
       "team_name": "Frankfurt",
-      "priority_score": 70.1,
+      "priority_score": 70.6,
       "asset_role": "short_term_trade",
-      "predicted_mv_change": 191.72,
-      "recommended_bid_max": 500092.0,
-      "competitive_bid_max": 500092.0,
+      "predicted_mv_change": 203.9,
+      "recommended_bid_max": 500098.0,
+      "competitive_bid_max": 500098.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 3.29,
+      "hours_to_exp": 3.07,
       "next_opponent": null,
       "fixture_difficulty": null
     },
     {
       "player": "Abdoul-Karim Coulibaly",
       "team_name": "Bremen",
-      "priority_score": 69.6,
+      "priority_score": 70.1,
       "asset_role": "short_term_trade",
-      "predicted_mv_change": 232277.26,
-      "recommended_bid_max": 3745636.0,
-      "competitive_bid_max": 3745636.0,
+      "predicted_mv_change": 233122.39,
+      "recommended_bid_max": 3746042.0,
+      "competitive_bid_max": 3746042.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 5.59,
+      "hours_to_exp": 5.37,
       "next_opponent": null,
       "fixture_difficulty": null
     },
     {
       "player": "Frederik Rönnow",
       "team_name": "Union Berlin",
-      "priority_score": 65.3,
+      "priority_score": 65.2,
       "asset_role": "medium_term_hold",
-      "predicted_mv_change": 151633.4,
-      "recommended_bid_max": 7568137.0,
-      "competitive_bid_max": 7568137.0,
+      "predicted_mv_change": 147744.44,
+      "recommended_bid_max": 7566737.0,
+      "competitive_bid_max": 7566737.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 673.62,
+      "hours_to_exp": 673.4,
       "next_opponent": "FC St. Pauli 1910",
       "fixture_difficulty": "good"
     },
     {
       "player": "Tiago Pereira Cardoso",
       "team_name": "M'gladbach",
-      "priority_score": 62.6,
+      "priority_score": 62.7,
       "asset_role": "medium_term_hold",
-      "predicted_mv_change": 144.08,
+      "predicted_mv_change": 145.66,
       "recommended_bid_max": 500052.0,
       "competitive_bid_max": 500052.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 11.35,
+      "hours_to_exp": 11.13,
       "next_opponent": null,
       "fixture_difficulty": null
     },
     {
       "player": "Maximilian Mittelstädt",
       "team_name": "Stuttgart",
-      "priority_score": 60.1,
+      "priority_score": 60.6,
       "asset_role": "short_term_trade",
-      "predicted_mv_change": 35239.69,
-      "recommended_bid_max": 32851707.0,
-      "competitive_bid_max": 32851707.0,
+      "predicted_mv_change": 36498.25,
+      "recommended_bid_max": 32852311.0,
+      "competitive_bid_max": 32852311.0,
       "recent_bid_competition": "medium",
-      "hours_to_exp": 3.75,
+      "hours_to_exp": 3.53,
       "next_opponent": null,
       "fixture_difficulty": null
     }
@@ -983,9 +980,9 @@
     {
       "player": "Robert Andrich",
       "team_name": "Leverkusen",
-      "sell_priority_score": 21.5,
+      "sell_priority_score": 21.8,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": -232994.66,
+      "predicted_mv_change": -244844.19,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -995,7 +992,7 @@
       "team_name": "Bayern",
       "sell_priority_score": 21.4,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 255173.58,
+      "predicted_mv_change": 253762.56,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -1005,7 +1002,7 @@
       "team_name": "Freiburg",
       "sell_priority_score": 18.9,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 837.44,
+      "predicted_mv_change": 1191.46,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -1015,7 +1012,7 @@
       "team_name": "Stuttgart",
       "sell_priority_score": 18.8,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 156543.25,
+      "predicted_mv_change": 156204.33,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -1025,15 +1022,15 @@
       "team_name": "Stuttgart",
       "sell_priority_score": 17.8,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 18351.28,
+      "predicted_mv_change": 19616.8,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
     }
   ],
   "budget_table": "      User      Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor\n      joel 126.686.923 175.983.956   126.686.923   -99.881.390       226.568.313             126.686.923                 99.881.390                     99.881.390\n       Rob 124.321.302 159.174.221   124.321.302   -93.553.523       217.874.825             124.321.302                 93.553.523                     93.553.523\n FlippiXxp  72.920.330 302.829.996    72.920.330  -123.997.608       196.917.938              72.920.330                123.997.608                    123.997.608\n       Jan  73.292.889 201.610.723    73.292.889   -90.718.192       164.011.081              73.292.889                 90.718.192                     90.718.192\n     Jonas  71.156.552 161.133.590    71.156.552   -76.655.747       147.812.299              71.156.552                 76.655.747                     76.655.747\n      Till  47.663.360 236.655.620    47.663.360   -93.825.263       141.488.623              47.663.360                 93.825.263                     93.825.263\n     David  16.717.482 244.813.597    16.717.482   -86.305.256       103.022.738              16.717.482                 86.305.256                     86.305.256\nLuca Malco   3.746.461 155.959.338     3.746.461   -52.702.914        56.449.375               3.746.461                 52.702.914                     52.702.914",
-  "market_table": "    first_name   last_name    team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid buy_gate_status buy_gate_reason  effective_bid_cap  hours_to_exp\n          Jens       Grahl    Frankfurt    500.000                  192              70             500.092              500.092                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                            500.092             3\n  Abdoul-Karim   Coulibaly       Bremen  3.634.143              232.277              70           3.745.636            3.745.636                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                          3.745.636             6\n      Frederik      Rönnow Union Berlin  7.513.549              151.633              65           7.568.137            7.568.137                   high aggressive_only_if_priority_a             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                          7.568.137           674\nTiago Pereira      Cardoso   M'gladbach    500.000                  144              63             500.052              500.052                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                            500.052            11\n    Maximilian Mittelstädt    Stuttgart 32.834.792               35.240              60          32.851.707           32.851.707                 medium              stay_disciplined            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                         32.851.707             4\n       Maarten Vandevoordt      Leipzig  4.457.377              -53.347              55           4.457.377            4.457.377                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                          4.457.377            19\n     Arkadiusz       Pyrka    St. Pauli  3.570.223             -101.489              54           3.570.223            3.570.223                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                          3.570.223             1\n        Ridle         Baku      Leipzig 21.936.083               85.520              52          21.966.870           21.966.870                   high aggressive_only_if_priority_a            MID              none                   0                        0                  stable                                      0                     -                                -           clear                         21.966.870            19\n        Justin     Njinmah       Bremen  6.052.077              144.414              52           6.104.066            6.104.066                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                          6.104.066           650\n        Philip       Otele      Hamburg  6.244.160              147.405              52           6.297.226            6.297.226                   high aggressive_only_if_priority_a             ST              none                   0                        0                  stable                                      0                     -                                -           clear                          6.297.226           704\n          Ísak Jóhannesson         Köln  3.140.637               52.994              51           3.159.715            3.159.715                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                          3.159.715           674\n        Joakim       Mæhle    Wolfsburg  4.193.816               56.784              50           4.214.258            4.214.258                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                          4.214.258           674\n       Mattias    Svanberg    Wolfsburg    500.000                  144              49             500.052              500.052                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                            500.052            10\nMaycon Douglas     Cardozo       Bayern  1.794.912               29.868              49           1.805.664            1.805.664                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                          1.805.664           704\n        Justin       Diehl    Stuttgart    500.000                  165              48             500.059              500.059                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                            500.059            14",
-  "squad_table": "first_name last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob            next_opponent\n    Robert   Andrich Leverkusen 18.869.255             -232.995                   22 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Manuel     Neuer     Bayern  7.094.577              255.174                   21 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Lucas     Höler   Freiburg    500.000                  837                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Josha  Vagnoman  Stuttgart  5.741.825              156.543                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n   Ermedin Demirović  Stuttgart 20.636.973               18.351                   18 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Marvin Pieringer Heidenheim  2.245.957              131.101                   17 rotation_hold              model_only                   0                        0                  stable                                  0         - Borussia Mönchengladbach\n Christian   Eriksen  Wolfsburg 10.784.236               45.858                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Kaishu      Sano      Mainz 11.826.283               50.539                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -      TSG 1899 Hoffenheim\n      Finn   Jeltsch  Stuttgart 10.852.259               70.808                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Marco    Friedl     Bremen 17.408.218             -157.283                    1  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n     Jakub  Kaminski       Köln 19.867.250               36.490                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -      Eintracht Frankfurt\n     Serge    Gnabry     Bayern 30.132.505               63.775                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -",
-  "ai_excerpt": "Hallo Luca Malco, hier ist deine Kickbase-Abendstrategie für Montag, den 30. März 2026. ### 1. TEAMSTATUS Dein Kader ist mit 12 von 17 Spielern noch nicht voll besetzt und bietet damit Handlungsspielraum. Dein Budget von 3.746.461 Euro ist solide, erfordert aber für größere Transfers Verkäufe. Die Marktknappheit ist hoch, was bedeutet, dass wir unsere Leistungsträger halten sollten. Der dringendste Handlungsbedarf ist die Verpflichtung eines zweiten Torwarts zur Absicherung, was derzeit als \"mittlere\" Priorität eingestuft ist. Die jüngsten Käufe waren teils verlustreich, daher agieren wir heut",
-  "ai_full_text": "Hallo Luca Malco, hier ist deine Kickbase-Abendstrategie für Montag, den 30. März 2026.\n\n### 1. TEAMSTATUS\nDein Kader ist mit 12 von 17 Spielern noch nicht voll besetzt und bietet damit Handlungsspielraum. Dein Budget von 3.746.461 Euro ist solide, erfordert aber für größere Transfers Verkäufe. Die Marktknappheit ist hoch, was bedeutet, dass wir unsere Leistungsträger halten sollten. Der dringendste Handlungsbedarf ist die Verpflichtung eines zweiten Torwarts zur Absicherung, was derzeit als \"mittlere\" Priorität eingestuft ist. Die jüngsten Käufe waren teils verlustreich, daher agieren wir heute mit erhöhter Disziplin.\n\n### 2. VERKAUFS-BEFEHLE\n**Verkaufe Robert Andrich (Leverkusen, 18.869.255 €)**\n\n*   **Grund:** Er hat die höchste Verkaufspriorität (22) in deinem Kader und eine negative Marktwertprognose von -232.995 €. Ein Verkauf würde sofort knapp 19 Mio. € Kapital freisetzen, was uns enorme Flexibilität für strategische Zukäufe gibt. In der Vergangenheit war seine Startelf-Position nicht immer gesichert, was ihn zu einem Rotationsrisiko macht.\n\n### 3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE\n**Kauf Abdoul-Karim Coulibaly (Bremen, 3.634.143 €) | Priorität A | Max Gebot 3.746.461 € | Rolle: Trader | Warum jetzt?**\n\n*   Dieser Transfer ist eine klare Chance für einen kurzfristigen Gewinn. Coulibaly läuft in 6 Stunden aus und hat eine positive Marktwertprognose von +232.277 €. Dein aktuelles Budget deckt das empfohlene Maximalgebot exakt ab. Der Wettbewerb ist zwar hoch, aber ein Gebot in Höhe deines verfügbaren Kapitals ist ein disziplinierter Versuch, den Gewinn mitzunehmen, ohne in einen Preiskrieg zu geraten. Sollten wir überboten werden, ziehen wir uns zurück. Jüngste Berichte zeigen, dass mehrere Topklubs, darunter Newcastle, Chelsea und PSG, an ihm interessiert sind, was seinen Marktwert weiter treiben könnte.\n\n### 4. SPAETERE CHANCEN UND HOLDS\n**Beobachte Frederik Rönnow (Union Berlin, 7.513.549 €) | Zielstrategie: Kaderbaustein bis Spieltag | Späteres Max Gebot: ca. 7.550.000 € | Warum relevant?**\n\n*   Rönnow ist der ideale Kandidat, um deine Torwart-Position abzusichern. Er hat eine positive Marktwertprognose (+151.633 €) und einen hohen `football_signal_score` (67). Nach dem Verkauf von Andrich hättest du das nötige Budget, um ihn zu verpflichten. Aktuelle Berichte deuten auf eine leichte Knöchelverletzung hin, die Anfang März im Training auftrat, aber es wird erwartet, dass er bald wieder fit ist.\n\n**Beobachte Justin Njinmah (Bremen, 6.052.077 €) | Zielstrategie: 2-4 Tage Hold | Späteres Max Gebot: ca. 6.100.000 € | Warum relevant?**\n\n*   Njinmah ist eine exzellente Mittelfrist-Anlage. Er hat eine starke Marktwertprognose (+144.414 €) und einen sehr hohen `football_signal_score` (71). Mit dem durch Andrich freigesetzten Kapital wäre er eine sinnvolle Investition, um den Kaderwert bis zum Spieltag weiter zu steigern.\n\n### 5. NEWS-CHECK\n*   **Manuel Neuer (Bayern):** Nach einer Wadenverletzung Anfang März ist Neuer Berichten vom 29. März zufolge wieder ins Training eingestiegen und für die kommenden Spiele einsatzbereit. Das stabilisiert seinen Platz im Kader, auch wenn sein `football_signal_score` (32) mäßig ist.\n*   **Serge Gnabry (Bayern):** Ältere Berichte erwähnen diverse Verletzungen, aber ein Interview von Anfang Februar 2026 deutet darauf hin, dass er fit ist und seinen Vertrag verlängern möchte, was seine Position im Team festigt.\n*   **Frederik Rönnow (Union Berlin):** Hatte Anfang März eine Trainingsverletzung. Wir müssen seinen Status weiter beobachten, aber die Daten deuten auf eine baldige Rückkehr hin.\n*   **Abdoul-Karim Coulibaly (Bremen):** Das große Interesse von internationalen Top-Vereinen könnte seinen Marktwert in nächster Zeit stark ansteigen lassen. Ältere Meldungen über eine Oberschenkelverletzung von Anfang März scheinen überholt, da er im Kader für das Spiel gegen Mainz stand.\n\nFür die anderen Spieler (Andrich, Friedl) wurden keine neuen, spielentscheidenden Informationen gefunden, die über die vorhandenen Leistungsdaten hinausgehen.\n\n### 6. TRADING-PLAN\nDeine Strategie für die nächsten Tage ist klar auf Kapitalumschichtung und Kaderoptimierung ausgelegt:\n1.  **Tag 1 (heute):** Verkaufe Robert Andrich, um maximales Kapital zu generieren. Platziere das disziplinierte Gebot auf Abdoul-Karim Coulibaly für einen potenziellen schnellen Gewinn.\n2.  **Tag 2-3:** Unabhängig vom Ausgang des Coulibaly-Gebots, fokussiere dich auf den Kauf von Frederik Rönnow, um die Torwartposition zu sichern. Das ist deine Management-Priorität.\n3.  **Tag 3-4:** Investiere das verbleibende Kapital gezielt in Spieler wie Justin Njinmah oder andere vielversprechende Kandidaten aus dem Marktsegment D, um das Kaderwachstum voranzutreiben und die verbleibenden fünf Kaderplätze mit sinnvollen Spielern zu füllen.\n\n### 7. FRIDAY-CHECK\nBis Freitagabend müssen folgende Punkte erledigt sein:\n*   **Kontostand:** Dein Kontostand muss zwingend bei 0 Euro oder im Plus sein. Der Verkauf von Andrich stellt dies sicher.\n*   **Kader aufgestellt:** Du benötigst eine vollständige, punktende Startelf für den 28. Spieltag.\n*   **Torwart-Backup:** Die Verpflichtung eines zweiten Torhüters wie Rönnow muss bis dahin abgeschlossen sein, um kein Risiko einzugehen."
+  "market_table": "    first_name   last_name    team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid buy_gate_status              buy_gate_reason  effective_bid_cap  hours_to_exp\n          Jens       Grahl    Frankfurt    500.000                  204              71             500.098              500.098                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                                         500.098             3\n  Abdoul-Karim   Coulibaly       Bremen  3.634.143              233.122              70           3.746.042            3.746.042                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                       3.746.042             5\n      Frederik      Rönnow Union Berlin  7.513.549              147.744              65           7.566.737            7.566.737                   high aggressive_only_if_priority_a             GK            medium                   0                        0                  stable                                      0                     -                                -      sell_first sell_first_insufficient_cash          7.566.737           673\nTiago Pereira      Cardoso   M'gladbach    500.000                  146              63             500.052              500.052                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -           clear                                         500.052            11\n    Maximilian Mittelstädt    Stuttgart 32.834.792               36.498              61          32.852.311           32.852.311                 medium              stay_disciplined            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                      32.852.311             4\n       Maarten Vandevoordt      Leipzig  4.457.377              -49.742              55           4.457.377            4.457.377                   high               avoid_price_war             GK            medium                   0                        0                  stable                                      0                     -                                -      sell_first sell_first_insufficient_cash          4.457.377            19\n     Arkadiusz       Pyrka    St. Pauli  3.570.223             -102.024              54           3.570.223            3.570.223                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                       3.570.223             0\n        Ridle         Baku      Leipzig 21.936.083               86.306              52          21.967.153           21.967.153                   high aggressive_only_if_priority_a            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                      21.967.153            19\n        Justin     Njinmah       Bremen  6.052.077              147.624              52           6.105.222            6.105.222                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.105.222           650\n        Philip       Otele      Hamburg  6.244.160              148.380              52           6.297.577            6.297.577                   high aggressive_only_if_priority_a             ST              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.297.577           704\n          Ísak Jóhannesson         Köln  3.140.637               53.067              51           3.159.741            3.159.741                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                       3.159.741           673\n        Joakim       Mæhle    Wolfsburg  4.193.816               55.835              50           4.213.917            4.213.917                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                       4.213.917           673\n       Mattias    Svanberg    Wolfsburg    500.000                  146              49             500.052              500.052                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                         500.052            10\nMaycon Douglas     Cardozo       Bayern  1.794.912               27.333              48           1.804.752            1.804.752                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                       1.804.752           704\n        Justin       Diehl    Stuttgart    500.000                  193              48             500.069              500.069                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                                         500.069            13",
+  "squad_table": "first_name last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob            next_opponent\n    Robert   Andrich Leverkusen 18.869.255             -244.844                   22 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Manuel     Neuer     Bayern  7.094.577              253.763                   21 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Lucas     Höler   Freiburg    500.000                1.191                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Josha  Vagnoman  Stuttgart  5.741.825              156.204                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n   Ermedin Demirović  Stuttgart 20.636.973               19.617                   18 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Marvin Pieringer Heidenheim  2.245.957              128.607                   17 rotation_hold              model_only                   0                        0                  stable                                  0         - Borussia Mönchengladbach\n Christian   Eriksen  Wolfsburg 10.784.236               45.887                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Kaishu      Sano      Mainz 11.826.283               50.996                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -      TSG 1899 Hoffenheim\n      Finn   Jeltsch  Stuttgart 10.852.259               72.390                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Marco    Friedl     Bremen 17.408.218             -170.496                    2  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n     Jakub  Kaminski       Köln 19.867.250               36.451                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -      Eintracht Frankfurt\n     Serge    Gnabry     Bayern 30.132.505               65.515                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -",
+  "ai_excerpt": "Hallo Luca, hier ist deine Kickbase-Portfolio-Analyse für den Montagabend. ### 1. TEAMSTATUS Dein Kader ist mit 12 von 17 Spielern kompakt und schlagkräftig aufgestellt. Mit einem Budget von 3.746.461 € hast du begrenzten, aber sofort verfügbaren Spielraum für gezielte Trades. Das Trading-Fenster ist im normalen \"Build-Up\"-Modus, was bedeutet, dass wir bis Freitag ein voll funktionsfähiges Team für den 28. Spieltag benötigen. Dein dringendster Handlungsbedarf ist die Absicherung der Torwartposition mit einem Backup für Manuel Neuer. ### 2. VERKAUFS-BEFEHLE Aktuell sehe ich keinen zwingenden so",
+  "ai_full_text": "Hallo Luca, hier ist deine Kickbase-Portfolio-Analyse für den Montagabend.\n\n### 1. TEAMSTATUS\nDein Kader ist mit 12 von 17 Spielern kompakt und schlagkräftig aufgestellt. Mit einem Budget von 3.746.461 € hast du begrenzten, aber sofort verfügbaren Spielraum für gezielte Trades. Das Trading-Fenster ist im normalen \"Build-Up\"-Modus, was bedeutet, dass wir bis Freitag ein voll funktionsfähiges Team für den 28. Spieltag benötigen. Dein dringendster Handlungsbedarf ist die Absicherung der Torwartposition mit einem Backup für Manuel Neuer.\n\n### 2. VERKAUFS-BEFEHLE\nAktuell sehe ich keinen zwingenden sofortigen Verkaufsbedarf. Robert Andrich und Marco Friedl haben zwar leicht negative Marktwertprognosen, sind aber als Leistungsträger zu wichtig, um sie ohne Not abzugeben. Friedl wird zudem als \"keep_due_to_thin_market\" eingestuft. Wir beobachten ihre Entwicklung, aber halten sie vorerst.\n\n### 3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE\nFür heute Abend konzentrieren wir uns auf eine realistische und budgetkonforme Option:\n\n*   **Kauf Abdoul-Karim Coulibaly | Priorität A | Max Gebot 3.746.042 € | Rolle: Trader | Warum jetzt:** Coulibaly läuft in 5 Stunden aus und hat mit +233.122 € die höchste positive Marktwertprognose im kurzfristigen Marktsegment. Dein Budget reicht exakt für das empfohlene Maximalgebot. Das Ziel ist ein schneller \"Overnight-Flip\", um Kapital für weitere Trades und die Torwart-Backup-Position zu generieren. Die aktuellsten Nachrichten deuten darauf hin, dass er nach einer Muskelverletzung bald wieder ins Training einsteigen könnte, was seinen Marktwert weiter stabilisieren sollte.\n\n### 4. SPAETERE CHANCEN UND HOLDS\nEin Spieler im späteren Marktsegment ist für uns von strategischem Interesse, sobald wir wieder flüssiger sind:\n\n*   **Beobachte Frederik Rönnow | Zielstrategie: Spieltag | Späteres Max Gebot: ca. 7.500.000 € | Warum relevant:** Rönnow ist eine Top-Option, um deine Torwartposition abzusichern und einen starken zweiten Keeper im Kader zu haben. Aktuell ist er durch dein Budget blockiert (\"sell_first\"). Sobald du durch Trades wie mit Coulibaly wieder Kapital freigeschaufelt hast, sollten wir hier einen Angriff wagen.\n\n### 5. NEWS-CHECK\nDie Nachrichtenlage zu den für uns relevanten Spielern ist überschaubar, aber es gibt einige wichtige Erkenntnisse:\n*   **Abdoul-Karim Coulibaly:** Fehlte Anfang Februar krankheitsbedingt im Training und erlitt kurz darauf eine Muskelverletzung. Jüngste Berichte von Anfang März deuten aber auf eine baldige Rückkehr ins Mannschaftstraining hin. Dies unterstützt das kurzfristige Trading-Potenzial.\n*   **Marco Friedl:** Hatte in der Vergangenheit immer wieder mit kleineren Verletzungen zu kämpfen, darunter eine Innenbandverletzung und muskuläre Probleme. Es gibt jedoch keine aktuellen Berichte über eine schwerwiegende Verletzung, die einen sofortigen Verkauf rechtfertigen würde.\n*   **Ermedin Demirović:** Ist nach einer längeren Verletzungspause Anfang des Jahres wieder ins Training eingestiegen. Das ist eine positive Entwicklung für seinen langfristigen Wert.\n*   **Robert Andrich:** Die gefundenen Informationen zu Verletzungen sind nicht aktuell und beziehen sich auf vergangene Spielzeiten oder kleinere, bereits auskurierte Probleme. Es gibt keine Anzeichen für einen bevorstehenden Ausfall.\n*   **Jens Grahl & Christian Eriksen:** Die Nachrichtenlage liefert keine neuen, spielentscheidenden Informationen, die unsere aktuelle Strategie beeinflussen würden.\n\n### 6. TRADING-PLAN\nDie Strategie für die nächsten 2-4 Tage ist klar auf Kapitalwachstum und Kaderabsicherung ausgelegt:\n1.  **Heute:** Kauf von Coulibaly als kurzfristigen Trade, um das Budget zu erhöhen.\n2.  **Morgen/Übermorgen:** Verkauf von Coulibaly mit Gewinn. Parallel dazu den Markt für einen günstigen Backup-Torwart sondieren. Sollte sich eine gute Gelegenheit ergeben, können wir auch einen Spieler wie Lucas Höler oder Marvin Pieringer für einen Trade in Betracht ziehen.\n3.  **Richtung Wochenende:** Mit dem erhöhten Budget einen guten zweiten Torwart (wie Rönnow) verpflichten und den Kader auf 13-14 Spieler auffüllen, um für den Spieltag gerüstet zu sein.\n\n### 7. FRIDAY-CHECK\nBis Freitag, 03. April 2026, müssen wir folgende Punkte sicherstellen:\n*   **Kontostand:** Dein Kontostand muss zwingend >= 0 € sein. Der Kauf von Coulibaly wird dein Budget aufbrauchen, der geplante Verkauf muss also zeitnah erfolgen.\n*   **Team-Aufstellung:** Eine spielfähige Elf muss stehen. Dazu gehört auch ein Backup-Torhüter, um auf kurzfristige Ausfälle von Manuel Neuer reagieren zu können. Die Kadergröße sollte auf mindestens 13 Spieler erhöht werden, um Flexibilität zu haben."
 }
