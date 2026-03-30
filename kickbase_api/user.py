@@ -6,6 +6,9 @@ import requests
 def login(username, password):
     """Logs in to Kickbase and returns the authentication token."""
 
+    if not username or not password:
+        raise ValueError("Kickbase credentials missing. Please provide KICK_USER and KICK_PASS.")
+
     url = f"{BASE_URL}/user/login"
     payload = {
         "em": username,
@@ -14,7 +17,14 @@ def login(username, password):
         "rep": {}
     }
     resp = requests.post(url, json=payload)
-    resp.raise_for_status()
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError as error:
+        if resp.status_code == 401:
+            raise RuntimeError(
+                "Kickbase login failed with 401 Unauthorized. Verify KICK_USER and KICK_PASS in your local .env or GitHub Actions secrets."
+            ) from error
+        raise
     data = resp.json()
     token = data.get("tkn")
 

@@ -62,6 +62,11 @@ def main() -> None:
     username = os.getenv("KICK_USER")
     password = os.getenv("KICK_PASS")
 
+    if not username or not password:
+        raise RuntimeError(
+            "Kickbase credentials are not configured. Set KICK_USER and KICK_PASS in the environment or GitHub Actions secrets."
+        )
+
     token = login(username, password)
     print("\nLogged in to Kickbase.")
 
