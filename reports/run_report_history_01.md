@@ -1,47 +1,47 @@
 # Last Run Summary
 
-- Report Date: 19. April 2026
-- Generated At: 2026-04-19T22:01:55.786753Z
+- Report Date: 20. April 2026
+- Generated At: 2026-04-20T22:11:18.188881Z
 - User: Luca Malco
-- Own Budget: 34996815.0
-- Market Players: 23
-- Squad Players: 11
+- Own Budget: 5533012.0
+- Market Players: 19
+- Squad Players: 12
 - Fixture Context Active: True
 - AI Status: success
-- Mail Status: failed: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-2e53d2cff04sm10991127eec.23 - gsmtp')
+- Mail Status: failed: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-2e53ac84c38sm16826030eec.13 - gsmtp')
 - Offer Tracking Active: 1
 - Offer Tracking Outbid: 0
 - Offer Tracking Won: 0
 
 ## Model Metrics
 
-- Signs Correct: 64.35
-- RMSE: 38852.36
-- MAE: 18913.88
-- R2: 0.9199
+- Signs Correct: 64.04
+- RMSE: 38729.43
+- MAE: 18834.2
+- R2: 0.9194
 
 ## Matchday Context
 
 - Next Matchday: 31
 - Next Matchday Date: 26-04-2026 17:30
-- Days Until Next Matchday: 7
+- Days Until Next Matchday: 5
 - Trading Window Mode: normal_build_up
 - Friday Safety Mode: inactive
 
 ## Own Budget Context
 
-- Budget: 34996815.0
-- Current Cash: 34996815.0
-- Spendable Without Debt: 34996815.0
-- Temporary Negative Buffer: 55947607.650000006
-- Theoretical Max Spend: 90944422.65
-- Max Negative: -55947607.650000006
-- Friday Recovery Need At Floor: 55947607.650000006
+- Budget: 5533012.0
+- Current Cash: 5533012.0
+- Spendable Without Debt: 5533012.0
+- Temporary Negative Buffer: 55636185.0
+- Theoretical Max Spend: 61169197.0
+- Max Negative: -55636185.0
+- Friday Recovery Need At Floor: 55636185.0
 
 ## Management Summary
 
-- Aktive Gebotssumme: 28349137.0
-- Effektives Cash nach aktiven Geboten: 6647678.0
+- Aktive Gebotssumme: 3139345.0
+- Effektives Cash nach aktiven Geboten: 2393667.0
 - Overbid-Druck: low
 - Suggested Markup: 0.0
 - Outbid Count 14d: 0
@@ -53,7 +53,7 @@
 
 - Marktknappheit: high
 - Starke Ersatzoptionen am Markt: 0
-- Geschuetzte Kaderspieler: 4
+- Geschuetzte Kaderspieler: 5
 
 ## Roster Need Summary
 
@@ -67,34 +67,34 @@
 
 ## Buy Gate Summary
 
-- Geblockte Kaufkandidaten: 1
+- Geblockte Kaufkandidaten: 2
 - Bereits ueber aktive Gebote gemanagte Kandidaten: 0
-- Club-Limit Blocks: 0
+- Club-Limit Blocks: 1
 - Budget-Hard-Blocks: 0
 - Erst verkaufen / Cash freimachen: 0
-- Freies Cash fuer Sofortkaeufe: 34996815.0
-- Absolute Budgetobergrenze: 90944422.65
-- Kadergroesse: 11 / 17
+- Freies Cash fuer Sofortkaeufe: 5533012.0
+- Absolute Budgetobergrenze: 61169197.0
+- Kadergroesse: 12 / 17
 
 ## Purchase Review Summary
 
-- Eigene Kaeufe im Fenster: 10
+- Eigene Kaeufe im Fenster: 13
 - Gut: 3
-- Neutral: 5
-- Schwach: 2
+- Neutral: 6
+- Schwach: 4
 - Gegen Modellsignal: 0
-- Realisiert: 1
-- Noch offen: 7
+- Realisiert: 3
+- Noch offen: 8
 - Learning: Die juengsten Kaeufe sind gemischt. Besonders Transfers ausserhalb der disziplinierten Modellgrenzen enger pruefen.
 
+- Fábio Silva | Urteil: neutral | Delta: -239648.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
+- Amiri | Urteil: poor | Delta: -2305153.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
+- Pereira Lage | Urteil: poor | Delta: -323046.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
 - Schmidt | Urteil: neutral | Delta: None | Status: nicht mehr im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Caci | Urteil: good | Delta: 461012.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Kramarić | Urteil: poor | Delta: -1585538.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Gregoritsch | Urteil: neutral | Delta: -135353.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
+- Caci | Urteil: good | Delta: 672889.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
+- Kramarić | Urteil: poor | Delta: -1470827.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
+- Gregoritsch | Urteil: neutral | Delta: -135353.0 | Status: bereits verkauft | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
 - Köhn | Urteil: neutral | Delta: -140260.0 | Status: bereits verkauft | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Jenz | Urteil: good | Delta: 495348.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Treu | Urteil: poor | Delta: -671868.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
-- Baku | Urteil: good | Delta: 519991.0 | Status: noch im Kader | Signal: unknown | Hinweis: Kein passender Marktsnapshot vor dem Kauf gefunden.
 
 ## API-Football Summary
 
@@ -128,78 +128,79 @@
 ## Manager Budget Snapshot
 
 ```text
-      User      Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor
-      Till 102.531.500 213.198.255   102.531.500  -104.190.819       206.722.319             102.531.500                104.190.819                    104.190.819
-       Rob  81.368.239 228.447.524    81.368.239  -102.239.202       183.607.441              81.368.239                102.239.202                    102.239.202
-      joel  69.101.965 247.311.234    69.101.965  -104.416.356       173.518.321              69.101.965                104.416.356                    104.416.356
-     David  70.732.525 217.565.606    70.732.525   -95.138.383       165.870.908              70.732.525                 95.138.383                     95.138.383
-       Jan  69.096.936 221.868.444    69.096.936   -96.018.575       165.115.511              69.096.936                 96.018.575                     96.018.575
-     Jonas  86.054.180 149.022.027    86.054.180   -77.575.148       163.629.328              86.054.180                 77.575.148                     77.575.148
- FlippiXxp  16.531.357 366.038.064    16.531.357  -126.247.909       142.779.266              16.531.357                126.247.909                    126.247.909
-Luca Malco  34.996.815 134.541.390    34.996.815   -55.947.608        90.944.423              34.996.815                 55.947.608                     55.947.608
+      User     Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor
+       Jan 79.573.270 222.847.710    79.573.270   -99.798.923       179.372.193              79.573.270                 99.798.923                     99.798.923
+     David 82.271.602 207.865.437    82.271.602   -95.745.223       178.016.825              82.271.602                 95.745.223                     95.745.223
+ FlippiXxp 35.576.922 372.505.738    35.576.922  -134.667.278       170.244.200              35.576.922                134.667.278                    134.667.278
+     Jonas 86.159.180 149.261.875    86.159.180   -77.688.948       163.848.128              86.159.180                 77.688.948                     77.688.948
+       Rob 55.467.734 229.457.131    55.467.734   -94.025.205       149.492.939              55.467.734                 94.025.205                     94.025.205
+      joel 44.307.257 270.821.245    44.307.257  -103.992.406       148.299.663              44.307.257                103.992.406                    103.992.406
+      Till 38.127.414 246.919.428    38.127.414   -94.065.458       132.192.872              38.127.414                 94.065.458                     94.065.458
+Luca Malco  5.533.012 163.061.488     5.533.012   -55.636.185        61.169.197               5.533.012                 55.636.185                     55.636.185
 ```
 
 ## Top Market Candidates
 
-- Ramon Hendriks | Team: Stuttgart | Score: 74.7 | Rolle: short_term_trade | Delta: 214444.5 | Max: 6780905.0 | Competitive Max: 6780905.0 | Wettbewerb: high | Gegner: None | Fixture: None
-- Mathias Pereira Lage | Team: St. Pauli | Score: 73.3 | Rolle: short_term_trade | Delta: 88474.07 | Max: 4544501.0 | Competitive Max: 4544501.0 | Wettbewerb: high | Gegner: None | Fixture: None
-- El Chadaille Bitshiabu | Team: Leipzig | Score: 68.7 | Rolle: short_term_trade | Delta: 299349.71 | Max: 3270197.0 | Competitive Max: 3394638.0 | Wettbewerb: high | Gegner: None | Fixture: None
-- Dzenan Pejcinovic | Team: Wolfsburg | Score: 68.6 | Rolle: short_term_trade | Delta: 299105.73 | Max: 1997385.0 | Competitive Max: 1997385.0 | Wettbewerb: high | Gegner: None | Fixture: None
-- Max Finkgräfe | Team: Leipzig | Score: 67.4 | Rolle: short_term_trade | Delta: 98395.32 | Max: 596551.0 | Competitive Max: 608844.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Max Finkgräfe | Team: Leipzig | Score: 84.3 | Rolle: short_term_trade | Delta: 130455.47 | Max: 733208.0 | Competitive Max: 750143.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Lukas Klostermann | Team: Leipzig | Score: 80.8 | Rolle: short_term_trade | Delta: 48990.01 | Max: 583860.0 | Competitive Max: 583860.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Hugo Bolin | Team: M'gladbach | Score: 78.3 | Rolle: short_term_trade | Delta: 142797.14 | Max: 584297.0 | Competitive Max: 584297.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Abdoul-Karim Coulibaly | Team: Bremen | Score: 62.3 | Rolle: short_term_trade | Delta: 190873.15 | Max: 4578000.0 | Competitive Max: 4578000.0 | Wettbewerb: high | Gegner: None | Fixture: None
+- Lucas Höler | Team: Freiburg | Score: 61.8 | Rolle: short_term_trade | Delta: 114390.44 | Max: 2941690.0 | Competitive Max: 2941690.0 | Wettbewerb: high | Gegner: None | Fixture: None
 
 ## Market Snapshot
 
 ```text
-  first_name     last_name  team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid buy_gate_status    buy_gate_reason  effective_bid_cap hours_to_exp
-       Ramon      Hendriks  Stuttgart  6.677.972              214.444              75           6.780.905            6.780.905                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             6.780.905            2
-     Mathias  Pereira Lage  St. Pauli  4.502.033               88.474              73           4.544.501            4.544.501                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                             4.544.501            2
-El Chadaille     Bitshiabu    Leipzig  3.126.509              299.350              69           3.270.197            3.394.638                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             3.394.638           16
-      Dzenan    Pejcinovic  Wolfsburg  1.877.469              299.106              69           1.997.385            1.997.385                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             1.997.385           17
-         Max     Finkgräfe    Leipzig    560.754               98.395              67             596.551              608.844                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                               608.844           26
-      Justin       Njinmah     Bremen  4.990.348              180.212              61           5.076.850            5.076.850                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             5.076.850           10
-     Alessio Castro-Montes       Köln  3.898.181              114.431              59           3.939.376            3.939.376                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                             3.939.376           23
-       Oscar       Højlund  Frankfurt  2.964.781              229.981              59           3.075.172            3.075.172                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                             3.075.172            -
-Abdoul-Karim     Coulibaly     Bremen  4.309.144              185.657              58           4.398.260            4.398.260                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             4.398.260           33
-     Mathias        Honsak Heidenheim  1.846.021              122.348              58           1.904.748            1.904.748                   high aggressive_only_if_priority_a             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             1.904.748            -
-        Cenk       Özkaçar       Köln  3.991.449              249.737              58           4.111.323            4.111.323                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             4.111.323            -
-      Arnaud    Kalimuendo  Frankfurt 21.540.328              181.549              55          21.627.471           21.627.471                 medium           small_markup_needed             ST              none                   0                        0                  stable                                      0                     -                                -           clear                            21.627.471           19
-               Fábio Silva   Dortmund  6.963.011               40.027              54           6.982.224            6.982.224                 medium           small_markup_needed             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             6.982.224           17
-      Nadiem         Amiri      Mainz 25.898.603              115.939              52          25.954.254           25.954.254                   high aggressive_only_if_priority_a            MID              none                   0                        0                  stable                                      0                 abort                                -         blocked active_offer_abort         25.954.254           10
-    Benjamin      Henrichs    Leipzig  4.109.882               24.527              51           4.121.655            4.121.655                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             4.121.655            7
+  first_name   last_name    team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid buy_gate_status    buy_gate_reason  effective_bid_cap hours_to_exp
+         Max   Finkgräfe      Leipzig    673.162              130.455              84             733.208              750.143                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                               750.143            2
+       Lukas Klostermann      Leipzig    560.345               48.990              81             583.860              583.860                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                               583.860            3
+        Hugo       Bolin   M'gladbach    536.669              142.797              78             584.297              584.297                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                               584.297            4
+Abdoul-Karim   Coulibaly       Bremen  4.486.381              190.873              62           4.578.000            4.578.000                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             4.578.000            9
+       Lucas       Höler     Freiburg  2.886.783              114.390              62           2.941.690            2.941.690                   high aggressive_only_if_priority_a             ST              none                   0                        0                  stable                                      0                 abort                                -         blocked active_offer_abort          2.941.690           10
+     Mathias      Honsak   Heidenheim  2.005.103              157.884              60           2.080.887            2.080.887                   high aggressive_only_if_priority_a             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             2.080.887            -
+        Cenk     Özkaçar         Köln  4.230.409              236.541              57           4.343.949            4.343.949                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             4.343.949            -
+       Oscar     Højlund    Frankfurt  3.165.566              177.770              56           3.250.896            3.250.896                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                             3.250.896            -
+      Daniel        Batz        Mainz 10.957.485               -5.180              54          10.957.485           10.957.485                 medium           small_markup_needed             GK            medium                   0                        0                  stable                                      0                     -                                -         blocked club_limit_reached         10.957.485            -
+     Danilho      Doekhi Union Berlin 20.348.600               42.919              49          20.364.051           20.364.051                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                            20.364.051           27
+  Maximilian   Eggestein     Freiburg 15.032.542              122.184              47          15.076.528           15.076.528                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                            15.076.528            -
+      Ellyes      Skhiri    Frankfurt    704.933              -26.090              45             704.933              704.933                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                               704.933           30
+      Jordan Torunarigha      Hamburg  9.572.265             -150.465              44           9.572.265            9.572.265                 medium           small_markup_needed            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                             9.572.265           13
+       Lovro       Majer    Wolfsburg  1.199.840             -130.648              43           1.199.840            1.199.840                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                             1.199.840            1
+      Martin     Terrier   Leverkusen  1.293.209             -126.403              38           1.293.209            1.293.209                   high               avoid_price_war             ST              none                   0                        0                  stable                                      0                     -                                -           clear                             1.293.209            2
 ```
 
 ## Top Sell Candidates
 
-- Philipp Treu | Team: Freiburg | Sell Score: 47.5 | Rolle: rotation_hold | Delta: -293056.61 | Gegner: None | Fixture: None
-- Michael Gregoritsch | Team: Augsburg | Sell Score: 34.5 | Rolle: rotation_hold | Delta: -101595.99 | Gegner: Eintracht Frankfurt | Fixture: medium
-- Manuel Neuer | Team: Bayern | Sell Score: 21.4 | Rolle: rotation_hold | Delta: 41826.89 | Gegner: None | Fixture: None
-- Ermedin Demirović | Team: Stuttgart | Sell Score: 20.6 | Rolle: rotation_hold | Delta: 127407.08 | Gegner: None | Fixture: None
-- Moritz Jenz | Team: Wolfsburg | Sell Score: 18.8 | Rolle: rotation_hold | Delta: -538.03 | Gegner: None | Fixture: None
+- Manuel Neuer | Team: Bayern | Sell Score: 22.5 | Rolle: rotation_hold | Delta: -31815.47 | Gegner: None | Fixture: None
+- Fábio Silva | Team: Dortmund | Sell Score: 20.8 | Rolle: rotation_hold | Delta: -33462.18 | Gegner: None | Fixture: None
+- Ermedin Demirović | Team: Stuttgart | Sell Score: 20.5 | Rolle: rotation_hold | Delta: 96430.75 | Gegner: None | Fixture: None
+- Moritz Jenz | Team: Wolfsburg | Sell Score: 18.9 | Rolle: rotation_hold | Delta: -4213.01 | Gegner: None | Fixture: None
+- Anthony Caci | Team: Mainz | Sell Score: 15.8 | Rolle: rotation_hold | Delta: 239208.8 | Gegner: FC Bayern München | Fixture: hard
 
 ## Squad Snapshot
 
 ```text
-first_name   last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob       next_opponent
-   Philipp        Treu   Freiburg  5.728.133             -293.057                   48 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
-   Michael Gregoritsch   Augsburg  4.480.060             -101.596                   34 rotation_hold              model_only                   0                        0                  stable                                  0         - Eintracht Frankfurt
-    Manuel       Neuer     Bayern  9.110.794               41.827                   21 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
-   Ermedin   Demirović  Stuttgart 21.822.462              127.407                   21 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
-    Moritz        Jenz  Wolfsburg  5.050.903                 -538                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
-   Anthony        Caci      Mainz  1.144.711              109.599                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -   FC Bayern München
-     Aaron     Zehnter  Wolfsburg    520.019              120.151                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
-    Kaishu        Sano      Mainz 13.961.282               62.259                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -   FC Bayern München
-    Andrej    Kramarić Hoffenheim 25.156.262              107.371                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -        Hamburger SV
-     Jakub    Kaminski       Köln 22.546.773              187.730                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         - Bayer 04 Leverkusen
-    Ridle         Baku    Leipzig 24.019.991              192.712                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                   -
+first_name    last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob       next_opponent
+    Manuel        Neuer     Bayern  9.118.661              -31.815                   22 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+            Fábio Silva   Dortmund  7.003.504              -33.462                   21 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+   Ermedin    Demirović  Stuttgart 21.928.209               96.431                   20 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+    Moritz         Jenz  Wolfsburg  5.079.451               -4.213                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+   Anthony         Caci      Mainz  1.356.588              239.209                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -   FC Bayern München
+   Mathias Pereira Lage  St. Pauli  4.598.661               95.210                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+     Aaron      Zehnter  Wolfsburg    647.713              173.931                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                   -
+    Kaishu         Sano      Mainz 14.029.313               67.935                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -   FC Bayern München
+    Andrej     Kramarić Hoffenheim 25.270.973              111.874                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -        Hamburger SV
+    Nadiem        Amiri      Mainz 26.043.984              140.230                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -   FC Bayern München
+     Jakub     Kaminski       Köln 22.745.961              182.125                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         - Bayer 04 Leverkusen
+    Ridle          Baku    Leipzig 24.238.470              197.334                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                   -
 ```
 
 ## Active Offers
 
-- Nadiem Amiri | Gebot: 28349137.0 | Marktwert: 25898603.0 | Ablauf: 2026-04-20T07:59:38Z
+- Lucas Höler | Gebot: 3139345.0 | Marktwert: 2886783.0 | Ablauf: 2026-04-21T08:27:12Z
 
 ## Active Offer Actions
 
-- Nadiem Amiri | Aktion: abbrechen | Aktuelles Gebot: 28349137.0 | Neues Max Gebot: None | Grund: Dein aktuelles Gebot liegt bereits klar ueber der disziplinierten Obergrenze.
+- Lucas Höler | Aktion: abbrechen | Aktuelles Gebot: 3139345.0 | Neues Max Gebot: None | Grund: Dein aktuelles Gebot liegt bereits klar ueber der disziplinierten Obergrenze.
 
 ## Recent Outbid Offers
 
@@ -218,54 +219,57 @@ first_name   last_name  team_name         mv  predicted_mv_change  sell_priority
 ### Market Feed Debug
 
 - Root Type: list
-- Item Count: 29
-- Pfad: market[0] | Spieler: None | Spieler-ID: None | Marktwert: 7623311.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "51", "fn": "Rani", "n": "Khedira", "tid": "40", "pos": 3, "st": 0, "mvt": 2, "mv": 7623311, "p": 1855, "ap": 64, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 7591380, "isn": false, "iposl": false, "dt": "2026-04-16T19:49:51Z", "pim": "content/file/98159e30baca4a1080128a7a4c32914e.png"}
-- Pfad: market[1] | Spieler: None | Spieler-ID: None | Marktwert: 10981795.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "577", "fn": "Daniel", "n": "Batz", "tid": "18", "pos": 1, "st": 0, "mvt": 2, "mv": 10981795, "p": 1967, "ap": 109, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 11064887, "isn": true, "iposl": false, "dt": "2026-04-19T10:16:16Z", "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"}
-- Pfad: market[2] | Spieler: Nadiem Amiri | Spieler-ID: 1639 | Marktwert: 25898603.0 | Ablauf: 2026-04-20T07:59:38Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, ofs, p, pim, pos, prc, st, tid, uoid, uop | Sample: {"i": "1639", "fn": "Nadiem", "n": "Amiri", "tid": "18", "pos": 3, "st": 0, "mvt": 1, "mv": 25898603, "p": 2863, "ap": 130, "ofc": 1, "exs": 35904, "prc": 25898603, "uop": 28349137, "uoid": "2622703", "isn": false, "ofs": "<list:1>", "iposl": false, "dt": "2026-04-18T18:10:38Z", "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"}
-- Pfad: market[3] | Spieler: None | Spieler-ID: None | Marktwert: 14920317.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "1645", "fn": "Maximilian", "n": "Eggestein", "tid": "5", "pos": 3, "st": 0, "mvt": 1, "mv": 14920317, "p": 2673, "ap": 89, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 14817151, "isn": true, "iposl": false, "dt": "2026-04-19T10:25:16Z", "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"}
-- Pfad: market[4] | Spieler: Benjamin Henrichs | Spieler-ID: 1689 | Marktwert: 4109882.0 | Ablauf: 2026-04-20T04:41:02Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1689", "fn": "Benjamin", "n": "Henrichs", "tid": "43", "pos": 2, "st": 0, "mvt": 2, "mv": 4109882, "p": 429, "ap": 33, "ofc": 0, "exs": 23988, "prc": 4109882, "isn": false, "iposl": false, "dt": "2026-04-18T19:13:02Z", "pim": "content/file/fe5ccc7927254a46ab71aeed829805e4.png"}
-- Pfad: market[5] | Spieler: Dan-Axel Zagadou | Spieler-ID: 2068 | Marktwert: 500000.0 | Ablauf: 2026-04-20T06:17:45Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2068", "fn": "Dan-Axel", "n": "Zagadou", "tid": "9", "pos": 2, "st": 0, "mvt": 0, "mv": 500000, "p": 350, "ap": 175, "ofc": 0, "exs": 29791, "prc": 500000, "isn": false, "iposl": false, "dt": "2026-04-19T01:54:45Z", "pim": "content/file/2dea6714f704489fa0fb302accce4e8a.png"}
-- Pfad: market[6] | Spieler: Philipp Mwene | Spieler-ID: 2232 | Marktwert: 4311684.0 | Ablauf: 2026-04-20T13:52:34Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2232", "fn": "Philipp", "n": "Mwene", "tid": "18", "pos": 2, "st": 0, "mvt": 2, "mv": 4311684, "p": 957, "ap": 38, "ofc": 0, "exs": 57080, "prc": 4311684, "isn": true, "iposl": false, "dt": "2026-04-19T13:49:34Z", "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"}
-- Pfad: market[7] | Spieler: None | Spieler-ID: None | Marktwert: 1846021.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "2455", "fn": "Mathias", "n": "Honsak", "tid": "50", "pos": 4, "st": 0, "mvt": 1, "mv": 1846021, "p": 784, "ap": 31, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 1721451, "isn": true, "iposl": false, "dt": "2026-04-19T10:25:19Z", "pim": "content/file/ef0f480acb2e4002811381446d78ae87.png"}
-- Pfad: market[8] | Spieler: Maximilian Beier | Spieler-ID: 2714 | Marktwert: 26190110.0 | Ablauf: 2026-04-20T13:54:49Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2714", "fn": "Maximilian", "n": "Beier", "tid": "3", "pos": 4, "st": 0, "mvt": 1, "mv": 26190110, "p": 2506, "ap": 90, "ofc": 0, "exs": 57215, "prc": 26190110, "isn": false, "iposl": false, "dt": "2026-04-18T14:49:49Z", "pim": "content/file/ed209b2ca67c4784a658521f80baa795.png"}
-- Pfad: market[9] | Spieler: Justin Njinmah | Spieler-ID: 3228 | Marktwert: 4990348.0 | Ablauf: 2026-04-20T08:11:44Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "3228", "fn": "Justin", "n": "Njinmah", "tid": "10", "pos": 4, "st": 0, "mvt": 1, "mv": 4990348, "p": 1342, "ap": 46, "ofc": 0, "exs": 36630, "prc": 4990348, "isn": false, "iposl": false, "dt": "2026-04-19T09:33:44Z", "pim": "content/file/1a88a39549924d048294f618079e8437.png"}
+- Item Count: 26
+- Pfad: market[0] | Spieler: None | Spieler-ID: None | Marktwert: 10957485.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "577", "fn": "Daniel", "n": "Batz", "tid": "18", "pos": 1, "st": 0, "mvt": 2, "mv": 10957485, "p": 1967, "ap": 109, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 11064887, "isn": false, "iposl": false, "dt": "2026-04-19T10:16:16Z", "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"}
+- Pfad: market[1] | Spieler: Lukas Klostermann | Spieler-ID: 1333 | Marktwert: 560345.0 | Ablauf: 2026-04-21T01:21:50Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1333", "fn": "Lukas", "n": "Klostermann", "tid": "43", "pos": 2, "st": 2, "mvt": 1, "mv": 560345, "p": 201, "ap": 40, "ofc": 0, "exs": 11469, "prc": 560345, "isn": false, "iposl": false, "dt": "2026-04-20T06:33:50Z", "pim": "content/file/fe5ccc7927254a46ab71aeed829805e4.png"}
+- Pfad: market[2] | Spieler: None | Spieler-ID: None | Marktwert: 15032542.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "1645", "fn": "Maximilian", "n": "Eggestein", "tid": "5", "pos": 3, "st": 0, "mvt": 1, "mv": 15032542, "p": 2676, "ap": 89, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 14817151, "isn": false, "iposl": false, "dt": "2026-04-19T10:25:16Z", "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"}
+- Pfad: market[3] | Spieler: Anthony Jung | Spieler-ID: 1858 | Marktwert: 500000.0 | Ablauf: 2026-04-21T11:10:55Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1858", "fn": "Anthony", "n": "Jung", "tid": "5", "pos": 2, "st": 0, "mvt": 0, "mv": 500000, "p": 420, "ap": 42, "ofc": 0, "exs": 46814, "prc": 500000, "isn": true, "iposl": false, "dt": "2026-04-20T18:28:55Z", "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"}
+- Pfad: market[4] | Spieler: Jordan Torunarigha | Spieler-ID: 1978 | Marktwert: 9572265.0 | Ablauf: 2026-04-21T10:51:10Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "1978", "fn": "Jordan", "n": "Torunarigha", "tid": "6", "pos": 2, "st": 0, "mvt": 2, "mv": 9572265, "p": 1530, "ap": 73, "ofc": 0, "exs": 45629, "prc": 9572265, "isn": false, "iposl": false, "dt": "2026-04-20T04:21:10Z", "pim": "content/file/6bd6cf911d5b497e977b3e6a4526aef9.png"}
+- Pfad: market[5] | Spieler: Lucas Höler | Spieler-ID: 2176 | Marktwert: 2886783.0 | Ablauf: 2026-04-21T08:27:12Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, ofs, p, pim, pos, prc, st, tid, uoid, uop | Sample: {"i": "2176", "fn": "Lucas", "n": "Höler", "tid": "5", "pos": 4, "st": 0, "mvt": 1, "mv": 2886783, "p": 1405, "ap": 48, "ofc": 1, "exs": 36991, "prc": 2886783, "uop": 3139345, "uoid": "2622703", "isn": true, "ofs": "<list:1>", "iposl": false, "dt": "2026-04-20T15:23:12Z", "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"}
+- Pfad: market[6] | Spieler: Florian Neuhaus | Spieler-ID: 2261 | Marktwert: 500000.0 | Ablauf: 2026-04-21T08:51:02Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2261", "fn": "Florian", "n": "Neuhaus", "tid": "15", "pos": 3, "st": 0, "mvt": 0, "mv": 500000, "p": 909, "ap": 53, "ofc": 0, "exs": 38421, "prc": 500000, "isn": true, "iposl": false, "dt": "2026-04-20T10:58:02Z", "pim": "content/file/d4b8e5025d3043b3ad48c1f6ac91830d.png"}
+- Pfad: market[7] | Spieler: None | Spieler-ID: None | Marktwert: 2005103.0 | Ablauf: None | Keys: ap, dt, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid, u | Sample: {"i": "2455", "fn": "Mathias", "n": "Honsak", "tid": "50", "pos": 4, "st": 0, "mvt": 1, "mv": 2005103, "p": 773, "ap": 31, "ofc": 0, "u": {"i": "<nested>", "n": "<nested>", "uim": "<nested>", "isvf": "<nested>", "st": "<nested>"}, "prc": 1721451, "isn": false, "iposl": false, "dt": "2026-04-19T10:25:19Z", "pim": "content/file/ef0f480acb2e4002811381446d78ae87.png"}
+- Pfad: market[8] | Spieler: Ellyes Skhiri | Spieler-ID: 2718 | Marktwert: 704933.0 | Ablauf: 2026-04-22T03:58:25Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2718", "fn": "Ellyes", "n": "Skhiri", "tid": "4", "pos": 3, "st": 0, "mvt": 1, "mv": 704933, "p": 758, "ap": 36, "ofc": 0, "exs": 107264, "prc": 704933, "isn": true, "iposl": false, "dt": "2026-04-20T14:16:25Z", "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"}
+- Pfad: market[9] | Spieler: Malik Tillman | Spieler-ID: 2846 | Marktwert: 21965247.0 | Ablauf: 2026-04-22T18:37:29Z | Keys: ap, dt, exs, fn, i, iposl, isn, mv, mvt, n, ofc, p, pim, pos, prc, st, tid | Sample: {"i": "2846", "fn": "Malik", "n": "Tillman", "tid": "7", "pos": 3, "st": 0, "mvt": 1, "mv": 21965247, "p": 2267, "ap": 91, "ofc": 0, "exs": 160008, "prc": 21965247, "isn": true, "iposl": false, "dt": "2026-04-20T19:33:29Z", "pim": "content/file/353820bceb58462590ea1a470cde9cc6.png"}
 
 ## AI Full Output
 
-Hallo Luca, hier ist deine Kickbase-Abendstrategie für Montag, den 19. April.
+Hallo Luca Malco, hier ist deine Kickbase-Abendstrategie für Dienstag, den 20. April 2026.
 
 ### 1. TEAMSTATUS
-Dein Kader ist mit 11 von 17 Plätzen noch ausbaufähig und verfügt über einen starken Kern von vier Spielern, die aufgrund der hohen Marktknappheit als unverkäuflich gelten. Dein Hauptaugenmerk heute Abend muss auf dem Management deines Budgets und deiner Gebote liegen. Du hast ein enormes Barvermögen von **34.996.815 €**, aber ein übergroßes Gebot für Nadiem Amiri blockiert davon **28.349.137 €**. Die sofortige Auflösung dieses Gebots ist der wichtigste erste Schritt. Danach verfügst du über fast 63,3 Mio. € an liquiden Mitteln, was dir für die restliche Woche enormen Handlungsspielraum gibt. Der dringendste Kaderbedarf ist eine Backup-Option für Manuel Neuer im Tor, was aktuell eine mittlere Priorität hat.
+Dein Kader ist mit 12 von 17 Plätzen gut aufgestellt und hat einen starken Kern. Dein effektives Budget von 5,5 Mio. € bietet Spielraum für kluge Trades. Das Tradingfenster ist im normalen "Build-up"-Modus, der Fokus liegt also auf dem kommenden 31. Spieltag in 5 Tagen. Dein dringendster Handlungsbedarf ist die Überprüfung deines aktiven Gebots für Lucas Höler, das von der Systemlogik als zu hoch eingestuft wird. Zudem solltest du den Markt nach kurzfristigen Marktwert-Traders scannen, um dein Budget weiter zu erhöhen. Der Bedarf an einem zweiten Torwart bleibt eine mittelfristige Priorität.
 
 ### 2. VERKAUFS-BEFEHLE
-**Verkaufe Philipp Treu (Freiburg, MW: 5.728.133 €)**
-*   **Grund:** Das System prognostiziert einen Marktwertverlust von ca. 293.000 € bis morgen und bewertet deinen initialen Kauf als "schwach". Seine Verkaufspriorität ist mit 48 die höchste im Kader. Ein Verkauf setzt sofort Kapital frei, um profitablere und formstärkere Spieler zu erwerben.
+Aktuell gibt es keinen zwingenden Verkaufsdruck. Die Marktknappheit ist hoch, daher sollten die als "core_starter" markierten Spieler gehalten werden, insbesondere die mit dem Hinweis "keep_due_to_thin_market".
+
+*   **Beobachtungsposten:**
+    *   **Fábio Silva (Dortmund):** Hat eine leichte negative Marktwertprognose. Ein Verkauf ist nicht dringend, aber bei einem passenden Angebot und einer besseren Alternative auf dem Markt könntest du überlegen, das Kapital (ca. 7 Mio. €) umzuschichten. Aktuell lautet die Empfehlung aber klar: **Halten**.
+    *   **Manuel Neuer (Bayern):** Ähnlich wie bei Silva eine leicht negative Prognose. Als dein einziger Torwart und mit seiner Klasse ist er aber aktuell unverzichtbar. **Halten**.
 
 ### 3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE
-**Aktives Gebot Nadiem Amiri | Aktion: *abbrechen* | Neues Max Gebot: 0 €**
-*   **Warum:** Dein aktuelles Gebot von 28,3 Mio. € ist ein massives Übergebot und wird von der Systemlogik klar als "abbrechen" markiert. Es bindet unnötig Kapital, das du für intelligentere, kurzfristige Trades mit höherem Gewinnpotenzial nutzen kannst. Bitte ziehe dieses Gebot sofort zurück.
 
-**Kauf Ramon Hendriks (Stuttgart, Abwehr) | Priorität A | Max Gebot 6.780.000 € | Rolle: Trader**
-*   **Warum jetzt:** Hendriks läuft in nur zwei Stunden aus und hat mit +214.000 € die höchste prognostizierte Marktwertsteigerung unter den kurzfristig verfügbaren Spielern. Er ist ein etablierter Stammspieler. Eine Nasenverletzung von Ende Januar scheint vollständig auskuriert zu sein. Der Markt ist umkämpft, aber ein Gebot bis zur empfohlenen Obergrenze ist ein kalkuliertes Risiko für einen schnellen Gewinn über Nacht.
+**Aktives Gebot:**
+*   **Aktives Gebot Lucas Höler | Aktion: abbrechen | Neues Max Gebot: keines | Warum:** Dein Gebot von 3.139.345 € für Höler ist laut Systemanalyse zu hoch und blockiert wichtiges Kapital. Die Empfehlung ist klar, das Gebot zurückzuziehen, um dein Budget für profitablere Gelegenheiten freizumachen.
 
-### 4. SPAETERE CHANCEN UND HOLDS
-**Beobachte El Chadaille Bitshiabu (Leipzig, Abwehr) | Zielstrategie: 2-4 Tage | Späteres Max Gebot: 3.300.000 €**
-*   **Warum relevant:** Bitshiabu hat mit +10% eine sehr hohe prozentuale Marktwertprognose. Er ist ein vielversprechendes Talent. Wenn du ihn ohne einen heftigen Bieterkrieg nahe seines Marktwertes bekommen kannst, stellt er ein exzellentes Trading-Asset für die nächsten Tage dar.
+**Neue Kaufempfehlungen:**
+*   **Kauf Max Finkgräfe (Leipzig) | Priorität A | Max Gebot: 750.000 € | Rolle: Trader | Warum jetzt:** Finkgräfe läuft in nur 2 Stunden ab und hat mit +19% die höchste erwartete Marktwertsteigerung unter den kurzfristigen Zielen. Er ist günstig und stellt eine exzellente Gelegenheit für einen schnellen "Overnight-Flip" dar, um dein Budget zu steigern.
 
-**Beobachte Dzenan Pejcinovic (Wolfsburg, Sturm) | Zielstrategie: 2-4 Tage | Späteres Max Gebot: 1.950.000 €**
-*   **Warum relevant:** Mit einer Prognose von +16% hat er das größte prozentuale Wachstumspotenzial auf dem Markt. Allerdings deuten ältere Berichte auf eine ernste Verletzungshistorie hin, darunter Meniskus- und Mittelfußprobleme. Sei hier vorsichtig und biete nur, wenn du ihn sehr günstig als spekulativen Trade bekommst.
+*   **Kauf Hugo Bolin (M'gladbach) | Priorität B | Max Gebot: 584.000 € | Rolle: Trader | Warum jetzt:** Bolin hat mit +27% eine noch höhere prozentuale Prognose und läuft in 4 Stunden aus. Er ist eine sehr gute, günstige Trading-Option. Die Strategie sollte sein, einen Preiskrieg zu vermeiden, aber bis zum empfohlenen Maximalgebot mitzugehen, ist sinnvoll.
 
-**Beobachte Daniel Batz (Mainz, Torwart) | Zielstrategie: Spieltag | Späteres Max Gebot: Marktwert**
-*   **Warum relevant:** Er ist die naheliegendste Option, um deine Torwart-Backup-Position zu besetzen. Aktuell ist seine Marktwertprognose leicht negativ. Greife hier erst zu, wenn sich sein Marktwert stabilisiert oder keine besseren Trading-Optionen mehr verfügbar sind, um dein Geld effektiver einzusetzen.
+*   **Kauf Lukas Klostermann (Leipzig) | Priorität C | Max Gebot: 583.000 € | Rolle: Trader | Warum jetzt:** Eine weitere solide, preiswerte Trading-Option, die in 3 Stunden ausläuft. Das Potenzial ist etwas geringer als bei Finkgräfe und Bolin, aber das Risiko ist minimal. Ideal, wenn du noch Budget für einen dritten kleinen Trade einsetzen möchtest.
+
+### 4. SPÄTERE CHANCEN UND HOLDS
+*   **Beobachte Daniel Batz (Mainz) | Zielstrategie: Kaderbaustein | Späteres Max Gebot: Marktwert | Warum relevant:** Er ist die einzige verfügbare Torwart-Option auf dem Markt und würde deinen mittelfristigen Kaderbedarf decken. Aktuell ist ein Kauf blockiert, da du bereits 3 Spieler von Mainz im Kader hast. Wenn du planst, einen deiner Mainzer (Caci, Sano, Amiri) mittelfristig zu verkaufen, wäre Batz der logische Ersatzkauf.
 
 ### 5. NEWS-CHECK
-Die Recherche hat ergeben, dass die Verletzung von **Ramon Hendriks** (blutige Nase) bereits Ende Januar war und keine Operation erforderte, er sollte also voll einsatzfähig sein. Bei **Dzenan Pejcinovic** gibt es Berichte über schwere Verletzungen aus der Vergangenheit (2024 und 2025), was sein hohes Marktwertpotenzial mit einem gewissen Risiko behaftet. Für die restlichen Kernspieler deines Kaders wie **Andrej Kramarić** oder potenzielle Ziele wie **El Chadaille Bitshiabu** und **Philipp Treu** wurden keine neuen, spielentscheidenden Informationen wie Verletzungen oder Sperren gefunden.
+Für die genannten Kaufkandidaten (Finkgräfe, Bolin, Klostermann) und die kritischen Kaderspieler (Silva, Neuer, Demirović) wurden keine neuen, spielentscheidenden Informationen wie Verletzungen oder bestätigte Rotationen gefunden. Die Entscheidungen basieren daher auf der aktuellen Datenlage.
 
 ### 6. TRADING-PLAN
-Deine Strategie für die nächsten Tage sollte sein, das durch den Abbruch des Amiri-Gebots und den Verkauf von Treu freigesetzte Kapital von rund 69 Mio. € gezielt in 2-3 kurzfristige Trades zu investieren. Konzentriere dich auf Spieler wie Hendriks, die eine hohe Wahrscheinlichkeit auf einen schnellen Marktwertgewinn haben. Das Ziel ist, dein Kapital bis Donnerstag durch schnelle "Flips" zu vermehren, um dann entweder einen hochwertigen Spieler für den Spieltag zu kaufen oder die verbleibenden 6 Kaderplätze mit soliden, steigenden Spielern aufzufüllen.
+*   **Nächste 24 Stunden:** Breche das Gebot für Höler ab. Investiere das freigewordene Budget gezielt in die empfohlenen Low-Cost-Trader wie Finkgräfe und Bolin. Ziel ist es, deren Marktwertsteigerungen bis zum nächsten Update mitzunehmen.
+*   **Nächste 2-4 Tage:** Verkaufe die eingekauften Trader mit Gewinn. Halte deine Core-Spieler, da die Marktknappheit hoch ist. Analysiere den Markt erneut auf Spieler, die du über mehrere Tage halten kannst, um von einem kontinuierlichen Anstieg zu profitieren.
+*   **Langfristig:** Behalte die Torwart-Situation im Auge. Die Kaderlücke ist keine akute Krise, sollte aber vor den letzten Spieltagen geschlossen werden, um flexibel zu bleiben.
 
 ### 7. FRIDAY-CHECK
-Bis Freitagabend müssen folgende Punkte erledigt sein:
-1.  **Kader füllen:** Du musst mindestens 4 weitere Spieler verpflichten, um eine spielfähige Mannschaft aufstellen zu können.
-2.  **Backup-Torwart:** Die offene Position des Ersatztorwarts sollte bis dahin besetzt sein, um kein Risiko für den Spieltag einzugehen.
-3.  **Budget im Plus:** Dein Kontostand muss zwingend positiv sein. Mit der aktuellen Liquidität und einer disziplinierten Gebotsstrategie ist das problemlos erreichbar. Vermeide riskante All-in-Gebote.
+Bis Freitagabend muss dein Kontostand wieder bei mindestens 0 € sein. Die heutige Strategie stellt kein Risiko dar:
+*   Das Abbrechen des Höler-Gebots setzt sofort 3,14 Mio. € frei.
+*   Die empfohlenen Käufe (z.B. Finkgräfe + Bolin) binden nur ca. 1,3 Mio. €.
+*   Du wirst also mit einem komfortablen Plus von über 4 Mio. € aus dem Abend gehen, ohne den negativen Puffer auch nur annähernd zu nutzen. Dein Kader für den Spieltag ist bereits jetzt einsatzbereit.
