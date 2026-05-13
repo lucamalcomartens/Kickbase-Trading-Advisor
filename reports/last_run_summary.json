@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-12T22:43:37.777543Z",
-  "report_date": "12. May 2026",
+  "generated_at": "2026-05-13T22:47:57.048589Z",
+  "report_date": "13. May 2026",
   "own_username": "Luca Malco",
   "own_budget": -58417110.0,
   "own_budget_row": {
@@ -8,49 +8,40 @@
     "Budget": -58417110.0,
     "Current Cash": -58417110.0,
     "Spendable Without Debt": 0.0,
-    "Temporary Negative Buffer": 5701791.660000004,
-    "Available Budget": 5701791.660000004,
-    "Max Negative": -64118901.660000004,
-    "Friday Recovery Need At Floor": 64118901.660000004
+    "Temporary Negative Buffer": 6339479.040000007,
+    "Available Budget": 6339479.040000007,
+    "Max Negative": -64756589.04000001,
+    "Friday Recovery Need At Floor": 64756589.04000001
   },
   "matchday_context": {
     "next_matchday": 34,
     "next_matchday_date": "16-05-2026 15:30",
-    "days_until_next_matchday": 3,
+    "days_until_next_matchday": 2,
     "trading_window_mode": "matchday_close",
     "friday_safety_mode": "active"
   },
   "model_metrics": {
-    "signs_percent": 60.74,
-    "rmse": 38862.05,
-    "mae": 18624.1,
-    "r2": 0.904
+    "signs_percent": 60.63,
+    "rmse": 39067.01,
+    "mae": 18710.25,
+    "r2": 0.902
   },
-  "market_player_count": 15,
+  "market_player_count": 14,
   "squad_player_count": 16,
   "fixture_context_active": true,
   "ai_status": "success",
-  "mail_status": "failed: (535, b'5.7.8 Username and Password not accepted. For more information, go to\\n5.7.8  https://support.google.com/mail/?p=BadCredentials 46e09a7af769-7e367d4fde9sm9685446a34.13 - gsmtp')",
+  "mail_status": "failed: (535, b'5.7.8 Username and Password not accepted. For more information, go to\\n5.7.8  https://support.google.com/mail/?p=BadCredentials d75a77b69052e-5164556c871sm2315751cf.0 - gsmtp')",
   "offer_tracking_summary": {
     "counts": {
-      "active_offers": 1,
+      "active_offers": 0,
       "outbid_offers": 0,
       "won_offers": 0,
       "unresolved_offers": 0
     },
     "recent_outbid": [],
-    "recent_active": [
-      {
-        "player_id": 10049,
-        "player_name": "Hennes Behrens",
-        "offer_amount": 1876989.0,
-        "market_value": 1787034.0,
-        "expires_at": "2026-05-13T02:42:00Z",
-        "last_seen_at": "2026-05-12T22:42:52Z"
-      }
-    ],
+    "recent_active": [],
     "stats": {
-      "active_offer_amount_total": 1876989.0,
+      "active_offer_amount_total": 0.0,
       "recent_outbid_count_7d": 0,
       "recent_outbid_count_14d": 0,
       "avg_outbid_gap": 0.0,
@@ -58,8 +49,210 @@
       "suggested_markup_pct": 0.0,
       "overbid_pressure_level": "low"
     },
+    "debug": {
+      "candidate_count": 0,
+      "examples": [],
+      "structure_examples": [
+        {
+          "path": "root",
+          "node_type": "dict",
+          "keys": [
+            "it",
+            "u",
+            "unm"
+          ],
+          "sample": {
+            "u": "2622703",
+            "unm": "Luca Malco",
+            "it": "<list:25>"
+          }
+        },
+        {
+          "path": "root.it",
+          "node_type": "list",
+          "length": 25
+        },
+        {
+          "path": "root.it[0]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "7226",
+            "pn": "Kane",
+            "tid": "2",
+            "tty": 1,
+            "trp": 70000100,
+            "dt": "2026-05-12T06:13:40Z",
+            "pim": "content/file/48622993193e45f09d696908d75ed523.png"
+          }
+        },
+        {
+          "path": "root.it[1]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "1856",
+            "pn": "Sabitzer",
+            "tid": "3",
+            "tty": 1,
+            "trp": 16728521,
+            "dt": "2026-05-12T01:28:23Z",
+            "pim": "content/file/ed209b2ca67c4784a658521f80baa795.png"
+          }
+        },
+        {
+          "path": "root.it[2]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "2176",
+            "pn": "Höler",
+            "tid": "5",
+            "tty": 2,
+            "trp": 4249687,
+            "dt": "2026-05-11T06:47:32Z",
+            "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"
+          }
+        },
+        {
+          "path": "root.it[3]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "11570",
+            "pn": "Sebulonsen",
+            "tid": "28",
+            "tty": 2,
+            "trp": 2423405,
+            "dt": "2026-05-11T06:47:21Z",
+            "pim": "content/file/f8ad86d8da474048b6156cfd32f2751a.png"
+          }
+        },
+        {
+          "path": "root.it[4]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "12321",
+            "pn": "Simpson-Pusey",
+            "tid": "28",
+            "tty": 2,
+            "trp": 6854415,
+            "dt": "2026-05-11T06:47:10Z",
+            "pim": "content/file/f8ad86d8da474048b6156cfd32f2751a.png"
+          }
+        },
+        {
+          "path": "root.it[5]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "9746",
+            "pn": "Andrés",
+            "tid": "9",
+            "tty": 1,
+            "trp": 5901684,
+            "dt": "2026-05-11T06:45:36Z",
+            "pim": "content/file/2dea6714f704489fa0fb302accce4e8a.png"
+          }
+        },
+        {
+          "path": "root.it[6]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "2120",
+            "pn": "Nartey",
+            "tid": "9",
+            "tty": 1,
+            "trp": 2543511,
+            "dt": "2026-05-11T01:26:17Z",
+            "pim": "content/file/2dea6714f704489fa0fb302accce4e8a.png"
+          }
+        },
+        {
+          "path": "root.it[7]",
+          "node_type": "dict",
+          "keys": [
+            "dt",
+            "pi",
+            "pim",
+            "pn",
+            "tid",
+            "trp",
+            "tty"
+          ],
+          "sample": {
+            "pi": "3475",
+            "pn": "Kaminski",
+            "tid": "28",
+            "tty": 2,
+            "trp": 24330821,
+            "dt": "2026-05-10T17:01:42Z",
+            "pim": "content/file/f8ad86d8da474048b6156cfd32f2751a.png"
+          }
+        }
+      ],
+      "root_type": "dict"
+    },
     "market_debug": {
-      "item_count": 24,
+      "item_count": 23,
       "examples": [
         {
           "path": "market[0]",
@@ -82,28 +275,28 @@
             "st",
             "tid"
           ],
-          "player_id": 118,
-          "player_name": "Vincenzo Grifo",
-          "market_value": 9907599.0,
-          "expires_at": "2026-05-13T14:57:30Z",
+          "player_id": 78,
+          "player_name": "Jonas Hofmann",
+          "market_value": 539034.0,
+          "expires_at": "2026-05-14T18:55:02Z",
           "sample": {
-            "i": "118",
-            "fn": "Vincenzo",
-            "n": "Grifo",
-            "tid": "5",
+            "i": "78",
+            "fn": "Jonas",
+            "n": "Hofmann",
+            "tid": "7",
             "pos": 3,
             "st": 0,
-            "mvt": 2,
-            "mv": 9907599,
-            "p": 2294,
-            "ap": 72,
+            "mvt": 1,
+            "mv": 539034,
+            "p": 1304,
+            "ap": 59,
             "ofc": 0,
-            "exs": 58478,
-            "prc": 9907599,
-            "isn": false,
+            "exs": 72445,
+            "prc": 539034,
+            "isn": true,
             "iposl": false,
-            "dt": "2026-05-12T03:04:29Z",
-            "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"
+            "dt": "2026-05-13T17:05:01Z",
+            "pim": "content/file/353820bceb58462590ea1a470cde9cc6.png"
           }
         },
         {
@@ -127,28 +320,28 @@
             "st",
             "tid"
           ],
-          "player_id": 163,
-          "player_name": "Niklas Süle",
-          "market_value": 561690.0,
-          "expires_at": "2026-05-13T00:12:50Z",
+          "player_id": 237,
+          "player_name": "Manuel Neuer",
+          "market_value": 5186754.0,
+          "expires_at": "2026-05-14T22:07:35Z",
           "sample": {
-            "i": "163",
-            "fn": "Niklas",
-            "n": "Süle",
-            "tid": "3",
-            "pos": 2,
+            "i": "237",
+            "fn": "Manuel",
+            "n": "Neuer",
+            "tid": "2",
+            "pos": 1,
             "st": 0,
             "mvt": 1,
-            "mv": 561690,
-            "p": 624,
-            "ap": 57,
+            "mv": 5186754,
+            "p": 2038,
+            "ap": 97,
             "ofc": 0,
-            "exs": 5398,
-            "prc": 561690,
-            "isn": false,
+            "exs": 83998,
+            "prc": 5186754,
+            "isn": true,
             "iposl": false,
-            "dt": "2026-05-11T01:54:49Z",
-            "pim": "content/file/ed209b2ca67c4784a658521f80baa795.png"
+            "dt": "2026-05-13T13:55:34Z",
+            "pim": "content/file/48622993193e45f09d696908d75ed523.png"
           }
         },
         {
@@ -172,32 +365,77 @@
             "st",
             "tid"
           ],
-          "player_id": 581,
-          "player_name": "Nicolas Höfler",
+          "player_id": 513,
+          "player_name": "Mario Götze",
           "market_value": 500000.0,
-          "expires_at": "2026-05-13T11:56:59Z",
+          "expires_at": "2026-05-14T15:27:24Z",
           "sample": {
-            "i": "581",
-            "fn": "Nicolas",
-            "n": "Höfler",
-            "tid": "5",
+            "i": "513",
+            "fn": "Mario",
+            "n": "Götze",
+            "tid": "4",
             "pos": 3,
             "st": 0,
             "mvt": 0,
             "mv": 500000,
-            "p": 191,
-            "ap": 16,
+            "p": 658,
+            "ap": 33,
             "ofc": 0,
-            "exs": 47647,
+            "exs": 59987,
             "prc": 500000,
             "isn": false,
             "iposl": false,
-            "dt": "2026-05-11T19:16:58Z",
-            "pim": "content/file/7d6a4935195d414a9119e81aa398222a.png"
+            "dt": "2026-05-13T02:56:23Z",
+            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
           }
         },
         {
           "path": "market[3]",
+          "keys": [
+            "ap",
+            "dt",
+            "exs",
+            "fn",
+            "i",
+            "iposl",
+            "isn",
+            "mv",
+            "mvt",
+            "n",
+            "ofc",
+            "p",
+            "pim",
+            "pos",
+            "prc",
+            "st",
+            "tid"
+          ],
+          "player_id": 577,
+          "player_name": "Daniel Batz",
+          "market_value": 8104596.0,
+          "expires_at": "2026-05-14T22:58:29Z",
+          "sample": {
+            "i": "577",
+            "fn": "Daniel",
+            "n": "Batz",
+            "tid": "18",
+            "pos": 1,
+            "st": 0,
+            "mvt": 2,
+            "mv": 8104596,
+            "p": 2049,
+            "ap": 102,
+            "ofc": 0,
+            "exs": 87052,
+            "prc": 8104596,
+            "isn": false,
+            "iposl": false,
+            "dt": "2026-05-13T00:54:28Z",
+            "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"
+          }
+        },
+        {
+          "path": "market[4]",
           "keys": [
             "ap",
             "dt",
@@ -233,57 +471,12 @@
             "p": 858,
             "ap": 61,
             "ofc": 0,
-            "exs": 129341,
-            "prc": 500000,
-            "isn": true,
-            "iposl": false,
-            "dt": "2026-05-12T21:34:32Z",
-            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
-          }
-        },
-        {
-          "path": "market[4]",
-          "keys": [
-            "ap",
-            "dt",
-            "exs",
-            "fn",
-            "i",
-            "iposl",
-            "isn",
-            "mv",
-            "mvt",
-            "n",
-            "ofc",
-            "p",
-            "pim",
-            "pos",
-            "prc",
-            "st",
-            "tid"
-          ],
-          "player_id": 2822,
-          "player_name": "Silas",
-          "market_value": 500000.0,
-          "expires_at": "2026-05-13T09:54:57Z",
-          "sample": {
-            "i": "2822",
-            "fn": "",
-            "n": "Silas",
-            "tid": "18",
-            "pos": 3,
-            "st": 1,
-            "mvt": 0,
-            "mv": 500000,
-            "p": 241,
-            "ap": 30,
-            "ofc": 0,
-            "exs": 40325,
+            "exs": 42656,
             "prc": 500000,
             "isn": false,
             "iposl": false,
-            "dt": "2026-05-12T08:35:56Z",
-            "pim": "content/file/0563ba9a260a4fd0a9c193dc525529b3.png"
+            "dt": "2026-05-12T21:34:32Z",
+            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
           }
         },
         {
@@ -307,28 +500,28 @@
             "st",
             "tid"
           ],
-          "player_id": 2862,
-          "player_name": "Jens Castrop",
-          "market_value": 3034331.0,
-          "expires_at": "2026-05-13T22:24:02Z",
+          "player_id": 1863,
+          "player_name": "Daniel Heuer Fernandes",
+          "market_value": 10892257.0,
+          "expires_at": "2026-05-14T02:04:31Z",
           "sample": {
-            "i": "2862",
-            "fn": "Jens",
-            "n": "Castrop",
-            "tid": "15",
-            "pos": 3,
-            "st": 8,
-            "mvt": 2,
-            "mv": 3034331,
-            "p": 1278,
-            "ap": 49,
+            "i": "1863",
+            "fn": "Daniel",
+            "n": "Heuer Fernandes",
+            "tid": "6",
+            "pos": 1,
+            "st": 0,
+            "mvt": 1,
+            "mv": 10892257,
+            "p": 3051,
+            "ap": 92,
             "ofc": 0,
-            "exs": 85270,
-            "prc": 3034331,
-            "isn": true,
+            "exs": 11814,
+            "prc": 10892257,
+            "isn": false,
             "iposl": false,
-            "dt": "2026-05-12T12:49:01Z",
-            "pim": "content/file/d4b8e5025d3043b3ad48c1f6ac91830d.png"
+            "dt": "2026-05-13T08:27:30Z",
+            "pim": "content/file/6bd6cf911d5b497e977b3e6a4526aef9.png"
           }
         },
         {
@@ -352,28 +545,28 @@
             "st",
             "tid"
           ],
-          "player_id": 2863,
-          "player_name": "Ansgar Knauff",
-          "market_value": 810864.0,
-          "expires_at": "2026-05-14T09:47:37Z",
+          "player_id": 2199,
+          "player_name": "Josha Vagnoman",
+          "market_value": 2141146.0,
+          "expires_at": "2026-05-13T23:40:23Z",
           "sample": {
-            "i": "2863",
-            "fn": "Ansgar",
-            "n": "Knauff",
-            "tid": "4",
-            "pos": 3,
+            "i": "2199",
+            "fn": "Josha",
+            "n": "Vagnoman",
+            "tid": "9",
+            "pos": 2,
             "st": 0,
             "mvt": 2,
-            "mv": 810864,
-            "p": 1257,
-            "ap": 47,
+            "mv": 2141146,
+            "p": 1631,
+            "ap": 63,
             "ofc": 0,
-            "exs": 126285,
-            "prc": 810864,
-            "isn": true,
+            "exs": 3166,
+            "prc": 2141146,
+            "isn": false,
             "iposl": false,
-            "dt": "2026-05-12T22:39:36Z",
-            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
+            "dt": "2026-05-13T04:00:22Z",
+            "pim": "content/file/2dea6714f704489fa0fb302accce4e8a.png"
           }
         },
         {
@@ -397,28 +590,28 @@
             "st",
             "tid"
           ],
-          "player_id": 3166,
-          "player_name": "Keke Topp",
-          "market_value": 500000.0,
-          "expires_at": "2026-05-13T05:31:13Z",
+          "player_id": 2863,
+          "player_name": "Ansgar Knauff",
+          "market_value": 704910.0,
+          "expires_at": "2026-05-14T09:47:37Z",
           "sample": {
-            "i": "3166",
-            "fn": "Keke",
-            "n": "Topp",
-            "tid": "10",
-            "pos": 4,
-            "st": 1,
-            "mvt": 0,
-            "mv": 500000,
-            "p": 438,
-            "ap": 22,
+            "i": "2863",
+            "fn": "Ansgar",
+            "n": "Knauff",
+            "tid": "4",
+            "pos": 3,
+            "st": 0,
+            "mvt": 2,
+            "mv": 704910,
+            "p": 1257,
+            "ap": 47,
             "ofc": 0,
-            "exs": 24501,
-            "prc": 500000,
+            "exs": 39600,
+            "prc": 704910,
             "isn": false,
             "iposl": false,
-            "dt": "2026-05-11T23:42:12Z",
-            "pim": "content/file/1a88a39549924d048294f618079e8437.png"
+            "dt": "2026-05-12T22:39:36Z",
+            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
           }
         },
         {
@@ -442,34 +635,33 @@
             "st",
             "tid"
           ],
-          "player_id": 3218,
-          "player_name": "Mio Backhaus",
-          "market_value": 10548333.0,
-          "expires_at": "2026-05-13T11:32:28Z",
+          "player_id": 2864,
+          "player_name": "Nnamdi Collins",
+          "market_value": 519573.0,
+          "expires_at": "2026-05-14T20:56:26Z",
           "sample": {
-            "i": "3218",
-            "fn": "Mio",
-            "n": "Backhaus",
-            "tid": "10",
-            "pos": 1,
-            "st": 0,
-            "mvt": 1,
-            "mv": 10548333,
-            "p": 2846,
-            "ap": 92,
+            "i": "2864",
+            "fn": "Nnamdi",
+            "n": "Collins",
+            "tid": "4",
+            "pos": 2,
+            "st": 4,
+            "mvt": 2,
+            "mv": 519573,
+            "p": 1622,
+            "ap": 71,
             "ofc": 0,
-            "exs": 46176,
-            "prc": 10548333,
+            "exs": 79729,
+            "prc": 519573,
             "isn": false,
             "iposl": false,
-            "dt": "2026-05-11T13:42:27Z",
-            "pim": "content/file/1a88a39549924d048294f618079e8437.png"
+            "dt": "2026-05-13T01:55:25Z",
+            "pim": "content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png"
           }
         },
         {
           "path": "market[9]",
           "keys": [
-            "ap",
             "dt",
             "exs",
             "fn",
@@ -480,35 +672,32 @@
             "mvt",
             "n",
             "ofc",
-            "p",
             "pim",
             "pos",
             "prc",
             "st",
             "tid"
           ],
-          "player_id": 3277,
-          "player_name": "Miro Muheim",
-          "market_value": 2170606.0,
-          "expires_at": "2026-05-13T15:38:55Z",
+          "player_id": 4419,
+          "player_name": "Nathan Ngoumou",
+          "market_value": 500000.0,
+          "expires_at": "2026-05-14T13:16:22Z",
           "sample": {
-            "i": "3277",
-            "fn": "Miro",
-            "n": "Muheim",
-            "tid": "6",
-            "pos": 2,
-            "st": 2,
-            "mvt": 2,
-            "mv": 2170606,
-            "p": 1912,
-            "ap": 68,
+            "i": "4419",
+            "fn": "Nathan",
+            "n": "Ngoumou",
+            "tid": "15",
+            "pos": 3,
+            "st": 4,
+            "mvt": 0,
+            "mv": 500000,
             "ofc": 0,
-            "exs": 60963,
-            "prc": 2170606,
+            "exs": 52125,
+            "prc": 500000,
             "isn": false,
             "iposl": false,
-            "dt": "2026-05-12T06:28:54Z",
-            "pim": "content/file/6bd6cf911d5b497e977b3e6a4526aef9.png"
+            "dt": "2026-05-12T20:25:21Z",
+            "pim": "content/file/d4b8e5025d3043b3ad48c1f6ac91830d.png"
           }
         }
       ],
@@ -518,46 +707,25 @@
   "strategy_context": {
     "management_summary": {
       "own_budget": -58417110.0,
-      "active_offer_amount_total": 1876989.0,
-      "effective_cash_after_active_offers": -60294099.0,
+      "active_offer_amount_total": 0.0,
+      "effective_cash_after_active_offers": -58417110.0,
       "overbid_pressure_level": "low",
       "suggested_markup_pct": 0.0,
       "recent_outbid_count_14d": 0,
       "avg_outbid_gap": 0.0,
       "avg_outbid_gap_pct": 0.0,
-      "active_offer_count": 1,
+      "active_offer_count": 0,
       "unmatched_active_offer_count": 0,
       "action_counts": {
         "hold": 0,
-        "raise_small": 1,
+        "raise_small": 0,
         "abort": 0
       },
       "validation_notes": [
         "Aktive Gebote binden mehr Kapital als aktuell als Budget ausgewiesen ist."
       ]
     },
-    "active_offer_actions": [
-      {
-        "player_name": "Hennes Behrens",
-        "player_id": 10049,
-        "current_offer_amount": 1876989.0,
-        "market_value": 1787034.0,
-        "competitive_bid_max": 1908565.0,
-        "recommended_bid_max": 1908565.0,
-        "recommended_action": "raise_small",
-        "recommended_action_label": "leicht erhoehen",
-        "recommended_new_bid": 1908565.0,
-        "decision_reason": "competitive_headroom_available",
-        "decision_reason_label": "Leicht anheben: Das Profil ist umkaempft und dein aktuelles Gebot liegt unter dem Wettbewerbsniveau.",
-        "expires_at": "2026-05-13T02:42:00Z",
-        "match_found": true,
-        "market_index": 0,
-        "priority_score": 78.7,
-        "buy_action": "buy_now",
-        "recent_bid_competition": "high",
-        "asset_role": "short_term_trade"
-      }
-    ],
+    "active_offer_actions": [],
     "recent_outbid": [],
     "validation_notes": [
       "Aktive Gebote binden mehr Kapital als aktuell als Budget ausgewiesen ist."
@@ -621,20 +789,20 @@
     },
     "buy_gates": {
       "blocked_count": 0,
-      "managed_existing_offer_count": 1,
+      "managed_existing_offer_count": 0,
       "club_limit_blocks": 0,
       "budget_blocks": 0,
-      "sell_first_flags": 1,
+      "sell_first_flags": 2,
       "available_cash": 0.0,
-      "available_budget": 5701791.66,
+      "available_budget": 6339479.04,
       "squad_size": 16,
       "squad_limit": 17,
       "sell_candidates": 0
     },
     "purchase_review": {
       "recent_purchase_count": 27,
-      "good_count": 11,
-      "neutral_count": 14,
+      "good_count": 12,
+      "neutral_count": 13,
       "poor_count": 2,
       "model_misaligned_count": 0,
       "realized_count": 15,
@@ -645,41 +813,19 @@
         {
           "player_name": "Kane",
           "purchase_price": 70000100.0,
-          "benchmark_value": 66424504.0,
-          "profit_delta": -3575596.0,
+          "benchmark_value": 66460247.0,
+          "profit_delta": -3539853.0,
           "verdict": "poor",
-          "signal_alignment": "unknown",
-          "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
-          "status_label": "noch im Kader",
-          "held_days": 0.7
-        },
-        {
-          "player_name": "Sabitzer",
-          "purchase_price": 16728521.0,
-          "benchmark_value": 16568965.0,
-          "profit_delta": -159556.0,
-          "verdict": "neutral",
-          "signal_alignment": "unknown",
-          "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
-          "status_label": "noch im Kader",
-          "held_days": 0.9
-        },
-        {
-          "player_name": "Andrés",
-          "purchase_price": 5901684.0,
-          "benchmark_value": 6261705.0,
-          "profit_delta": 360021.0,
-          "verdict": "good",
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
           "status_label": "noch im Kader",
           "held_days": 1.7
         },
         {
-          "player_name": "Nartey",
-          "purchase_price": 2543511.0,
-          "benchmark_value": 2651374.0,
-          "profit_delta": 107863.0,
+          "player_name": "Sabitzer",
+          "purchase_price": 16728521.0,
+          "benchmark_value": 16675958.0,
+          "profit_delta": -52563.0,
           "verdict": "neutral",
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
@@ -687,15 +833,37 @@
           "held_days": 1.9
         },
         {
-          "player_name": "Lienhart",
-          "purchase_price": 5391823.0,
-          "benchmark_value": 5547639.0,
-          "profit_delta": 155816.0,
+          "player_name": "Andrés",
+          "purchase_price": 5901684.0,
+          "benchmark_value": 6505799.0,
+          "profit_delta": 604115.0,
+          "verdict": "good",
+          "signal_alignment": "unknown",
+          "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
+          "status_label": "noch im Kader",
+          "held_days": 2.7
+        },
+        {
+          "player_name": "Nartey",
+          "purchase_price": 2543511.0,
+          "benchmark_value": 2768918.0,
+          "profit_delta": 225407.0,
           "verdict": "neutral",
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
           "status_label": "noch im Kader",
-          "held_days": 3.2
+          "held_days": 2.9
+        },
+        {
+          "player_name": "Lienhart",
+          "purchase_price": 5391823.0,
+          "benchmark_value": 5667595.0,
+          "profit_delta": 275772.0,
+          "verdict": "neutral",
+          "signal_alignment": "unknown",
+          "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
+          "status_label": "noch im Kader",
+          "held_days": 4.2
         },
         {
           "player_name": "Sebulonsen",
@@ -711,91 +879,91 @@
         {
           "player_name": "Dinkçi",
           "purchase_price": 3889935.0,
-          "benchmark_value": 4442931.0,
-          "profit_delta": 552996.0,
+          "benchmark_value": 4705150.0,
+          "profit_delta": 815215.0,
           "verdict": "good",
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
           "status_label": "noch im Kader",
-          "held_days": 3.6
+          "held_days": 4.6
         },
         {
           "player_name": "Brandt",
           "purchase_price": 21227526.0,
-          "benchmark_value": 21366518.0,
-          "profit_delta": 138992.0,
+          "benchmark_value": 21533961.0,
+          "profit_delta": 306435.0,
           "verdict": "good",
           "signal_alignment": "unknown",
           "signal_note": "Kein passender Marktsnapshot vor dem Kauf gefunden.",
           "status_label": "noch im Kader",
-          "held_days": 5.8
+          "held_days": 6.8
         }
       ]
     }
   },
   "top_market_candidates": [
     {
-      "player": "Dzenan Pejcinovic",
-      "team_name": "Wolfsburg",
-      "priority_score": 85.2,
+      "player": "Josha Vagnoman",
+      "team_name": "Stuttgart",
+      "priority_score": 65.1,
       "asset_role": "short_term_trade",
-      "predicted_mv_change": 202035.84,
-      "recommended_bid_max": 4331724.0,
-      "competitive_bid_max": 4331724.0,
+      "predicted_mv_change": 41913.74,
+      "recommended_bid_max": 2161265.0,
+      "competitive_bid_max": 2161265.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 6.54,
+      "hours_to_exp": 0.88,
       "next_opponent": null,
       "fixture_difficulty": null
     },
     {
-      "player": "Hennes Behrens",
-      "team_name": "Heidenheim",
-      "priority_score": 78.7,
-      "asset_role": "short_term_trade",
-      "predicted_mv_change": 253188.71,
-      "recommended_bid_max": 1908565.0,
-      "competitive_bid_max": 1908565.0,
-      "recent_bid_competition": "high",
-      "hours_to_exp": 3.99,
-      "next_opponent": "1. FSV Mainz 05",
-      "fixture_difficulty": "medium"
-    },
-    {
-      "player": "Cédric Zesiger",
-      "team_name": "Augsburg",
-      "priority_score": 62.1,
-      "asset_role": "short_term_trade",
-      "predicted_mv_change": 111365.26,
-      "recommended_bid_max": 6049234.0,
-      "competitive_bid_max": 6049234.0,
-      "recent_bid_competition": "high",
-      "hours_to_exp": 6.84,
-      "next_opponent": "1. FC Union Berlin",
-      "fixture_difficulty": "good"
-    },
-    {
-      "player": "Jean-Luc Dompé",
+      "player": "Daniel Heuer Fernandes",
       "team_name": "Hamburg",
-      "priority_score": 59.5,
-      "asset_role": "medium_term_hold",
-      "predicted_mv_change": -49905.78,
-      "recommended_bid_max": 594128.0,
-      "competitive_bid_max": 594128.0,
+      "priority_score": 63.8,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 38024.22,
+      "recommended_bid_max": 10910509.0,
+      "competitive_bid_max": 10910509.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 1.23,
+      "hours_to_exp": 3.28,
       "next_opponent": "Bayer 04 Leverkusen",
       "fixture_difficulty": "medium"
     },
     {
-      "player": "Senne Lynen",
-      "team_name": "Bremen",
-      "priority_score": 59.3,
-      "asset_role": "short_term_trade",
-      "predicted_mv_change": 128141.41,
-      "recommended_bid_max": 6455142.0,
-      "competitive_bid_max": 6455142.0,
+      "player": "Manuel Neuer",
+      "team_name": "Bayern",
+      "priority_score": 56.9,
+      "asset_role": "medium_term_hold",
+      "predicted_mv_change": 160503.5,
+      "recommended_bid_max": 5244535.0,
+      "competitive_bid_max": 5244535.0,
       "recent_bid_competition": "high",
-      "hours_to_exp": 14.48,
+      "hours_to_exp": 23.33,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "Christian Kofane",
+      "team_name": "Leverkusen",
+      "priority_score": 56.6,
+      "asset_role": "medium_term_hold",
+      "predicted_mv_change": -38625.67,
+      "recommended_bid_max": 3716711.0,
+      "competitive_bid_max": 3716711.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": 27.39,
+      "next_opponent": null,
+      "fixture_difficulty": null
+    },
+    {
+      "player": "nan Arthur",
+      "team_name": "Leverkusen",
+      "priority_score": 54.7,
+      "asset_role": "short_term_trade",
+      "predicted_mv_change": 47777.11,
+      "recommended_bid_max": 904867.0,
+      "competitive_bid_max": 904867.0,
+      "recent_bid_competition": "high",
+      "hours_to_exp": null,
       "next_opponent": null,
       "fixture_difficulty": null
     }
@@ -804,9 +972,9 @@
     {
       "player": "Philipp Lienhart",
       "team_name": "Freiburg",
-      "sell_priority_score": 18.7,
+      "sell_priority_score": 18.5,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 157400.65,
+      "predicted_mv_change": 91653.6,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -814,9 +982,9 @@
     {
       "player": "Denis Vavro",
       "team_name": "Wolfsburg",
-      "sell_priority_score": 15.5,
+      "sell_priority_score": 15.3,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 141585.77,
+      "predicted_mv_change": 117246.82,
       "s_11_prob": null,
       "next_opponent": null,
       "fixture_difficulty": null
@@ -824,9 +992,9 @@
     {
       "player": "Eren Sami Dinkçi",
       "team_name": "Heidenheim",
-      "sell_priority_score": 15.5,
+      "sell_priority_score": 15.3,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 233710.67,
+      "predicted_mv_change": 214456.3,
       "s_11_prob": null,
       "next_opponent": "1. FSV Mainz 05",
       "fixture_difficulty": "medium"
@@ -834,9 +1002,9 @@
     {
       "player": "Finn Dahmen",
       "team_name": "Augsburg",
-      "sell_priority_score": 15.4,
+      "sell_priority_score": 15.2,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 56076.85,
+      "predicted_mv_change": 35030.31,
       "s_11_prob": null,
       "next_opponent": "1. FC Union Berlin",
       "fixture_difficulty": "good"
@@ -844,17 +1012,17 @@
     {
       "player": "Chrislain Matsima",
       "team_name": "Augsburg",
-      "sell_priority_score": 15.4,
+      "sell_priority_score": 15.2,
       "squad_role": "rotation_hold",
-      "predicted_mv_change": 232004.2,
+      "predicted_mv_change": 189419.98,
       "s_11_prob": null,
       "next_opponent": "1. FC Union Berlin",
       "fixture_difficulty": "good"
     }
   ],
-  "budget_table": "      User      Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor\n      Till  98.639.237 224.038.627    98.639.237  -106.483.695       205.122.932              98.639.237                106.483.695                    106.483.695\n     David  93.613.439 219.253.662    93.613.439  -103.246.143       196.859.582              93.613.439                103.246.143                    103.246.143\n FlippiXxp  56.618.163 335.593.257    56.618.163  -129.429.769       186.047.932              56.618.163                129.429.769                    129.429.769\n       Rob  70.013.516 246.100.825    70.013.516  -104.317.733       174.331.249              70.013.516                104.317.733                    104.317.733\n      joel  67.560.216 219.365.674    67.560.216   -94.685.544       162.245.760              67.560.216                 94.685.544                     94.685.544\n     Jonas  69.985.289 154.093.781    69.985.289   -73.946.093       143.931.382              69.985.289                 73.946.093                     73.946.093\n       Jan  39.698.027 223.423.930    39.698.027   -86.830.246       126.528.273              39.698.027                 86.830.246                     86.830.246\nLuca Malco -58.417.110 252.716.812   -58.417.110   -64.118.902         5.701.792                       0                  5.701.792                     64.118.902",
-  "market_table": " first_name  last_name  team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid        buy_gate_status              buy_gate_reason  effective_bid_cap hours_to_exp\n     Dzenan Pejcinovic  Wolfsburg  4.234.747              202.036              85           4.331.724            4.331.724                   high aggressive_only_if_priority_a             ST              high                   0                        0                  stable                                      0                     -                                -             sell_first sell_first_insufficient_cash          4.331.724            7\n     Hennes    Behrens Heidenheim  1.787.034              253.189              79           1.908.565            1.908.565                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0           raise_small                        1.908.565 managed_existing_offer        manage_existing_offer          1.908.565            4\n     Cédric    Zesiger   Augsburg  5.995.779              111.365              62           6.049.234            6.049.234                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -                  clear                                       5.701.792            7\n   Jean-Luc      Dompé    Hamburg    594.128              -49.906              60             594.128              594.128                   high               avoid_price_war             ST              high                   0                        0                  stable                                      0                     -                                -                  clear                                         594.128            1\n      Senne      Lynen     Bremen  6.393.634              128.141              59           6.455.142            6.455.142                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                       5.701.792           14\n          -     Arthur Leverkusen    819.721               66.894              59             851.830              851.830                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -                  clear                                         851.830            -\n        Mio   Backhaus     Bremen 10.548.333               63.252              54          10.578.694           10.578.694                   high aggressive_only_if_priority_a             GK              none                   0                        0                  stable                                      0                     -                                -                  clear                                       5.701.792           13\n     Niklas       Süle   Dortmund    561.690              -38.304              51             561.690              561.690                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -                  clear                                         561.690            2\n   Vincenzo      Grifo   Freiburg  9.907.599              -50.687              44           9.907.599            9.907.599                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                       5.701.792           16\n      Yuito     Suzuki   Freiburg  4.326.802             -126.613              44           4.326.802            4.326.802                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                       4.326.802            4\nBara Sapoko     Ndiaye     Bayern  2.407.556              -95.145              32           2.407.556            2.407.556                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                       2.407.556            9\n       Jens    Castrop M'gladbach  3.034.331             -125.413              31           3.034.331            3.034.331                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                       3.034.331           24\n       Miro     Muheim    Hamburg  2.170.606             -121.041              29           2.170.606            2.170.606                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -                  clear                                       2.170.606           17\n       Hugo      Bolin M'gladbach    612.127              -81.656              26             612.127              612.127                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                         612.127           23\n     Ansgar     Knauff  Frankfurt    810.864             -103.573              21             810.864              810.864                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -                  clear                                         810.864           35",
-  "squad_table": "first_name last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob            next_opponent\n   Philipp  Lienhart   Freiburg  5.547.639              157.401                   19 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Denis     Vavro  Wolfsburg  7.648.770              141.586                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n Eren Sami    Dinkçi Heidenheim  4.442.931              233.711                   16 rotation_hold              model_only                   0                        0                  stable                                  0         -          1. FSV Mainz 05\n      Finn    Dahmen   Augsburg 10.441.065               56.077                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -       1. FC Union Berlin\n Chrislain   Matsima   Augsburg  4.991.352              232.004                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -       1. FC Union Berlin\n     Chema    Andrés  Stuttgart  6.261.705              223.420                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Albert   Grønbæk    Hamburg  2.594.124              178.871                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -      Bayer 04 Leverkusen\n   Nikolas    Nartey  Stuttgart  2.651.374              187.111                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Jonas     Urbig     Bayern  5.475.484               43.963                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Harry      Kane     Bayern 66.424.504               29.429                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n    Ridle       Baku    Leipzig 26.227.054               32.542                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n    Nadiem     Amiri      Mainz 28.446.342               62.831                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -    1. FC Heidenheim 1846\n    Kaishu      Sano      Mainz 15.998.819               65.250                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -    1. FC Heidenheim 1846\n    Marcel  Sabitzer   Dortmund 16.568.965              111.810                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n    Andrej  Kramarić Hoffenheim 27.630.166              112.851                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         - Borussia Mönchengladbach",
-  "ai_excerpt": "Hallo Luca, hier ist deine Abendstrategie. Die Lage ist kritisch, aber mit den richtigen Schritten bekommen wir das hin. ### 1. TEAMSTATUS Dein Budget ist mit **-58,4 Mio. Euro** massiv im Minus. Da der `FRIDAY_SAFETY_MODE` aktiv ist, hat die Herstellung deiner Zahlungsfähigkeit bis Freitag absolute Priorität. Jeder Kauf ist aktuell blockiert, bis du signifikant Kapital freisetzt (`sell_first`). Gleichzeitig klafft in deinem Kader eine strukturelle Lücke, da dir ein zweiter Stürmer fehlt. Dein Handlungsbedarf ist daher zweigeteilt und extrem dringend: Du musst verkaufen, um liquide zu werden, ",
-  "ai_full_text": "Hallo Luca, hier ist deine Abendstrategie. Die Lage ist kritisch, aber mit den richtigen Schritten bekommen wir das hin.\n\n### 1. TEAMSTATUS\nDein Budget ist mit **-58,4 Mio. Euro** massiv im Minus. Da der `FRIDAY_SAFETY_MODE` aktiv ist, hat die Herstellung deiner Zahlungsfähigkeit bis Freitag absolute Priorität. Jeder Kauf ist aktuell blockiert, bis du signifikant Kapital freisetzt (`sell_first`). Gleichzeitig klafft in deinem Kader eine strukturelle Lücke, da dir ein zweiter Stürmer fehlt. Dein Handlungsbedarf ist daher zweigeteilt und extrem dringend: Du musst verkaufen, um liquide zu werden, und dann gezielt die Stürmerposition besetzen, um für den Spieltag am Samstag bereit zu sein.\n\n### 2. VERKAUFS-BEFEHLE\nUm dein Konto aus dem tiefroten Bereich zu holen, sind drastische Massnahmen unumgänglich. Das Halten aller Stars ist bei diesem Kontostand keine Option.\n\n*   **Verkaufe Nadiem Amiri (28,4 Mio. €):** Er ist einer deiner teuersten Spieler, hat aber nur eine minimale prognostizierte Marktwertsteigerung. Der Verkauf schafft sofort finanziellen Spielraum.\n*   **Verkaufe Andrej Kramarić (27,6 Mio. €):** Ähnlich wie bei Amiri bindet er enormes Kapital für wenig kurzfristiges Wachstum. Der kombinierte Verkauf dieser beiden Spieler ist der entscheidende Hebel, um dein Budgetproblem zu lösen und Handlungsfähigkeit zurückzugewinnen.\n\nDurch diese beiden Verkäufe würdest du rund **56 Mio. Euro** einnehmen und deinen Kontostand auf ca. -2,4 Mio. Euro verbessern. Diese Restschuld kann durch die Marktwertgewinne deines restlichen Kaders bis Freitag ausgeglichen werden.\n\n### 3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE\nAlle Käufe stehen unter dem Vorbehalt der erfolgreichen Verkäufe von Amiri und Kramarić.\n\n*   **Aktives Gebot Hennes Behrens | Aktion: leicht erhöhen | Neues Max Gebot: 1.908.565 € | Warum:** Die Systemlogik empfiehlt eine leichte Erhöhung, da dein Gebot unter dem Wettbewerbsniveau liegt. Mit einer prognostizierten Steigerung von 14% ist er ein exzellenter kurzfristiger Trade, um schnell Gewinn zu machen. Da die Kosten überschaubar sind, solltest du hier mitgehen, sobald das Geld aus den Verkäufen da ist.\n\n*   **Kauf Dzenan Pejcinovic | Priorität A | Max Gebot: 4.331.724 € | Rolle: Trader & Kaderfüller | Warum jetzt:** Pejcinovic ist die klare Top-Priorität. Er schliesst deine kritische Lücke im Sturm, hat mit +202k eine gute Wachstumsprognose und läuft in wenigen Stunden aus. Er ist die perfekte Kombination aus sportlicher Notwendigkeit und Trading-Potenzial. Das Gebot ist nur nach den Verkäufen möglich.\n\n*   **Cédric Zesiger | Nicht kaufen:** Konzentriere dein Kapital vollständig auf Pejcinovic, um die wichtigste Kaderlücke zu schliessen.\n\n### 4. SPAETERE CHANCEN UND HOLDS\nAktuell gibt es keine späteren Chancen, die deine Aufmerksamkeit erfordern. Der volle Fokus liegt auf der sofortigen Sanierung deines Budgets und der Sicherung eines spielfähigen Kaders für den letzten Spieltag.\n\n### 5. NEWS-CHECK\nDie Recherche hat ergeben, dass die meisten deiner Spieler fit und einsatzbereit sind.\n\n*   **Dzenan Pejcinovic:** Ältere Berichte aus Mai 2024 und März 2025 erwähnen Mittelfussverletzungen, aber neuere Informationen deuten auf eine Rückkehr in die Startelf hin. Ein Bericht vom 7. Mai 2026 nennt ihn explizit als wahrscheinlichen Starter gegen die Bayern. Es gibt keine aktuellen, negativen Informationen, die gegen einen Kauf sprechen.\n*   **Nadiem Amiri:** Berichte von Anfang April und Ende Februar 2026 bestätigen eine hartnäckige Fersenverletzung, die ihn zu einer längeren Pause zwang. Es gibt keine brandneuen Meldungen über seinen aktuellen Status, was ein kleines Restrisiko bedeutet.\n*   **Harry Kane:** Ältere Meldungen aus April 2026 zeigen, dass er nach einer kleineren Verletzung wieder voll im Training ist. Er ist fit.\n*   **Andrej Kramarić & Ridle Baku:** Es wurden keine relevanten negativen Nachrichten über Verletzungen oder Sperren gefunden.\n\nDie Nachrichtenlage stützt die vorgeschlagene Strategie. Das geringe Restrisiko bei Amiri macht einen Verkauf zusätzlich vertretbar.\n\n### 6. TRADING-PLAN\nDeine Strategie für die nächsten Tage ist klar auf die Wiederherstellung der finanziellen Stabilität und die Spieltags-Readiness ausgerichtet:\n\n1.  **Heute (Mittwoch):** Setze Amiri und Kramarić sofort auf den Transfermarkt. Erhöhe parallel das Gebot für Behrens und platziere das Gebot für Pejcinovic, damit es ausgeführt wird, sobald die Verkäufe durchgehen.\n2.  **Morgen (Donnerstag):** Überprüfe die Marktwertentwicklung deiner Neuzugänge. Halte deinen Kader stabil und nimm die prognostizierten Gewinne mit.\n3.  **Freitag:** Stelle sicher, dass dein Kontostand positiv ist. Stelle deine finale Aufstellung für den Spieltag auf, mit Pejcinovic als zweitem Stürmer.\n\n### 7. FRIDAY-CHECK\nBis Freitagabend müssen folgende Punkte erledigt sein, um die Regeln einzuhalten:\n\n*   **Budget >= 0 Euro:** Die Verkäufe von Amiri und Kramarić müssen abgeschlossen sein. Die prognostizierten Marktwertgewinne des restlichen Kaders sollten die verbleibende Lücke schliessen.\n*   **Funktionierendes Team:** Du musst eine vollständige, gültige Aufstellung für den 34. Spieltag haben. Mit dem Kauf von Pejcinovic ist die Stürmer-Position besetzt und dein Kader mit dann 16 Spielern (nach 2 Verkäufen und 1 Kauf) einsatzbereit."
+  "budget_table": "      User      Budget  Team Value  Current Cash  Max Negative  Available Budget  Spendable Without Debt  Temporary Negative Buffer  Friday Recovery Need At Floor\n     David  93.613.439 219.222.007    93.613.439  -103.235.697       196.849.136              93.613.439                103.235.697                    103.235.697\n      Till  88.408.711 236.319.779    88.408.711  -107.160.402       195.569.113              88.408.711                107.160.402                    107.160.402\n       Rob  70.013.516 247.226.139    70.013.516  -104.689.086       174.702.602              70.013.516                104.689.086                    104.689.086\n FlippiXxp  42.238.874 348.005.065    42.238.874  -128.780.500       171.019.374              42.238.874                128.780.500                    128.780.500\n      joel  69.560.216 228.829.136    69.560.216   -98.468.486       168.028.702              69.560.216                 98.468.486                     98.468.486\n     Jonas  69.985.289 152.928.811    69.985.289   -73.561.653       143.546.942              69.985.289                 73.561.653                     73.561.653\n       Jan  39.698.027 224.079.515    39.698.027   -87.046.589       126.744.616              39.698.027                 87.046.589                     87.046.589\nLuca Malco -58.417.110 254.649.198   -58.417.110   -64.756.589         6.339.479                       0                  6.339.479                     64.756.589",
+  "market_table": "first_name       last_name  team_name         mv  predicted_mv_change  priority_score recommended_bid_max  competitive_bid_max recent_bid_competition             bid_strategy_note position_label roster_need_level  team_missing_count  team_questionable_count team_availability_level  team_availability_priority_adjustment active_offer_decision active_offer_recommended_new_bid buy_gate_status              buy_gate_reason  effective_bid_cap hours_to_exp\n     Josha        Vagnoman  Stuttgart  2.141.146               41.914              65           2.161.265            2.161.265                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -      sell_first sell_first_insufficient_cash          2.161.265            1\n    Daniel Heuer Fernandes    Hamburg 10.892.257               38.024              64          10.910.509           10.910.509                   high aggressive_only_if_priority_a             GK              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.339.479            3\n    Manuel           Neuer     Bayern  5.186.754              160.504              57           5.244.535            5.244.535                   high               avoid_price_war             GK              none                   0                        0                  stable                                      0                     -                                -           clear                                       5.244.535           23\n Christian          Kofane Leverkusen  3.716.711              -38.626              57           3.716.711            3.716.711                   high               avoid_price_war             ST              high                   0                        0                  stable                                      0                     -                                -      sell_first sell_first_insufficient_cash          3.716.711           27\n         -          Arthur Leverkusen    881.934               47.777              55             904.867              904.867                   high aggressive_only_if_priority_a            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                         904.867            -\n     Kamil         Grabara  Wolfsburg 14.865.256               58.575              52          14.893.372           14.893.372                   high aggressive_only_if_priority_a             GK              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.339.479           13\nDeniz Emre            Ofli     Bayern    675.035               -1.478              48             675.035              675.035                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                         675.035            7\n    Daniel            Batz      Mainz  8.104.596               67.280              48           8.128.817            8.128.817                   high               avoid_price_war             GK              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.339.479           24\n   Nicolas         Seiwald    Leipzig 22.466.915               10.993              46          22.470.873           22.470.873                   high aggressive_only_if_priority_a            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.339.479           26\n    Franck         Honorat M'gladbach 12.001.586              -32.766              44          12.001.586           12.001.586                 medium              stay_disciplined            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                       6.339.479           30\n    Warmed           Omari    Hamburg  2.410.249              -58.187              38           2.410.249            2.410.249                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                       2.410.249           14\n    Nnamdi         Collins  Frankfurt    519.573              -18.802              32             519.573              519.573                   high               avoid_price_war            DEF              none                   0                        0                  stable                                      0                     -                                -           clear                                         519.573           22\n     Jonas         Hofmann Leverkusen    539.034              -28.793              30             539.034              539.034                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                         539.034           20\n    Ansgar          Knauff  Frankfurt    704.910              -93.503              26             704.910              704.910                   high               avoid_price_war            MID              none                   0                        0                  stable                                      0                     -                                -           clear                                         704.910           11",
+  "squad_table": "first_name last_name  team_name         mv  predicted_mv_change  sell_priority_score    squad_role     squad_strategy_note  team_missing_count  team_questionable_count team_availability_level  team_availability_sell_adjustment s_11_prob            next_opponent\n   Philipp  Lienhart   Freiburg  5.667.595               91.654                   18 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Denis     Vavro  Wolfsburg  7.789.193              117.247                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n Eren Sami    Dinkçi Heidenheim  4.705.150              214.456                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -          1. FSV Mainz 05\n      Finn    Dahmen   Augsburg 10.488.848               35.030                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -       1. FC Union Berlin\n Chrislain   Matsima   Augsburg  5.228.344              189.420                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -       1. FC Union Berlin\n     Chema    Andrés  Stuttgart  6.505.799              202.390                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n     Jonas     Urbig     Bayern  5.497.610               -3.228                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n   Nikolas    Nartey  Stuttgart  2.768.918              100.265                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -                        -\n    Albert   Grønbæk    Hamburg  2.750.369              127.459                   15 rotation_hold              model_only                   0                        0                  stable                                  0         -      Bayer 04 Leverkusen\n    Ridle       Baku    Leipzig 26.247.278               16.402                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n     Harry      Kane     Bayern 66.460.247               29.587                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n    Nadiem     Amiri      Mainz 28.512.689               57.484                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -    1. FC Heidenheim 1846\n    Kaishu      Sano      Mainz 16.078.245               62.282                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -    1. FC Heidenheim 1846\n    Marcel  Sabitzer   Dortmund 16.675.958               85.709                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         -                        -\n    Andrej  Kramarić Hoffenheim 27.738.994               97.858                    0  core_starter keep_due_to_thin_market                   0                        0                  stable                                  0         - Borussia Mönchengladbach",
+  "ai_excerpt": "Hallo Luca Malco, hier ist deine Kickbase-Portfolio-Analyse für den Abend. **1. TEAMSTATUS** Dein Kader ist mit 16 von 17 Plätzen fast voll und du hast mit -58.417.110 Euro ein erhebliches Minus. Dein sofort verfügbares Cash ist bei null, dein theoretisches Ausgabenlimit bis zur Negativgrenze liegt bei 6.339.479 Euro. Da heute Donnerstag ist und der `FRIDAY_SAFETY_MODE` aktiv ist, hat das Erreichen eines positiven Kontostands bis morgen oberste Priorität. Der dringendste Kaderbedarf ist ein zweiter Stürmer, was eine echte strukturelle Lücke darstellt. Die mehrfache Belegung von Spielern aus Au",
+  "ai_full_text": "Hallo Luca Malco, hier ist deine Kickbase-Portfolio-Analyse für den Abend.\n\n**1. TEAMSTATUS**\n\nDein Kader ist mit 16 von 17 Plätzen fast voll und du hast mit -58.417.110 Euro ein erhebliches Minus. Dein sofort verfügbares Cash ist bei null, dein theoretisches Ausgabenlimit bis zur Negativgrenze liegt bei 6.339.479 Euro. Da heute Donnerstag ist und der `FRIDAY_SAFETY_MODE` aktiv ist, hat das Erreichen eines positiven Kontostands bis morgen oberste Priorität. Der dringendste Kaderbedarf ist ein zweiter Stürmer, was eine echte strukturelle Lücke darstellt. Die mehrfache Belegung von Spielern aus Augsburg, Stuttgart, Bayern, Mainz und Dortmund (jeweils 2) ist unkritisch, da das Limit von 3 pro Verein nicht überschritten wird.\n\n**2. VERKAUFS-BEFEHLE**\n\nUm dein Budgetproblem schnellstmöglich zu lösen und Handlungsspielraum zu gewinnen, sind Verkäufe unumgänglich.\n\n*   **Verkauf Jonas Urbig (5.497.610 €):** Er hat eine leicht negative Marktwertprognose und als zweiter Torhüter neben Dahmen ist er entbehrlich, um dringend benötigtes Kapital freizumachen.\n*   **Verkauf Philipp Lienhart (5.667.595 €):** Sein `football_signal_score` ist mit 52 der niedrigste unter deinen Verteidigern und seine Marktwertprognose ist nur leicht positiv. Ein Verkauf setzt ebenfalls signifikantes Budget frei.\n\nDiese beiden Verkäufe würden dein Budget um ca. 11,16 Mio. Euro entlasten und dich dem Ziel eines ausgeglichenen Kontos bis Freitag deutlich näherbringen.\n\n**3. SOFORT-KÄUFE BIS ZUM NAECHSTEN UPDATE**\n\nAufgrund deines negativen Kontostands und des `sell_first` Gates für die attraktivsten Kandidaten, ist ein direkter Kauf ohne vorherige Verkäufe nicht möglich.\n\n*   **Kein Kauf von Josha Vagnoman | Priorität C | Rolle: Trader | Warum jetzt:** Trotz seiner positiven Marktwertprognose und der Kennzeichnung als \"Rebound-Kandidat\" ist ein Kauf aufgrund der `sell_first`-Regel und deines Budgets nicht sofort umsetzbar. Zudem deuten ältere Berichte auf eine Verletzungshistorie hin. Eine Meldung von Anfang Mai deutet auf eine baldige Rückkehr hin, ein Restrisiko bleibt aber.\n*   **Kein Kauf von Daniel Heuer Fernandes | Priorität C | Rolle: Hold | Warum jetzt:** Er wäre eine solide Torwart-Option, aber du bist mit Dahmen bereits besetzt. Dein Budget erlaubt diesen Transfer aktuell nicht.\n\n**4. SPÄTERE CHANCEN UND HOLDS**\n\nSobald du durch Verkäufe wieder liquide bist, solltest du den Stürmermarkt beobachten.\n\n*   **Beobachte Christian Kofane | Zielstrategie: Spieltag | Späteres Max Gebot: 3.716.711 € | Warum relevant:** Er ist als Stürmer markiert und würde deine primäre Kaderlücke schließen. Sein Kauf ist aber an die Bedingung geknüpft, dass du zuerst verkaufst (`sell_first_insufficient_cash`). Behalte ihn im Auge, sobald dein Budget es zulässt.\n\n**5. NEWS-CHECK**\n\n*   **Josha Vagnoman:** Ältere Meldungen bestätigen eine Verletzungsanfälligkeit, insbesondere eine Stressreaktion im Fuß im April 2024. Anfang Mai 2026 gab es jedoch die Erwartung, dass er zeitnah zurückkehren könnte.\n*   **Harry Kane:** Es gibt keine Anzeichen für eine Verletzung oder einen Ausfall. Er scheint voll einsatzbereit zu sein.\n*   **Ridle Baku:** Keine negativen Nachrichten gefunden. Er ist fit und einsatzbereit.\n*   **Nadiem Amiri:** Es gibt ältere Berichte über eine hartnäckige Fersenverletzung von Anfang 2026 und eine Rotsperre im Dezember 2024. Es gibt keine aktuellen Hinweise auf eine Sperre oder Verletzung.\n\n**6. TRADING-PLAN**\n\nDeine Strategie für die nächsten 2-4 Tage muss sich voll und ganz auf die Sanierung deines Budgets konzentrieren.\n\n1.  **Priorität 1 (Heute):** Verkaufe Urbig und Lienhart, um einen Großteil des negativen Saldos auszugleichen.\n2.  **Priorität 2 (Morgen):** Bewerte nach den Verkäufen dein neues Budget. Sollte es immer noch negativ sein, müssen weitere Verkäufe aus dem \"rotation_hold\"-Segment (z.B. Nartey oder Matsima) in Betracht gezogen werden.\n3.  **Priorität 3 (Nach Budget-Ausgleich):** Sobald du wieder im Plus bist, kannst du vorsichtig nach einem günstigen Stürmer Ausschau halten, um deine Kaderlücke zu schließen. Vermeide teure Bieterkriege.\n\n**7. FRIDAY-CHECK**\n\nBis morgen Abend, Freitag, 15. Mai 2026, musst du unbedingt einen Kontostand von >= 0 Euro erreichen. Die heute empfohlenen Verkäufe von Urbig und Lienhart sind der entscheidende Schritt, um diese Anforderung zu erfüllen. Stelle sicher, dass du ein spielfähiges Team mit mindestens 11 Spielern hast, bei denen eine hohe Startelfwahrscheinlichkeit besteht. Deine \"core_starter\" sind gesetzt, aber achte darauf, dass du nach den Verkäufen noch genügend fitte Spieler für eine volle Aufstellung hast."
 }
